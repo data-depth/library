@@ -64,8 +64,7 @@ def halfspace(x, data,numDirections=1000,exact=True,method="recursive",
             print("Wrong argument, method=str(recursive) or str(plane) or str(line)")
             print("recursive by default")
             method=3
-        
-        
+
         points_list=data.flatten()
         objects_list=x.flatten()
         points=(c_double*len(points_list))(*points_list)
@@ -96,11 +95,7 @@ def halfspace(x, data,numDirections=1000,exact=True,method="recursive",
 halfspace.__doc__="""
 
 Description
-    Calculates the exact or random Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a
-    multivariate data set.
-
-Usage
-    depth.halfspace(x, data, numDirections, exact, method, solver, NRandom, option, n_refinements, sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+    Calculates the exact or approximated Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a multivariate data set.
 
 Arguments
     x 			
@@ -112,74 +107,70 @@ Arguments
         is to be calculated.
 
     exact			
-        The type of the used method. The default is ``exact=F``, which leads to approx-
-        imate computation of the Tukey depth. For exact=F, ``method= Sunif.1D``
-        is used by default. 
-        If exact=T, the Tukey depth is computed exactly, with ``method= recursive`` by default.
+        The type of the used method. The default is ``exact=False``, which leads to approx-
+        imate computation of the Tukey depth.
+        If ``exact=True``, the Tukey depth is computed exactly, with ``method=recursive`` by default.
 
     method			
-        For exact=F, if ``method=Sunif.1D`` (by default), the Tukey depth is computed
-        approximately by being minimized over univariate projections (see Details below).
-        For exact=T, the Tukey depth is calculated as the minimum over all combinations of k points from data (see Details below).
-        In this case parameter method specifies k, with possible values 1 for ``method= recursive`` (by default), d − 2
-        for ``method= plane``, d − 1 for ``method= line``.
+        For ``exact=True``, the Tukey depth is calculated as the minimum over all combinations of k points from data (see Details below).
+        In this case parameter method specifies k, with possible values 1 for ``method=recursive`` (by default), ``d−2``
+        for ``method=plane``, ``d−1`` for ``method=line``.
         The name of the method may be given as well as just parameter exact, in which
         case the default method will be used.
-
-    num.directions 	
-        Number of random directions to be generated (for ``method= Sunif.1D``). The
-        algorithmic complexity is linear in the number of observations in data, given
-        the number of directions.
-
-    notion 	      
-        {'halfspace', 'mahalanobis', 'zonoid', 'projection', 'aprojection'}, **optional**
-        Which depth will be computed.
                    
     solver 	       
         The type of solver used to approximate the depth.
-        {'simplegrid', 'refinedgrid', 'simplerandom', 'refinedrandom', 'coordinatedescent', 'randomsimplices', 'neldermead','simulatedannealing'}, **optional**
+        {``'simplegrid'``, ``'refinedgrid'``, ``'simplerandom'``, ``'refinedrandom'``, ``'coordinatedescent'``, ``'randomsimplices'``, ``'neldermead'``, ``'simulatedannealing'``}
 
-        
     NRandom 	       
         The total number of iterations to compute the depth. Some solvers are converging 
         faster so they are run several time to achieve ``NRandom`` iterations.
                    
     option                
-        |		If ``option`` = ``1``, only approximated depths are returned.
-        |		If ``option`` = ``2``, best directions to approximate depths are also returned.
-        |		If ``option`` = ``3``, depths calculated at every iteration are also returned.
-        |		If ``option`` = ``4``, random directions used to project depths are also returned with indices of converging for the solver selected.
+        |		If ``option=1``, only approximated depths are returned.
+        |		If ``option=2``, best directions to approximate depths are also returned.
+        |		If ``option=3``, depths calculated at every iteration are also returned.
+        |		If ``option=4``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
     n_refinements         
         Set the maximum of iteration for computing the depth of one point.
-        For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
+        For ``solver=refinedrandom`` or ``refinedgrid``.
                       
     sphcap_shrink         
-        It's the shrinking of the spherical cap. For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
+        It's the shrinking of the spherical cap. For ``solver=refinedrandom`` or ``refinedgrid``.
 
     alpha_Dirichlet       
-        It's the parameter of the Dirichlet distribution. For ``solver`` = ``randomsimplices``. 
+        It's the parameter of the Dirichlet distribution. For ``solver=randomsimplices``.
 
     cooling_factor        
-        It's the cooling factor. For ``solver`` = ``randomsimplices``.
+        It's the cooling factor. For ``solver=randomsimplices``.
 
     cap_size              
-        It's the size of the spherical cap. For ``solver`` = ``simulatedannealing`` or ``neldermead``. 
+        It's the size of the spherical cap. For ``solver=simulatedannealing`` or ``neldermead``.
 
     start                
-        {'mean', 'random'}, **optional**
-        For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the method used to compute the first depth.
+        {'mean', 'random'}.
+        For ``solver=simulatedannealing`` or ``neldermead``, it's the method used to compute the first depth.
                       
     space         
-        {'sphere', 'euclidean'}, **optional**
+        {``'sphere'``, ``'euclidean'``}.
         For ``solver`` = ``coordinatedescent`` or ``neldermead``, it's the type of spacecin which the solver is running.
                       
     line_solver           
-        {'uniform', 'goldensection'}, **optional**
-        For ``solver`` = ``coordinatedescent``, it's the line searh strategy used by this solver.
+        {``'uniform'``, ``'goldensection'``}.
+        For ``solver=coordinatedescent``, it's the line searh strategy used by this solver.
                       
     bound_gc             
-        For ``solver`` = ``neldermead``, it's ``True`` if the search is limited to the closed hemisphere.
+        For ``solver=neldermead``, it's ``True`` if the search is limited to the closed hemisphere.
+
+References
+    * Tukey, J. W. (1975). Mathematics and the picturing of data. In R. James (Ed.), *Proceedings of the International Congress of Mathematicians*, Volume 2, Canadian Mathematical Congress, 523–531.
+    
+    * Donoho, D. L. and M. Gasko (1992). Breakdown properties of location estimates based on halfspace depth and projected outlyingness. *The Annals of Statistics*, 20(4), 1803–1827.
+    
+    * Dyckerhoff, R. and Mozharovskyi, P. (2016): Exact computation of the halfspace depth. *Computational Statistics and Data Analysis*, 98, 19–30.
+
+    * Dyckerhoff, R., Mozharovskyi, P., and Nagy, S. (2021). Approximate computation of projection depths. *Computational Statistics and Data Analysis*, 157, 107166.
 
 Examples
         >>> import numpy as np
@@ -191,8 +182,6 @@ Examples
         >>> halfspace(x, data)
         [0.    0.005 0.005 0.    0.04  0.01  0.    0.    0.04  0.01 ]
         >>> halfspace(x, data, exact=True)
-        [0.    0.005 0.005 0.    0.04  0.01  0.    0.    0.04  0.01 ]
-        >>> halfspace(x, data, numDirections=1000, exact=True, method="line")
         [0.    0.005 0.005 0.    0.04  0.01  0.    0.    0.04  0.01 ]
 
 """

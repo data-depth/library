@@ -37,7 +37,7 @@ if sys.platform=='win32' and platform.architecture()[0] == "32bit":
     libr=CDLL(r""+site_packages+"\depth\Win32\ddalpha.dll")
     libRom=CDLL(r""+site_packages+"\depth\Win32\depth_wrapper.dll")
 
-def aprojection(x, data, notion = None, 
+def aprojection(x, data,
         solver = "neldermead",
         NRandom = 1000,
         option = 1,
@@ -50,7 +50,6 @@ def aprojection(x, data, notion = None,
         space = "sphere",
         line_solver = "goldensection",
         bound_gc = True):
-
 
     return depth_approximation(x, data, "aprojection", solver, NRandom, option, n_refinements,
     sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)

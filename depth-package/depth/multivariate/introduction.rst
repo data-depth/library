@@ -52,7 +52,7 @@ References
 
 * Lange, T., Mosler, K., and Mozharovskyi, P. (2014). Fast nonparametric classification based on data depth. *Statistical Papers*, 55, 49–69.
 
-* Lange, T., Mosler, K., and Mozharovskyi, P. (2014). DDα-classification of asymmetric and fattailed data. In: Spiliopoulou, M., Schmidt Thieme, L., Janning, R. (eds). *Data Analysis, Machine Learning and Knowledge Discovery*, Springer (Berlin), 71–78.
+* Lange, T., Mosler, K., and Mozharovskyi, P. (2014). DDα-classification of asymmetric and fattailed data. In: Spiliopoulou, M., Schmidt Thieme, L., Janning, R. (eds), *Data Analysis, Machine Learning and Knowledge Discovery*, Springer (Berlin), 71–78.
 
 * Mozharovskyi, P. (2022). Anomaly detection using data depth: multivariate case. [arXiv:2210.02851]
 

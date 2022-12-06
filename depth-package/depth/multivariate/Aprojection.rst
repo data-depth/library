@@ -1,10 +1,9 @@
 .. _Aprojection:
 
-Approximated projection depths
-==============================
+Asymmetric projection depth
+===========================
 
 .. automodule:: Aprojection
    :members:
    :undoc-members:
    :show-inheritance:
-   
