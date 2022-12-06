@@ -1,0 +1,193 @@
+import numpy as np
+from ctypes import *
+import sklearn.covariance as sk
+from depth.multivariate.Depth_approximation import depth_approximation
+import sys, os, glob
+import platform
+
+if sys.platform=='linux':
+    for i in sys.path :
+        if i.split('/')[-1]=='site-packages':
+            ddalpha_exact=glob.glob(i+'/depth/UNIX/'+'ddalpha.so')
+            ddalpha_approx=glob.glob(i+'/depth/UNIX/'+'depth_wrapper.so')
+    
+
+    libr=CDLL(ddalpha_exact[0])
+    libRom=CDLL(ddalpha_approx[0])
+    
+if sys.platform=='darwin':
+    for i in sys.path :
+        if i.split('/')[-1]=='site-packages':
+            ddalpha_exact=glob.glob(i+'/depth/MACOS/'+'ddalpha.so')
+            ddalpha_approx=glob.glob(i+'/depth/MACOS/'+'depth_wrapper.so')
+    
+
+    libr=CDLL(ddalpha_exact[0])
+    libRom=CDLL(ddalpha_approx[0])
+
+if sys.platform=='win32' and platform.architecture()[0] == "64bit":
+    site_packages = next(p for p in sys.path if 'site-packages' in p)
+    print(site_packages)
+    os.add_dll_directory(site_packages+"\depth\Win64")
+    libr=CDLL(r""+site_packages+"\depth\Win64\ddalpha.dll")
+    libRom=CDLL(r""+site_packages+"\depth\Win64\depth_wrapper.dll")
+    
+if sys.platform=='win32' and platform.architecture()[0] == "32bit":
+    site_packages = next(p for p in sys.path if 'site-packages' in p)
+    print(site_packages)
+    os.add_dll_directory(site_packages+"\depth\Win32")
+    libr=CDLL(r""+site_packages+"\depth\Win32\ddalpha.dll")
+    libRom=CDLL(r""+site_packages+"\depth\Win32\depth_wrapper.dll")
+
+
+def MCD_fun(data,alpha,NeedLoc=False):
+    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
+    if NeedLoc:return([cov.covariance_,cov.location_])
+    else:return(cov.covariance_)
+
+def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75, 
+                method="recursive",
+                solver = "neldermead",
+                NRandom = 1000,
+                option = 1,
+                n_refinements = 10,
+                sphcap_shrink = 0.5,
+                alpha_Dirichlet = 1.25,
+                cooling_factor = 0.95,
+                cap_size = 1,
+                start = "mean",
+                space = "sphere",
+                line_solver = "goldensection",
+                bound_gc = True):
+                        
+                        
+    if exact:
+    
+
+        points_list=data.flatten()
+        objects_list=x.flatten()
+        
+        points=(c_double*len(points_list))(*points_list)
+        objects=(c_double*len(objects_list))(*objects_list)
+
+        points=pointer(points)
+        objects=pointer(objects)
+        numPoints=pointer(c_int(len(data)))
+        numObjects=pointer(c_int(len(x)))
+        dimension=pointer(c_int(len(data[0])))
+        PY_MatMCD=MCD_fun(data,mah_parMcd)
+        PY_MatMCD=PY_MatMCD.flatten(order='C')
+        mat_MCD=pointer((c_double*len(PY_MatMCD))(*PY_MatMCD))
+
+        
+        
+        depths=pointer((c_double*len(x))(*np.zeros(len(x))))
+
+        libr.MahalanobisDepth(points,objects,numPoints,numObjects,dimension,mat_MCD,depths)
+
+        res=np.zeros(len(x))
+        for i in range(len(x)):
+            res[i]=depths[0][i]
+        return res
+    else:
+        return depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
+        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+    
+    
+
+mahalanobis.__doc__= """
+
+
+
+
+Description
+    Calculates the Mahalanobis depth of points w.r.t. a multivariate data set.
+
+Usage
+    mahalanobis(x, data,exact="True",mah_estimate="moment",mah_parMcd = 0.75,  method="recursive", solver = "neldermead", NRandom = 100, option = 1, n_refinements = 10, sphcap_shrink = 0.5, alpha_Dirichlet = 1.25, cooling_factor = 0.95, cap_size = 1, start = "mean", space = "sphere", line_solver = "goldensection", bound_gc = True)
+
+Arguments
+    x 		
+        Matrix of objects (numerical vector as one object) whose depth is to be calculated;
+        each row contains a d-variate point. Should have the same dimension as
+        data.
+
+    data 		
+        Matrix of data where each row contains a d-variate point, w.r.t. which the depth
+        is to be calculated.
+            
+            
+    exact		
+        The type of the used method. The default is exact=F, which leads to approx- imate computation of the Tukey depth. 
+        For exact=F, ``method=Sunif.1D`` is used by default. If exact=T, the Tukey depth is computed exactly, with ``method=recursive`` by default.
+
+    mah.estimate 	
+        is a character string specifying which estimates to use when calculating the Mahalanobis depth; can be "moment" or ``MCD``, 
+        determining whether traditional moment or Minimum Covariance Determinant (MCD) 
+        (see covMcd) estimates for mean and covariance are used. By default ``moment`` is used.
+
+    mah.parMcd	
+        is the value of the argument alpha for the function covMcd; is used when
+        mah.estimate = ``MCD``.
+            
+    methode	
+        For exact=F, if ``method=Sunif.1D`` (by default), the Tukey depth is computed approximately by being minimized over univariate projections (see Details below).
+        For exact=T, the Tukey depth is calculated as the minimum over all combinations of k points from data (see Details below). In this case parameter method specifies k, 	                    with possible values 1 for ``method=recursive`` (by default), d − 2 for ``method=plane``, d − 1 for ``method=line``. The name of the method may be given 
+        as well as just parameter exact, in which case the default method will be used.
+    
+    solver 	
+        {'simplegrid', 'refinedgrid', 'simplerandom', 'refinedrandom', 'coordinatedescent', 'randomsimplices', 'neldermead', 'simulatedannealing'}, **optional**
+    
+    NRandom 	
+        The total number of iterations to compute the depth. 
+        Some solvers are converging faster so they are run several time to achieve ``NRandom`` iterations.
+                   
+        
+    option          
+        |		If ``option`` = ``1``, only approximated depths are returned.
+        |		If ``option`` = ``2``, best directions to approximate depths are also returned.
+        |		If ``option`` = ``3``, depths calculated at every iteration are also returned.
+        |		If ``option`` = ``4``, random directions used to project depths are also returned with indices of converging for the solver selected.
+         
+        
+    n_refinements  
+        Set the maximum of iteration for computing the depth of one point. For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
+                      
+    sphcap_shrink  
+        It's the shrinking of the spherical cap. For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
+
+    alpha_Dirichlet
+        It's the parameter of the Dirichlet distribution. For ``solver`` = ``randomsimplices``.
+
+    cooling_factor 
+        It's the cooling factor. For ``solver`` = ``randomsimplices``. 
+
+    cap_size       
+        It's the size of the spherical cap. For ``solver`` = ``simulatedannealing`` or ``neldermead``.
+
+    start                
+        {'mean', 'random'}, **optional**
+        it's the method used to compute the first depth. For ``solver`` = ``simulatedannealing`` or ``neldermead``.
+                      
+    space                 
+        {'sphere', 'euclidean'}, **optional**
+        It's the type of spacecin which the solver is running. For ``solver`` = ``coordinatedescent`` or ``neldermead``.
+
+Examples
+        >>> import numpy as np
+        >>> from depth.multivariate import *
+        >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
+        >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
+        >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
+        >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
+        >>> mahalanobis(x, data)
+        [0.17849871 0.10412453 0.1331417  0.13578021 0.3154836  0.29103769
+            0.13398989 0.13913017 0.59339051 0.10556139]
+        >>> mahalanobis(x, data, exact="True", mah_estimate="MCD", mah_parMcd = 0.75)
+        [0.17758703 0.10367974 0.131705   0.13575221 0.31847867 0.29034948
+            0.13291613 0.13792774 0.59094958 0.10491694]
+    
+    
+
+"""
+

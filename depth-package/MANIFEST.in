@@ -1,0 +1,5 @@
+include ./UNIX/ddalpha.so
+include ./UNIX/depth_wrapper.so
+recursive-include ./depth/Win64 *.dll
+recursive-include ./depth/Win32 *.dll
+recursive-include ./depth/UNIX *.so
