@@ -22,18 +22,18 @@ Specifications
 
 12 multivariate depths are implemented in the :math:`\texttt{data-depth}` library, in both exact and approximate - to avoid excessive computational time - version:
 
- - :ref:`asymmetric projection <Aprojection>` depth (approximate),
- - :ref:`beta-skeleton <BetaSkeleton>` depth, including spherical and lens depths as special cases (exact),
- - :ref:`convex hull peeling <Qhpeeling>` (also called onion) depth (exact),
- - :ref:`halfspace <Halfspace>` (also called Tukey or location) depth (exact and approximate),
- - :ref:`L2 <L2>` depth (exact),
- - :ref:`Mahalanobis <Mahalanobis>` depth (exact and approximate),
- - :ref:`potential <Potential>` depth (exact),
- - :ref:`projection <Projection>` depth (approximate),
- - :ref:`simplicial <Simplicial>` depth (exact and approximate),
- - :ref:`simplicial volume <SimplicialVolume>` (also called Oja) depth (exact and approximate),
- - :ref:`spatial <Spatial>` depth (exact),
- - :ref:`zonoid <Zonoid>` depth (exact and approximate).
+ - :ref:`asymmetric projection <Aprojection>` depth [approximate];
+ - :ref:`beta-skeleton <BetaSkeleton>` depth, including spherical and lens depths as special cases [exact];
+ - :ref:`convex hull peeling <Qhpeeling>` (also called onion) depth [exact];
+ - :ref:`halfspace <Halfspace>` (also called Tukey or location) depth [exact and approximate];
+ - :ref:`L2 <L2>` depth [exact];
+ - :ref:`Mahalanobis <Mahalanobis>` depth [exact and approximate];
+ - :ref:`potential <Potential>` depth [exact];
+ - :ref:`projection <Projection>` depth [approximate];
+ - :ref:`simplicial <Simplicial>` depth [exact and approximate];
+ - :ref:`simplicial volume <SimplicialVolume>` (also called Oja) depth [exact and approximate];
+ - :ref:`spatial <Spatial>` depth [exact];
+ - :ref:`zonoid <Zonoid>` depth [exact and approximate].
 
 The mentioned below publications are presenting, from a general point of view, the data depth methodology and some of its most important applications. More references follow in the sections dedicated to particular functions of the :math:`\texttt{data-depth}` library.
 

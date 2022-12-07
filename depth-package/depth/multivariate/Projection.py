@@ -37,7 +37,7 @@ if sys.platform=='win32' and platform.architecture()[0] == "32bit":
     libr=CDLL(r""+site_packages+"\depth\Win32\ddalpha.dll")
     libRom=CDLL(r""+site_packages+"\depth\Win32\depth_wrapper.dll")
 
-def projection(x, data, notion = None, 
+def projection(x, data,
         solver = "neldermead",
         NRandom = 1000,
         option = 1,
@@ -54,15 +54,10 @@ def projection(x, data, notion = None,
     return depth_approximation(x, data, "projection", solver, NRandom, option, n_refinements,
     sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
 
-
-
 projection.__doc__="""
 
 Description
-    Calculates the projection depth of points w.r.t. a multivariate data set.
-    
-Usage
-    projection(x, data, solver = "neldermead", NRandom = 100, option = 1, n_refinements = 10, sphcap_shrink = 0.5, alpha_Dirichlet = 1.25, cooling_factor = 0.95, cap_size = 1,start = "mean", space = "sphere", line_solver = "goldensection", bound_gc = True)
+    Calculates approximately the projection depth of points w.r.t. a multivariate data set.
 
 Arguments
     x 			
@@ -73,51 +68,55 @@ Arguments
         Matrix of data where each row contains a d-variate point, w.r.t. which the depth
         is to be calculated.
     
-    solver 	       
+    solver
         The type of solver used to approximate the depth.
-        {'simplegrid', 'refinedgrid', 'simplerandom', 'refinedrandom', 'coordinatedescent', 'randomsimplices', 'neldermead','simulatedannealing'}, **optional**
-    
-    NRandom 	       
+        {``'simplegrid'``, ``'refinedgrid'``, ``'simplerandom'``, ``'refinedrandom'``, ``'coordinatedescent'``, ``'randomsimplices'``, ``'neldermead'``, ``'simulatedannealing'``}
+
+    NRandom
         The total number of iterations to compute the depth. Some solvers are converging
-        faster so they are run several time to achieve ``NRandom`` iterations.	       
+        faster so they are run several time to achieve ``NRandom`` iterations.
+                   
+    option
+        |        If ``option=1``, only approximated depths are returned.
+        |        If ``option=2``, best directions to approximate depths are also returned.
+        |        If ``option=3``, depths calculated at every iteration are also returned.
+        |        If ``option=4``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
-    option                
-        |		If ``option`` = ``1``, only approximated depths are returned.
-        |		If ``option`` = ``2``, best directions to approximate depths are also returned.
-        |		If ``option`` = ``3``, depths calculated at every iteration are also returned.
-        |		If ``option`` = ``4``, random directions used to project depths are also returned with indices of converging for the solver selected.
-         
-        
-    n_refinements         
+        n_refinements
         Set the maximum of iteration for computing the depth of one point.
-        For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
-            
-    sphcap_shrink         
-        It's the shrinking of the spherical cap. For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
-
-    alpha_Dirichlet       
-        It's the parameter of the Dirichlet distribution. For ``solver`` = ``randomsimplices``. 
-
-    cooling_factor        
-        It's the cooling factor. For ``solver`` = ``randomsimplices``.
-
-    cap_size              
-        It's the size of the spherical cap. For ``solver`` = ``simulatedannealing`` or ``neldermead``. 
-
-    start                
-        {'mean', 'random'}, **optional**
-        For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the method used to compute the first depth.
+        For ``solver='refinedrandom'`` or ``'refinedgrid'``.
                       
-    space         
-        {'sphere', 'euclidean'}, **optional**
-        For ``solver`` = ``coordinatedescent`` or ``neldermead``, it's the type of spacecin which the solver is running.
+    sphcap_shrink
+        It's the shrinking of the spherical cap. For ``solver='refinedrandom'`` or ``'refinedgrid'``.
+
+    alpha_Dirichlet
+        It's the parameter of the Dirichlet distribution. For ``solver='randomsimplices'``.
+
+    cooling_factor
+        It's the cooling factor. For ``solver='simulatedannealing'``.
+
+    cap_size
+        It's the size of the spherical cap. For ``solver='simulatedannealing'`` or ``'neldermead'``.
+
+    start
+        {'mean', 'random'}.
+        For ``solver='simulatedannealing'`` or ``'neldermead'``, it's the method used to compute the first depth.
                       
-    line_solver           
-        {'uniform', 'goldensection'}, **optional**
-        For ``solver`` = ``coordinatedescent``, it's the line searh strategy used by this solver.
+    space
+        {``'sphere'``, ``'euclidean'``}.
+        For ``solver='coordinatedescent'`` or ``'neldermead'``, it's the type of spacecin which the solver is running.
                       
-    bound_gc             
-        For ``solver`` = ``neldermead``, it's ``True`` if the search is limited to the closed hemisphere.
+    line_solver
+        {``'uniform'``, ``'goldensection'``}.
+        For ``solver='coordinatedescent'``, it's the line searh strategy used by this solver.
+                      
+    bound_gc
+        For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
+
+References
+    * Zuo, Y. and Serfling, R. (2000). General notions of statistical depth function. *The Annals of Statistics*, 28, 461–482.
+
+    * Dyckerhoff, R., Mozharovskyi, P., and Nagy, S. (2021). Approximate computation of projection depths. *Computational Statistics and Data Analysis*, 157, 107166.
 
 Examples
         >>> import numpy as np

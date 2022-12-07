@@ -58,10 +58,7 @@ def aprojection(x, data,
 aprojection.__doc__="""
 
 Description
-    Calculates the asymmetric projection depth of points w.r.t. a multivariate data set.
-    
-Usage
-    aprojection(x, data, solver = "neldermead", NRandom = 100, option = 1, n_refinements = 10, sphcap_shrink = 0.5, alpha_Dirichlet = 1.25, cooling_factor = 0.95, cap_size = 1,start = "mean", space = "sphere", line_solver = "goldensection", bound_gc = True)
+    Calculates approximately the asymmetric projection depth of points w.r.t. a multivariate data set.
 
 Arguments
     x 			
@@ -72,51 +69,55 @@ Arguments
             Matrix of data where each row contains a d-variate point, w.r.t. which the depth
             is to be calculated.
 
-    solver 	       
-            The type of solver used to approximate the depth.
-            {`simplegrid`, 'refinedgrid', 'simplerandom', 'refinedrandom', 'coordinatedescent', 'randomsimplices', 'neldermead','simulatedannealing'}, **optional**
+    solver
+        The type of solver used to approximate the depth.
+        {``'simplegrid'``, ``'refinedgrid'``, ``'simplerandom'``, ``'refinedrandom'``, ``'coordinatedescent'``, ``'randomsimplices'``, ``'neldermead'``, ``'simulatedannealing'``}
 
-    NRandom 	       
-            The total number of iterations to compute the depth. Some solvers are converging
-            faster so they are run several time to achieve ``NRandom`` iterations.	       
+    NRandom
+        The total number of iterations to compute the depth. Some solvers are converging
+        faster so they are run several time to achieve ``NRandom`` iterations.
+                   
+    option
+        |        If ``option=1``, only approximated depths are returned.
+        |        If ``option=2``, best directions to approximate depths are also returned.
+        |        If ``option=3``, depths calculated at every iteration are also returned.
+        |        If ``option=4``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
-    option                
-        |       If ``option`` = ``1``, only approximated depths are returned.
-        |		If ``option`` = ``2``, best directions to approximate depths are also returned.
-        |		If ``option`` = ``3``, depths calculated at every iteration are also returned.
-        |		If ``option`` = ``4``, random directions used to project depths are also returned with indices of converging for the solver selected.
-            
-        
-    n_refinements         
-            Set the maximum of iteration for computing the depth of one point.
-            For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
-            
-    sphcap_shrink         
-            It's the shrinking of the spherical cap. For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
+    n_refinements
+        Set the maximum of iteration for computing the depth of one point.
+        For ``solver='refinedrandom'`` or ``'refinedgrid'``.
+                      
+    sphcap_shrink
+        It's the shrinking of the spherical cap. For ``solver='refinedrandom'`` or ``'refinedgrid'``.
 
-    alpha_Dirichlet       
-            It's the parameter of the Dirichlet distribution. For ``solver`` = ``randomsimplices``. 
+    alpha_Dirichlet
+        It's the parameter of the Dirichlet distribution. For ``solver='randomsimplices'``.
 
-    cooling_factor        
-            It's the cooling factor. For ``solver`` = ``randomsimplices``.
+    cooling_factor
+        It's the cooling factor. For ``solver='simulatedannealing'``.
 
-    cap_size              
-            It's the size of the spherical cap. For ``solver`` = ``simulatedannealing`` or ``neldermead``. 
+    cap_size
+        It's the size of the spherical cap. For ``solver='simulatedannealing'`` or ``'neldermead'``.
 
-    start                
-            {'mean', 'random'}, **optional**
-            For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the method used to compute the first depth.
-                        
-    space         
-            {'sphere', 'euclidean'}, **optional**
-            For ``solver`` = ``coordinatedescent`` or ``neldermead``, it's the type of spacecin which the solver is running.
-                        
-    line_solver           
-            {'uniform', 'goldensection'}, **optional**
-            For ``solver`` = ``coordinatedescent``, it's the line searh strategy used by this solver.
-                        
-    bound_gc             
-            For ``solver`` = ``neldermead``, it's ``True`` if the search is limited to the closed hemisphere.
+    start
+        {'mean', 'random'}.
+        For ``solver='simulatedannealing'`` or ``'neldermead'``, it's the method used to compute the first depth.
+                      
+    space
+        {``'sphere'``, ``'euclidean'``}.
+        For ``solver='coordinatedescent'`` or ``'neldermead'``, it's the type of spacecin which the solver is running.
+                      
+    line_solver
+        {``'uniform'``, ``'goldensection'``}.
+        For ``solver='coordinatedescent'``, it's the line searh strategy used by this solver.
+                      
+    bound_gc
+        For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
+
+References
+    * Dyckerhoff, R. (2004). Data depths satisfying the projection property. *Allgemeines Statistisches Archiv*, 88, 163–190.
+    
+    * Dyckerhoff, R., Mozharovskyi, P., and Nagy, S. (2021). Approximate computation of projection depths. *Computational Statistics and Data Analysis*, 157, 107166.
 
 Examples
             >>> import numpy as np

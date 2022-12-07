@@ -95,7 +95,7 @@ def halfspace(x, data,numDirections=1000,exact=True,method="recursive",
 halfspace.__doc__="""
 
 Description
-    Calculates the exact or approximated Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a multivariate data set.
+    Calculates the exact and approximated Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a multivariate data set.
 
 Arguments
     x 			
@@ -106,15 +106,15 @@ Arguments
         Matrix of data where each row contains a d-variate point, w.r.t. which the depth
         is to be calculated.
 
-    exact			
+    exact
         The type of the used method. The default is ``exact=False``, which leads to approx-
         imate computation of the Tukey depth.
-        If ``exact=True``, the Tukey depth is computed exactly, with ``method=recursive`` by default.
+        If ``exact=True``, the Tukey depth is computed exactly, with ``method='recursive'`` by default.
 
     method			
         For ``exact=True``, the Tukey depth is calculated as the minimum over all combinations of k points from data (see Details below).
-        In this case parameter method specifies k, with possible values 1 for ``method=recursive`` (by default), ``d−2``
-        for ``method=plane``, ``d−1`` for ``method=line``.
+        In this case parameter method specifies k, with possible values 1 for ``method='recursive'`` (by default), d−2
+        for ``method='plane'``, d−1 for ``'method=line'``.
         The name of the method may be given as well as just parameter exact, in which
         case the default method will be used.
                    
@@ -132,36 +132,36 @@ Arguments
         |		If ``option=3``, depths calculated at every iteration are also returned.
         |		If ``option=4``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
-    n_refinements         
+        n_refinements
         Set the maximum of iteration for computing the depth of one point.
-        For ``solver=refinedrandom`` or ``refinedgrid``.
+        For ``solver='refinedrandom'`` or ``'refinedgrid'``.
                       
-    sphcap_shrink         
-        It's the shrinking of the spherical cap. For ``solver=refinedrandom`` or ``refinedgrid``.
+    sphcap_shrink
+        It's the shrinking of the spherical cap. For ``solver='refinedrandom'`` or ``'refinedgrid'``.
 
-    alpha_Dirichlet       
-        It's the parameter of the Dirichlet distribution. For ``solver=randomsimplices``.
+    alpha_Dirichlet
+        It's the parameter of the Dirichlet distribution. For ``solver='randomsimplices'``.
 
-    cooling_factor        
-        It's the cooling factor. For ``solver=randomsimplices``.
+    cooling_factor
+        It's the cooling factor. For ``solver='simulatedannealing'``.
 
-    cap_size              
-        It's the size of the spherical cap. For ``solver=simulatedannealing`` or ``neldermead``.
+    cap_size
+        It's the size of the spherical cap. For ``solver='simulatedannealing'`` or ``'neldermead'``.
 
-    start                
+    start
         {'mean', 'random'}.
-        For ``solver=simulatedannealing`` or ``neldermead``, it's the method used to compute the first depth.
+        For ``solver='simulatedannealing'`` or ``'neldermead'``, it's the method used to compute the first depth.
                       
-    space         
+    space
         {``'sphere'``, ``'euclidean'``}.
-        For ``solver`` = ``coordinatedescent`` or ``neldermead``, it's the type of spacecin which the solver is running.
+        For ``solver='coordinatedescent'`` or ``'neldermead'``, it's the type of spacecin which the solver is running.
                       
-    line_solver           
+    line_solver
         {``'uniform'``, ``'goldensection'``}.
-        For ``solver=coordinatedescent``, it's the line searh strategy used by this solver.
+        For ``solver='coordinatedescent'``, it's the line searh strategy used by this solver.
                       
-    bound_gc             
-        For ``solver=neldermead``, it's ``True`` if the search is limited to the closed hemisphere.
+    bound_gc
+        For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
 
 References
     * Tukey, J. W. (1975). Mathematics and the picturing of data. In R. James (Ed.), *Proceedings of the International Congress of Mathematicians*, Volume 2, Canadian Mathematical Congress, 523–531.

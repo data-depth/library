@@ -45,8 +45,7 @@ def MCD_fun(data,alpha,NeedLoc=False):
     if NeedLoc:return([cov.covariance_,cov.location_])
     else:return(cov.covariance_)
 
-def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75, 
-                method="recursive",
+def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                 solver = "neldermead",
                 NRandom = 1000,
                 option = 1,
@@ -97,14 +96,8 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
 
 mahalanobis.__doc__= """
 
-
-
-
 Description
     Calculates the Mahalanobis depth of points w.r.t. a multivariate data set.
-
-Usage
-    mahalanobis(x, data,exact="True",mah_estimate="moment",mah_parMcd = 0.75,  method="recursive", solver = "neldermead", NRandom = 100, option = 1, n_refinements = 10, sphcap_shrink = 0.5, alpha_Dirichlet = 1.25, cooling_factor = 0.95, cap_size = 1, start = "mean", space = "sphere", line_solver = "goldensection", bound_gc = True)
 
 Arguments
     x 		
@@ -115,63 +108,70 @@ Arguments
     data 		
         Matrix of data where each row contains a d-variate point, w.r.t. which the depth
         is to be calculated.
-            
-            
-    exact		
-        The type of the used method. The default is exact=F, which leads to approx- imate computation of the Tukey depth. 
-        For exact=F, ``method=Sunif.1D`` is used by default. If exact=T, the Tukey depth is computed exactly, with ``method=recursive`` by default.
 
-    mah.estimate 	
-        is a character string specifying which estimates to use when calculating the Mahalanobis depth; can be "moment" or ``MCD``, 
+    exact
+        The type of the used method. The default is ``exact=False``, which leads to approx-
+        imate computation of the Mahalanobis depth using the method defined by the argument ``solver``.
+        If ``exact=True``, the Mahalanobis depth is computed exactly, using the closed-form expression.
+
+    mah_estimate
+        A character string specifying which estimates to use when calculating the Mahalanobis depth; can be "'moment'" or ``'MCD'``,
         determining whether traditional moment or Minimum Covariance Determinant (MCD) 
-        (see covMcd) estimates for mean and covariance are used. By default ``moment`` is used.
+        estimates for mean and covariance are used. By default ``'moment'`` is used.
 
-    mah.parMcd	
+    mah_parMcd
         is the value of the argument alpha for the function covMcd; is used when
-        mah.estimate = ``MCD``.
-            
-    methode	
-        For exact=F, if ``method=Sunif.1D`` (by default), the Tukey depth is computed approximately by being minimized over univariate projections (see Details below).
-        For exact=T, the Tukey depth is calculated as the minimum over all combinations of k points from data (see Details below). In this case parameter method specifies k, 	                    with possible values 1 for ``method=recursive`` (by default), d − 2 for ``method=plane``, d − 1 for ``method=line``. The name of the method may be given 
-        as well as just parameter exact, in which case the default method will be used.
+        mah.estimate = ``'MCD'``.
     
-    solver 	
-        {'simplegrid', 'refinedgrid', 'simplerandom', 'refinedrandom', 'coordinatedescent', 'randomsimplices', 'neldermead', 'simulatedannealing'}, **optional**
-    
-    NRandom 	
-        The total number of iterations to compute the depth. 
-        Some solvers are converging faster so they are run several time to achieve ``NRandom`` iterations.
+    solver
+        The type of solver used to approximate the depth.
+        {``'simplegrid'``, ``'refinedgrid'``, ``'simplerandom'``, ``'refinedrandom'``, ``'coordinatedescent'``, ``'randomsimplices'``, ``'neldermead'``, ``'simulatedannealing'``}
+
+    NRandom
+        The total number of iterations to compute the depth. Some solvers are converging
+        faster so they are run several time to achieve ``NRandom`` iterations.
                    
-        
-    option          
-        |		If ``option`` = ``1``, only approximated depths are returned.
-        |		If ``option`` = ``2``, best directions to approximate depths are also returned.
-        |		If ``option`` = ``3``, depths calculated at every iteration are also returned.
-        |		If ``option`` = ``4``, random directions used to project depths are also returned with indices of converging for the solver selected.
-         
-        
-    n_refinements  
-        Set the maximum of iteration for computing the depth of one point. For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
+    option
+        |        If ``option=1``, only approximated depths are returned.
+        |        If ``option=2``, best directions to approximate depths are also returned.
+        |        If ``option=3``, depths calculated at every iteration are also returned.
+        |        If ``option=4``, random directions used to project depths are also returned with indices of converging for the solver selected.
+
+        n_refinements
+        Set the maximum of iteration for computing the depth of one point.
+        For ``solver='refinedrandom'`` or ``'refinedgrid'``.
                       
-    sphcap_shrink  
-        It's the shrinking of the spherical cap. For ``solver`` = ``refinedrandom`` or ``refinedgrid``.
+    sphcap_shrink
+        It's the shrinking of the spherical cap. For ``solver='refinedrandom'`` or ``'refinedgrid'``.
 
     alpha_Dirichlet
-        It's the parameter of the Dirichlet distribution. For ``solver`` = ``randomsimplices``.
+        It's the parameter of the Dirichlet distribution. For ``solver='randomsimplices'``.
 
-    cooling_factor 
-        It's the cooling factor. For ``solver`` = ``randomsimplices``. 
+    cooling_factor
+        It's the cooling factor. For ``solver='simulatedannealing'``.
 
-    cap_size       
-        It's the size of the spherical cap. For ``solver`` = ``simulatedannealing`` or ``neldermead``.
+    cap_size
+        It's the size of the spherical cap. For ``solver='simulatedannealing'`` or ``'neldermead'``.
 
-    start                
-        {'mean', 'random'}, **optional**
-        it's the method used to compute the first depth. For ``solver`` = ``simulatedannealing`` or ``neldermead``.
+    start
+        {``'mean'``, ``'random'``}.
+        For ``solver='simulatedannealing'`` or ``'neldermead'``, it's the method used to compute the first depth.
                       
-    space                 
-        {'sphere', 'euclidean'}, **optional**
-        It's the type of spacecin which the solver is running. For ``solver`` = ``coordinatedescent`` or ``neldermead``.
+    space
+        {``'sphere'``, ``'euclidean'``}.
+        For ``solver='coordinatedescent'`` or ``'neldermead'``, it's the type of spacecin which the solver is running.
+                      
+    line_solver
+        {``'uniform'``, ``'goldensection'``}.
+        For ``solver='coordinatedescent'``, it's the line searh strategy used by this solver.
+                      
+    bound_gc
+        For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
+
+References
+    * Mahalanobis, P. C. (1936). On the generalized distance in statistics. *Proceedings of the National Institute of Sciences of India*, 12, 49–55.
+    
+    * Mosler, K. and Mozharovskyi, P. (2022). Choosing among notions of multivariate depth statistics. *Statistical Science*, 37(3), 348-368.
 
 Examples
         >>> import numpy as np
@@ -186,8 +186,5 @@ Examples
         >>> mahalanobis(x, data, exact="True", mah_estimate="MCD", mah_parMcd = 0.75)
         [0.17758703 0.10367974 0.131705   0.13575221 0.31847867 0.29034948
             0.13291613 0.13792774 0.59094958 0.10491694]
-    
-    
 
 """
-

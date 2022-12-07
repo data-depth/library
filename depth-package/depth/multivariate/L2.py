@@ -80,9 +80,6 @@ L2.__doc__="""
 
 Description
 			Calculates the L2-depth of points w.r.t. a multivariate data set.
-
-Usage
-			depth.L2(x, data, mah.estimate = "moment", mah.parMcd = 0.75).
 			
 Arguments
 	x 			
@@ -93,17 +90,21 @@ Arguments
  			Matrix of data where each row contains a d-variate point, w.r.t. which the depth
 			is to be calculated.
 
-	mah.estimate 		
+	mah_estimate
 			Is a character string specifying which estimates to use when calculating sample
-			covariance matrix; can be ``none``, ``moment`` or ``MCD``, determining whether
-			traditional moment or Minimum Covariance Determinant (MCD) (see covMcd)
-			estimates for mean and covariance are used. By default ``moment`` is used. With
-			``none`` the non-affine invariant version of the L2-depth is calculated.	
+			covariance matrix; can be ``'none'``, ``'moment'`` or ``'MCD'``, determining whether
+			traditional moment or Minimum Covariance Determinant (MCD) estimates for mean and covariance are used. By default ``'moment'`` is used. With
+			``'none'`` the non-affine invariant version of the L2-depth is calculated.
 
-	mah.parMcd		
+	mah_parMcd
 			is the value of the argument alpha for the function covMcd; is used when
-			mah.estimate = ``MCD``.
+			``mah.estimate='MCD'``.
 			
+References
+    * Zuo, Y. and Serfling, R. (2000). General notions of statistical depth function. *The Annals of Statistics*, 28, 461–482.
+    
+    * Mosler, K. and Mozharovskyi, P. (2022). Choosing among notions of multivariate depth statistics. *Statistical Science*, 37(3), 348-368.
+   
 Examples
 			>>> import numpy as np
 			>>> from depth.multivariate import *
@@ -114,4 +115,5 @@ Examples
 			>>> L2(x, data)
 			[0.2867197  0.19718391 0.18896649 0.24623271 0.20979579 0.22055673
  			0.20396566 0.20779032 0.24901829 0.26734192]
+
 """

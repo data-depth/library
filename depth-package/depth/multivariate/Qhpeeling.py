@@ -92,13 +92,16 @@ Usage
     depth.qhpeeling(x, data)
 
 Arguments
-    x           
-            Matrix of objects (numerical vector as one object) whose depth is to be calculated; 
-            each row contains a d-variate point. Should have the same dimension as data.
+    x
+        Matrix of objects (numerical vector as one object) whose depth is to be calculated; each row contains a d-variate point. Should have the same dimension as data.
 
     data            
-            Matrix of data where each row contains a d-variate point, w.r.t. which the depth
-            is to be calculated.
+        Matrix of data where each row contains a d-variate point, w.r.t. which the depth is to be calculated.
+            
+References
+    * Barnett, V. (1976). The ordering of multivariate data. *Journal of the Royal Statistical Society*, *Series A*, 139, 318–355.
+    
+    * Eddy, W. F. (1981). Graphics for the multivariate two-sample problem: Comment. *Journal of the American Statistical Association*, 76, 287–289.
             
 Examples
             >>> from depth.multivariate import *
@@ -109,6 +112,4 @@ Examples
             >>> qhpeeling(x, data)
             [0.   0.   0.   0.   0.   0.   0.01 0.   0.   0.01]
 
-
 """
-

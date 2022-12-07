@@ -102,15 +102,11 @@ def betaSkeleton(x, data, beta = 2, distance = "Lp", Lp_p = 2, mah_estimate = "m
 	return res
 
 	
-	
-	
+
 betaSkeleton.__doc__= """ 
 
 Description
 	Calculates the beta-skeleton depth of points w.r.t. a multivariate data set.
-
-Usage
-	depth.betaSkeleton(x, data, beta = 2, distance = "Lp", Lp.p = 2, mah.estimate = "moment", mah.parMcd = 0.75)
 
 Arguments
 	x		
@@ -129,23 +125,31 @@ Arguments
 	distance	
 			A character string defining the distance to be used for determining inclusion
 			of a point into the lens (influence region), see Yang and Modarres (2017) for
-			details. Possibilities are ``Lp`` for the Lp-metric (default) or ``Mahalanobis`` for
+			details. Possibilities are ``'Lp'`` for the Lp-metric (default) or ``'Mahalanobis'`` for
 			the Mahalanobis distance adjustment.
 
-	Lp.p 		
+	Lp_p
 			A non-negative number defining the distance’s power equal ``2`` by default (Euclidean distance)
-			is used only when distance = ``Lp``.
+			is used only when ``distance='Lp'``.
 
-	mah.estimate 	
+	mah_estimate
 			A character string specifying which estimates to use when calculating sample
-			covariance matrix; can be ``none``, ``moment`` or ``MCD``, determining whether
-			traditional moment or Minimum Covariance Determinant (MCD) (see covMcd)
-			estimates for mean and covariance are used. By default ``moment`` is used. Is
-			used only when distance = ``Mahalanobis``.
+			covariance matrix; can be ``'none'``, ``'moment'`` or ``'MCD'``, determining whether
+			traditional moment or Minimum Covariance Determinant (MCD)
+			estimates for mean and covariance are used. By default ``'moment'`` is used. Is
+			used only when ``distance='Mahalanobis'``.
 
-	mah.parMcd	
-			The value of the argument alpha for the function covMcd; is used when distance
-			= ``Mahalanobis`` and mah.estimate = ``MCD``.
+	mah_parMcd	
+			The value of the argument alpha for Minimum Covariance Determinant (MCD); is used when ``distance='Mahalanobis'`` and ``mah.estimate='MCD'``.
+
+References
+    * Elmore, R. T., Hettmansperger, T. P. and Xuan, F. (2006). Spherical data depth and a multivariate median. In R. Y. Lui, R. Serfling, and D. L. Souvaine, (Eds.), *Data Depth: Robust Multivariate Analysis, Computational Geometry and Applications*, *DIMACS Series Discrete Mathematics and Theoretical Computer Science*, 72, American Mathematical Society, Providence, RI, 87–101.
+    
+    * Liu, Z. and Modarres, R. (2011). Lens data depth and median. *Journal of Nonparametric Statistics*, 23, 1063–1074.
+    
+    * Kleindessner, M. and Von Luxburg, U. (2017). Lens depth function and k-relative neighborhood graph: Versatile tools for ordinal data analysis. *Journal of Machine Learning Research*, 18, 58, 52.
+    
+    * Yang, M. and Modarres, R. (2018). :math:`{\\beta}`-skeleton depth functions and medians. *Communications in Statistics - Theory and Methods*, 47, 5127–5143.
 
 Examples
 			>>> import numpy as np
@@ -157,7 +161,6 @@ Examples
 			>>> BetaSkeleton(x, data)
 			[0.16467668 0.336002   0.43702102 0.25827828 0.4204044  0.46894895
  			0.27825225 0.11572372 0.4663003  0.18778579]
-
 
 """
 

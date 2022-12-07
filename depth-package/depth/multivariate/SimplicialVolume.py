@@ -116,9 +116,6 @@ simplicialVolume.__doc__="""
 Description
     Calculates the simpicial volume depth of points w.r.t. a multivariate data set.
 
-Usage
-    depth.simplicialVolume(x, data, exact = F, k = 0.05, mah.estimate = "moment", mah.parMcd = 0.75, seed = 0)
-
 Arguments
     x 			
             Matrix of objects (numerical vector as one object) whose depth is to be calculated;
@@ -131,21 +128,23 @@ Arguments
             ``exact=True`` (by default) implies the **exact algorithm**, ``exact=False`` implies the **approximative algorithm**, considering k simplices.
 
     k			
-            |	**Number (k > 1)** or **portion (if 0 < k < 1)** of simplices that are considered if ``exact = F``. 
+            |	Number (``k > 1``) or portion (if ``0 < k < 1``) of simplices that are considered if ``exact = F``.
             |	If ``k > 1``, then the algorithmic complexity is polynomial in d but is independent of the number of observations in data, given k. 
             |	If ``0 < k < 1``, then the algorithmic complexity is exponential in the number of observations in data, but the calculation precision stays approximately the same.
 
-    mah.estimate 		
-            A character string specifying affine-invariance adjustment; can be ``none``, ``moment``
-            or ``MCD``, determining whether no affine-invariance adjustemt or moment or Minimum Covariance Determinant (MCD) 
-            (see covMcd) estimates of the covariance are used. By default ``moment`` is used.
+    mah_estimate
+            A character string specifying affine-invariance adjustment; can be ``'none'``, ``'moment'``
+            or ``'MCD'``, determining whether no affine-invariance adjustemt or moment or Minimum Covariance Determinant (MCD)
+            estimates of the covariance are used. By default ``'moment'`` is used.
 
-    mah.parMcd 		
-            The value of the argument alpha for the function covMcd is used when, ``mah.estimate = MCD``.
-
+    mah_parMcd
+            The value of the argument alpha for the function covMcd is used when, ``mah.estimate='MCD'``.
 
     seed 			
-            The random seed. The default value **seed=0** makes no changes.
+            The random seed. The default value ``seed=0`` makes no changes.
+
+References
+    * Oja, H. (1983). Descriptive statistics for multivariate distributions. *Statistics and Probability Letters*, 1, 327–332.
 
 Examples
             >>> import numpy as np

@@ -46,7 +46,7 @@ def longtoint(k):
   return np.array([k1,k2])
 
 
-def simplicial(x, data,exact=True,k=0.05,seed=0):
+def simplicial(x, data, exact=True, k=0.05, seed=0):
     points_list=data.flatten()
     objects_list=x.flatten()
     points=(c_double*len(points_list))(*points_list)
@@ -90,9 +90,6 @@ simplicial.__doc__ = """
 Description
     Calculates the simplicial depth of points w.r.t. a multivariate data set.
 
-Usage
-    depth.simplicial(x, data, exact = True, k = 0.05, seed = 0)
-
 Arguments
     x 			
             Matrix of objects (numerical vector as one object) whose depth is to be calculated;
@@ -102,15 +99,18 @@ Arguments
             Matrix of data where each row contains a d-variate point, w.r.t. which the depth is to be calculated.
 
     exact 			
-            ``exact=True`` (by default) implies the **exact algorithm**, ``exact=False`` implies the **approximative algorithm**, considering k simplices.
+            ``exact=True`` (by default) implies the exact algorithm, ``exact=False`` implies the approximative algorithm, considering k simplices.
 
     k 			
-            |	**Number (k > 1)** or **portion (if 0 < k < 1)** of simplices that are considered if exact=F. 
+            |	Number (``k > 1``) or portion (if ``0 < k < 1``) of simplices that are considered if ``exact=False``.
             |	If ``k > 1``, then the algorithmic complexity is polynomial in d but is independent of the number of observations in data, given k. 
             |	If ``0 < k < 1``,then the algorithmic complexity is exponential in the number of observations in data, but the calculation precision stays approximately the same.
 
     seed 			
             The random seed. The default value ``seed=0`` makes no change.
+
+References
+    * Liu , R. Y. (1990). On a notion of data depth based on random simplices. *The Annals of Statistics*, 18, 405–414.
 
 Examples
             >>> import numpy as np

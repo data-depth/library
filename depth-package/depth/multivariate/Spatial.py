@@ -93,27 +93,21 @@ spatial.__doc__="""
 Description
 	Calculates the spatial depth of points w.r.t. a multivariate data set.
 
-Usage
-	depth.spatial(x, data, mah.estimate = "moment", mah.parMcd = 0.75)
-
 Arguments
-        x 			
-		Matrix of objects (numerical vector as one object) whose depth is to be calculated;
-		each row contains a d-variate point. Should have the same dimension as data.
+    x
+        Matrix of objects (numerical array) whose depth is to be calculated; each row contains a d-variate point. Should have the same dimension as data.
+        
+    data
+		Matrix of data where each row contains a d-variate point, w.r.t. which the depth is to be calculated.
+  
+    mah_estimate
+		String character specifying which estimates to use when calculating sample covariance matrix. It can be ``'none'``, ``'moment'`` or ``'MCD'``, determining whether traditional moment or Minimum Covariance Determinant (MCD) estimates for mean and covariance are used. By default ``'moment'`` is used. With ``'none'`` the non-affine invariant version of spatial depth is calculated.
+    
+    mah_parMcd
+		Argument alpha for the function covMcd is used when ``mah.estimate='MCD'``.
 
-	data			
-		Matrix of data where each row contains a d-variate point, w.r.t. which the depth
-		is to be calculated.
-
-	mah.estimate 		
-		String character specifying which estimates to use when calculating sample
-		covariance matrix. It can be ``none``, ``moment`` or ``MCD``, determining whether
-		traditional moment or Minimum Covariance Determinant (MCD) (see covMcd)
-		estimates for mean and covariance are used. By default ``moment`` is used. With
-		``none`` the non-affine invariant version of Spatial depth is calculated
-
-	mah.parMcd 		
-		Argument alpha for the function covMcd is used when mah.estimate = ``MCD``.
+References
+    * Serfling, R. (2002). A depth function and a scale curve based on spatial quantiles. In Dodge, Y. (Ed.), *Statistical Data Analysis Based on the L1-Norm and Related Methods*, *Statisctics in Industry and Technology*, Birkhäuser, Basel, 25–38.
 
 Examples
         >>> import numpy as np
@@ -126,6 +120,5 @@ Examples
         [0.22548919451212823, 0.14038895785356165, 0.2745517635029123, 0.35450156620496354,
         0.42373722245348566, 0.34562025044812095, 0.3585616673301636, 0.16916309940691643,
         0.573349631625784, 0.32017213635679687]
-
 
 """

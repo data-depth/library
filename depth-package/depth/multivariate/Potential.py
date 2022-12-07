@@ -117,12 +117,7 @@ def Maha_transform (x, mu, B_inv):
 potential.__doc__="""
 
 Description
-	Calculate the potential of the points w.r.t. a multivariate data set. The potential is the kernel-
-	estimated density multiplied by the prior probability of a class. Different from the data depths, a
-	density estimate measures at a given point how much mass is located around it.
-
-Usage
-	potential(x, data, pretransform = "1Mom", kernel="EDKernel" ,mah_parMcd=0.75)
+	Calculate the potential of the points w.r.t. a multivariate data set. The potential is the kernel-estimated density multiplied by the prior probability of a class. Different from the data depths, a density estimate measures at a given point how much mass is located around it.
 
 Arguments
 	x 			
@@ -135,21 +130,23 @@ Arguments
 
 	pretransform 		
 			|	The method of data scaling.
-			|	NULL to use the original data,
-			|	1Mom or NMom for scaling using data moments,
-			|	1MCD or NMCD for scaling using robust data moments (Minimum Covariance Determinant (MCD) ).
+			|	``'1Mom'`` or ``'NMom'`` for scaling using data moments.
+			|	``'1MCD'`` or ``'NMCD'`` for scaling using robust data moments (Minimum Covariance Determinant (MCD).
 
 	kernel			
-			|	``EDKernel`` for the kernel of type 1/(1+kernel.bandwidth*EuclidianDistance2(x,y)),
-			|	``GKernel`` [default and recommended] for the simple Gaussian kernel,
-			|	``EKernel`` exponential kernel: exp(-kernel.bandwidth*EuclidianDistance(x, y)),
-			|	``VarGKernel`` variable Gaussian kernel, where kernel.bandwidth is proportional to the depth.zonoid of a point.
+			|	``'EDKernel'`` for the kernel of type 1/(1+kernel.bandwidth*EuclidianDistance2(x,y)),
+			|	``'GKernel'`` [default and recommended] for the simple Gaussian kernel,
+			|	``'EKernel'`` exponential kernel: exp(-kernel.bandwidth*EuclidianDistance(x, y)),
+			|	``'VarGKernel'`` variable Gaussian kernel, where kernel.bandwidth is proportional to the depth.zonoid of a point.
 
 	kernel.bandwidth	
-			the single bandwidth parameter of the kernel. If NULL - the Scott’s rule of thumb is used.
+			the single bandwidth parameter of the kernel. If ``0`` - the Scott’s rule of thumb is used.
 
 	mah.parMcd		
-			is the value of the argument alpha for the function covMcd is used when **pretransform = MCD**.
+			is the value of the argument alpha for the function covMcd is used when ``pretransform='MCD'``.
+
+References
+    * Pokotylo, O. and Mosler, K. (2019). Classification with the pot–pot plot. *Statistical Papers*, 60, 903-931.
 			
 Examples
 			>>> import numpy as np
