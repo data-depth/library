@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: depth
+Version: 1.0.0
+Summary: The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth
+Home-page: UNKNOWN
+Author: Pavlo mozharovskyi
+Author-email: pavlo.mozharovskyi@telecom-paris.fr
+License: UNKNOWN
+Description: The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
