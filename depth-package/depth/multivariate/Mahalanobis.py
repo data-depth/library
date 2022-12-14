@@ -5,12 +5,17 @@ from depth.multivariate.Depth_approximation import depth_approximation
 import sys, os, glob
 import platform
 
+
+
+
 if sys.platform=='linux':
+    
     for i in sys.path :
         if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/depth/UNIX/'+'ddalpha.so')
-            ddalpha_approx=glob.glob(i+'/depth/UNIX/'+'depth_wrapper.so')
+            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
+            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
     
+
 
     libr=CDLL(ddalpha_exact[0])
     libRom=CDLL(ddalpha_approx[0])
@@ -18,26 +23,25 @@ if sys.platform=='linux':
 if sys.platform=='darwin':
     for i in sys.path :
         if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/depth/MACOS/'+'ddalpha.so')
-            ddalpha_approx=glob.glob(i+'/depth/MACOS/'+'depth_wrapper.so')
-    
-
+            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
+            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
+  
     libr=CDLL(ddalpha_exact[0])
     libRom=CDLL(ddalpha_approx[0])
 
 if sys.platform=='win32' and platform.architecture()[0] == "64bit":
     site_packages = next(p for p in sys.path if 'site-packages' in p)
-    print(site_packages)
-    os.add_dll_directory(site_packages+"\depth\Win64")
-    libr=CDLL(r""+site_packages+"\depth\Win64\ddalpha.dll")
-    libRom=CDLL(r""+site_packages+"\depth\Win64\depth_wrapper.dll")
+    
+    os.add_dll_directory(site_packages)
+    libr=CDLL(r""+site_packages+"\*ddalpha*.dll")
+    libRom=CDLL(r""+site_packages+"\*depth_wrapper*.dll")
     
 if sys.platform=='win32' and platform.architecture()[0] == "32bit":
     site_packages = next(p for p in sys.path if 'site-packages' in p)
-    print(site_packages)
-    os.add_dll_directory(site_packages+"\depth\Win32")
-    libr=CDLL(r""+site_packages+"\depth\Win32\ddalpha.dll")
-    libRom=CDLL(r""+site_packages+"\depth\Win32\depth_wrapper.dll")
+    
+    os.add_dll_directory(site_packages)
+    libr=CDLL(r""+site_packages+"\*ddalpha.dll*")
+    libRom=CDLL(r""+site_packages+"\*depth_wrapper*.dll")
 
 
 def MCD_fun(data,alpha,NeedLoc=False):

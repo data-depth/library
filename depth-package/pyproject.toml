@@ -1,3 +1,19 @@
 [build-system]
-requires = ["setuptools>=42",'numpy>=0.0','scipy>=0.0','sklearn>=0.0']
+requires = ["setuptools>=42",'numpy>=0.0','scipy>=0.0','scikit-learn>=0.0']
 build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+# Only build on CPython 3.9
+#build = "cp39-*"
+#skip = ["cp39-musllinux*"]
+# Skip for Windows
+#skip = ["pp*", "cp310-*",'*i686*']
+#Skip for MacOS
+# skip = ["pp*"]
+#Skip for Ubuntu   # 32bit cp310 results in error
+skip = ['*i686*',"*musllinux*", "pp*", "cp310-*"]
+# Build `universal2` and `arm64` wheels on an Intel runner.
+# Note that the `arm64` wheel and the `arm64` part of the `universal2`
+# wheel cannot be tested in this configuration.
+#[tool.cibuildwheel.macos]
+#archs = ["x86_64", "universal2"]
