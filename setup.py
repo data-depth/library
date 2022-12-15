@@ -17,34 +17,50 @@ class custom_build_ext(build_ext):
         	self.compiler.set_executable("linker_so", "g++ -Wl,--gc-sections -shared -lstdc++")
         build_ext.build_extensions(self)
 
-
-setup(
-    name="depth",
-    version="1.0.0",
-    author="Pavlo mozharovskyi",
-    author_email="pavlo.mozharovskyi@telecom-paris.fr",
-    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
-    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
-    long_description_content_type="text/markdown",
-    packages=find_packages(),
-    install_requires=['numpy','scipy','scikit-learn'],
-    include_package_data=True,
-    ext_modules=[
-        Extension(
-            "ddalpha", 
-            sources=["depth/src/ddalpha.cpp"],
-            extra_compile_args=["-I.",'-std=c++14','-fPIC'],
-            extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
-        ),Extension(
-            "depth_wrapper", 
-            sources=["depth/src/depth_wrapper.cpp"],
-            extra_compile_args=["-I.",'-std=c++14','-fPIC'],
-            extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
-        )
-     
-   	
-    ],
-    data_files=[('depth/multivariate', glob.glob("depth/multivariate/*.rst"))],
-    zip_safe=False,
-    cmdclass={"build_ext": custom_build_ext}
-)
+if sys.platform=='darwin' or sys.platform=='linux':
+	setup(
+	    name="depth",
+	    version="1.0.0",
+	    author="Pavlo mozharovskyi",
+	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
+	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	    long_description_content_type="text/markdown",
+	    packages=find_packages(),
+	    install_requires=['numpy','scipy','scikit-learn'],
+	    include_package_data=True,
+	    ext_modules=[
+		Extension(
+		    "ddalpha", 
+		    sources=["depth/src/ddalpha.cpp"],
+		    extra_compile_args=["-I.",'-std=c++14','-fPIC'],
+		    extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
+		),Extension(
+		    "depth_wrapper", 
+		    sources=["depth/src/depth_wrapper.cpp"],
+		    extra_compile_args=["-I.",'-std=c++14','-fPIC'],
+		    extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
+		)
+	     
+	   	
+	    ],
+	    data_files=[('depth/multivariate', glob.glob("depth/multivariate/*.rst"))],
+	    zip_safe=False,
+	    cmdclass={"build_ext": custom_build_ext}
+	)
+if sys.platform=='win32':
+	setup(
+	    name="depth",
+	    version="1.0.0",
+	    author="Pavlo mozharovskyi",
+	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
+	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	    long_description_content_type="text/markdown",
+	    packages=find_packages(),
+	    install_requires=['numpy','scipy','scikit-learn'],
+	    include_package_data=True,
+	    data_files=[('depth/src', glob.glob("depth/src/*"))],
+	    zip_safe=False
+	)
+	
