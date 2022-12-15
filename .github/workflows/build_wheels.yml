@@ -24,131 +24,131 @@ jobs:
       - uses: actions/checkout@v1
       
       - name: test commands ddalpha
-        run: g++ -fpic -std=c++11 -c ${{ runner.workspace }}/DataDepth/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/DataDepth/depth/src/ddalpha.o
-        #run: python3 ${{ runner.workspace }}/DataDepth/setup.py bdist_wheel --compiler=mingw32 
-        #run: python3 ${{ runner.workspace }}/DataDepth/setup.py --help-commands
+        run: g++ -fpic -std=c++11 -c ${{ runner.workspace }}/library/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/library/depth/src/ddalpha.o
+        #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
+        #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
         
       - name: Build shared library ddalpha.dll
-        run: g++ -shared -lstdc++ ${{ runner.workspace }}/DataDepth/depth/src/ddalpha.o -o ${{ runner.workspace }}/DataDepth/depth/src/ddalpha.dll
+        run: g++ -shared -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: copy shared library
-        run: cp ${{ runner.workspace }}/DataDepth/depth/src/ddalpha.dll ${{ runner.workspace }}/DataDepth
+        run: cp ${{ runner.workspace }}/library/depth/src/ddalpha.dll ${{ runner.workspace }}/library
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: test commands for depth-wrapper
-        run: g++ -fpic -std=c++14 -c ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.cpp -o ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.o
-        #run: python3 ${{ runner.workspace }}/DataDepth/setup.py bdist_wheel --compiler=mingw32 
-        #run: python3 ${{ runner.workspace }}/DataDepth/setup.py --help-commands
+        run: g++ -fpic -std=c++14 -c ${{ runner.workspace }}/library/depth/src/depth_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.o
+        #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
+        #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: Build shared library depth-wrapper
-        run: g++ -shared -lstdc++ ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.dll
+        run: g++ -shared -lstdc++ ${{ runner.workspace }}/library/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: copy shared library
-        run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.dll ${{ runner.workspace }}/DataDepth
+        run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll ${{ runner.workspace }}/library
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
        
       - name: install requirements for Build-package
-        #run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.so ${{ runner.workspace }}/DataDepth
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: py -m pip install build
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: Build-package run
-        #run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.so ${{ runner.workspace }}/DataDepth
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: pip3 install wheel
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: Build-package run
-        #run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.so ${{ runner.workspace }}/DataDepth
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: python3 setup.py bdist_wheel --plat-name=win-amd64 --python-tag=cp31 --py-limited-api=cp31
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: Build-package run
-        #run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.so ${{ runner.workspace }}/DataDepth
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: python3 setup.py bdist_wheel --plat-name=win32 --python-tag=cp31 --py-limited-api=cp31
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: Build-package run
-        #run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.so ${{ runner.workspace }}/DataDepth
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: python3 setup.py bdist_wheel --plat-name=win-arm64 --python-tag=cp31 --py-limited-api=cp31
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: Build-package run
-        #run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.so ${{ runner.workspace }}/DataDepth
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: python3 setup.py bdist_wheel --plat-name=win-amd64 --python-tag=py3
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: Build-package run
-        #run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.so ${{ runner.workspace }}/DataDepth
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: python3 setup.py bdist_wheel --plat-name=win32 --python-tag=py3
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
           
       - name: Build-package run
-        #run: cp ${{ runner.workspace }}/DataDepth/depth/src/depth_wrapper.so ${{ runner.workspace }}/DataDepth
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: python3 setup.py bdist_wheel --plat-name=win-arm64 --python-tag=py3 
         #run: g++ --version
         env:
-          HOME: ${{ runner.workspace }}/DataDepth
+          HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
       
           
       - uses: actions/upload-artifact@v3
         with:
-          path: ${{ runner.workspace }}/DataDepth/dist/*.whl
+          path: ${{ runner.workspace }}/library/dist/*.whl
         
