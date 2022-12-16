@@ -29,15 +29,19 @@ if sys.platform=='win32' and platform.architecture()[0] == "64bit":
     site_packages = next(p for p in sys.path if 'site-packages' in p)
     
     os.add_dll_directory(site_packages)
-    libr=CDLL(r""+site_packages+"\*ddalpha*.dll")
-    libRom=CDLL(r""+site_packages+"\*depth_wrapper*.dll")
+    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
+    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
+    libr=CDLL(r""+ddalpha_exact[0])
+    libRom=CDLL(r""+ddalpha_approx[0])
     
 if sys.platform=='win32' and platform.architecture()[0] == "32bit":
     site_packages = next(p for p in sys.path if 'site-packages' in p)
     
     os.add_dll_directory(site_packages)
-    libr=CDLL(r""+site_packages+"\*ddalpha.dll*")
-    libRom=CDLL(r""+site_packages+"\*depth_wrapper*.dll")
+    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
+    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
+    libr=CDLL(r""+ddalpha_exact[0])
+    libRom=CDLL(r""+ddalpha_approx[0])
 
 def zonoid(x, data, seed=0, exact=True, solver="neldermead",
                         NRandom=1000,
