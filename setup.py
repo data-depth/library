@@ -50,7 +50,7 @@ if sys.platform=='darwin' or sys.platform=='linux':
 	)
 if sys.platform=='win32':
 	setup(
-	    name="depth",
+	    name="data_depth",
 	    version="1.0.0",
 	    author="Pavlo mozharovskyi",
 	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
