@@ -3,6 +3,7 @@ from ctypes import *
 from multiprocessing import *
 import sys, os, glob
 import platform
+import sklearn.covariance as sk
 
 if sys.platform=='linux':
     
@@ -10,8 +11,6 @@ if sys.platform=='linux':
         if i.split('/')[-1]=='site-packages':
             ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
             ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-    
-
 
     libr=CDLL(ddalpha_exact[0])
     libRom=CDLL(ddalpha_approx[0])
@@ -27,71 +26,70 @@ if sys.platform=='darwin':
 
 if sys.platform=='win32' and platform.architecture()[0] == "64bit":
     site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
+
     os.add_dll_directory(site_packages)
     ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
     ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
     libr=CDLL(r""+ddalpha_exact[0])
     libRom=CDLL(r""+ddalpha_approx[0])
-    
+
 if sys.platform=='win32' and platform.architecture()[0] == "32bit":
     site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
+
     os.add_dll_directory(site_packages)
     ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
     ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
     libr=CDLL(r""+ddalpha_exact[0])
     libRom=CDLL(r""+ddalpha_approx[0])
-
+    
+def MCD_fun(data,alpha,NeedLoc=False):
+    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
+    if NeedLoc:return([cov.covariance_,cov.location_])
+    else:return(cov.covariance_)
 
 def spatial(x, data,mah_estimate='moment',mah_parMcd=0.75):
-        depths_tab=[]
+    depths_tab=[]
 
-        if mah_estimate=='none':
-                print('none')
-                lambda1=np.eye(len(data))
-        elif mah_estimate=='moment':
-                print('moment')
-                cov=np.cov(np.transpose(data))
-        elif mah_estimate=='MCD':
-                print('mcd')
-        if np.sum(np.isnan(cov))==0:
-                w,v=np.linalg.eig(cov)
-                lambda1=np.linalg.inv(np.matmul(v,np.diag(np.sqrt(w))))#invàconfirmer
-        else:
-                lambda1=np.eye(len(data))
+    if mah_estimate=='none':
+        lambda1=np.eye(len(data))
+        cov=np.empty((data.shape[1], data.shape[1]))
+        cov[:]=np.nan
+    elif mah_estimate=='moment':
+        cov=np.cov(np.transpose(data))
+    elif mah_estimate=='MCD':
+        cov=MCD_fun(data,mah_parMcd)
+    print(cov)
+    print(np.isnan(cov))
+    if np.sum(np.isnan(cov))==0:
+        w,v=np.linalg.eig(cov)
+        lambda1=np.linalg.inv(np.matmul(v,np.diag(np.sqrt(w))))
+    else:
+        lambda1=np.eye(data.shape[1])
 
-        depths=np.repeat(-1,len(x),axis=0)
-        for i in range(len(x)):
-                interm=[]
-                tmp1_ter=np.transpose(x[i]-data)
-                tmp1=np.transpose(np.matmul(lambda1,tmp1_ter))
-                tmp1_bis=np.sum(tmp1,axis=1)
-                for elements in tmp1_bis:
-                        if elements==0:
-                                interm.append(False)
-                        if elements!=0:
-                                interm.append(True)
-                
-                interm=np.array(interm)
-                tmp1=tmp1[interm]
-                tmp2=1/np.sqrt(np.sum(np.power(tmp1,2),axis=1))
-                tmp3=np.zeros([len(tmp1),len(tmp1[0])])
-                tmp1=np.transpose(tmp1)
-                for jj in range(len(tmp1)):
-                        tmp3[:,jj]=tmp2*(tmp1[:][jj])
-                tmp4=np.sum(tmp3,axis=0)/len(data)
-                tmp5=np.power((tmp4),2)
-                tmp6=np.sum(tmp5)
-                depths_tab.append(1-np.sqrt(tmp6))
-        return depths_tab
-
-
-
-
-
-
-
+    depths=np.repeat(-1,len(x),axis=0)
+    for i in range(len(x)):
+        interm=[]
+        tmp1_ter=np.transpose(x[i]-data)
+        tmp1=np.transpose(np.matmul(lambda1,tmp1_ter))
+        tmp1_bis=np.sum(tmp1,axis=1)
+        for elements in tmp1_bis:
+            if elements==0:
+                interm.append(False)
+            if elements!=0:
+                interm.append(True)
+        
+        interm=np.array(interm)
+        tmp1=tmp1[interm]
+        tmp2=1/np.sqrt(np.sum(np.power(tmp1,2),axis=1))
+        tmp3=np.zeros([len(tmp1),len(tmp1[0])])
+        tmp1=np.transpose(tmp1)
+        for jj in range(len(tmp1)):
+            tmp3[:,jj]=tmp2*(tmp1[:][jj])
+        tmp4=np.sum(tmp3,axis=0)/len(data)
+        tmp5=np.power((tmp4),2)
+        tmp6=np.sum(tmp5)
+        depths_tab.append(1-np.sqrt(tmp6))
+    return depths_tab
 
 spatial.__doc__=""" 
 
