@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 #Skip for MacOS
 # skip = ["pp*"]
 #Skip for Ubuntu   # 32bit cp310 results in error
-skip = ['*i686*',"*musllinux*", "pp*", "cp310-*"]
+skip = ['*i686*',"*musllinux*", "pp*"]
 # Build `universal2` and `arm64` wheels on an Intel runner.
 # Note that the `arm64` wheel and the `arm64` part of the `universal2`
 # wheel cannot be tested in this configuration.
