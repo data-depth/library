@@ -12,8 +12,6 @@ if sys.platform=='linux':
         if i.split('/')[-1]=='site-packages':
             ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
             ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-    
-
 
     libr=CDLL(ddalpha_exact[0])
     libRom=CDLL(ddalpha_approx[0])
@@ -97,8 +95,6 @@ def betaSkeleton(x, data, beta = 2, distance = "Lp", Lp_p = 2, mah_estimate = "m
 	sigma=pointer((c_double*len(sigma.flatten()))(*sigma.flatten()))
 	depth=pointer((c_double*len(x))(*np.zeros(len(x))))
 
-	
-	
 	libr.BetaSkeletonDepth(points, objects, numPoints, numObjects, dimension, beta, code, Lp_p, sigma, depth)
     	
 	res=np.zeros(len(x))
@@ -168,6 +164,3 @@ Examples
  			0.27825225 0.11572372 0.4663003  0.18778579]
 
 """
-
-
-

@@ -19,11 +19,14 @@
 extern "C" {
 #endif
 
-
-
-
 void Sum(double *a, double *b, double *res){
 	res[0] = a[0] + b[0];
+}
+
+void Det(double *A, int *dim, double *res){
+    TDMatrix x = asMatrix(A, *dim, *dim);
+    *res = getDet(x, *dim);
+    delete[] x;
 }
 
 void setSeed(int random_seed){
@@ -165,10 +168,10 @@ void OjaDepth(double *points, double *objects, int *numPoints, int *numObjects, 
 	TDMatrix X = asMatrix(points, *numPoints, *dimension);
 	TDMatrix x = asMatrix(objects, *numObjects, *dimension);
 	TDMatrix cov = asMatrix(covEst, *dimension, *dimension);
-
-	if (*exact)
-		OjaDepthsEx(X, x, *dimension, *numPoints, *numObjects, *useCov, cov, depths);
-	else{
+    
+    if (*exact)
+        OjaDepthsEx(X, x, *dimension, *numPoints, *numObjects, *useCov, cov, depths);
+    else{
 		long long K = ((long long)2000000000)*k[0] + k[1];
 		OjaDepthsApx(X, x, *dimension, *numPoints, *numObjects, K, *useCov, cov, depths);
 	}

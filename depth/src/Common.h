@@ -31,6 +31,7 @@ void outFeatures(Features fs);
 unsigned long long choose(unsigned long long n, unsigned long long k);
 unsigned long long fact(unsigned long long n);
 bool solveUnique(TDMatrix A, double* b, double* x, int d);
+double getDet(TDMatrix A, int d);
 
 double determinant(TDMatrix& m);
 double* means(TDMatrix X, int n, int d);

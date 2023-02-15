@@ -1,8 +1,18 @@
 import numpy as np
 from ctypes import *
 from depth.multivariate.Depth_approximation import depth_approximation
+from depth.multivariate.Halfspace import halfspace
+from depth.multivariate.Projection import projection
+from depth.multivariate.SimplicialVolume import simplicialVolume
+from depth.multivariate.Spatial import spatial
+from depth.multivariate.Simplicial import simplicial
+from depth.multivariate.Zonoid import zonoid
+from depth.multivariate.BetaSkeleton import betaSkeleton
 import sys, os, glob
 import platform
+from matplotlib.colors import BoundaryNorm
+from matplotlib.ticker import MaxNLocator
+import matplotlib.pyplot as plt
 
 if sys.platform=='linux':
     
@@ -10,8 +20,6 @@ if sys.platform=='linux':
         if i.split('/')[-1]=='site-packages':
             ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
             ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-    
-
 
     libr=CDLL(ddalpha_exact[0])
     libRom=CDLL(ddalpha_approx[0])
@@ -43,7 +51,79 @@ if sys.platform=='win32' and platform.architecture()[0] == "32bit":
     libr=CDLL(r""+ddalpha_exact[0])
     libRom=CDLL(r""+ddalpha_approx[0])
 
-def halfspace(x, data, numDirections=1000, exact=True, method="recursive",
+def depth_mesh(data, notion = "halfspace",
+                freq = [100, 100],
+                xlim = None,
+                ylim = None,
+                mah_estimate = "moment",
+                mah_parMCD = 0.75,
+                beta = 2,
+                distance = "Lp",
+                Lp_p = 2,
+                exact = True,
+                method = "recursive",
+                k = 0.05,
+                solver = "neldermead",
+                NRandom = 1000,
+                option = 1,
+                n_refinements = 10,
+                sphcap_shrink = 0.5,
+                alpha_Dirichlet = 1.25,
+                cooling_factor = 0.95,
+                cap_size = 1,
+                start = "mean",
+                space = "sphere",
+                line_solver = "goldensection",
+                bound_gc = True):
+    
+    # Prepare the depth-calculating arguments
+    xs, ys = np.meshgrid(np.linspace(xlim[0], xlim[1], freq[0]), np.linspace(ylim[0], ylim[1], freq[1]))
+    objects = np.c_[xs.ravel(), ys.ravel()]
+    # Fork for calling a depth notion
+    if notion == "halfspace":
+        zDepth = halfspace(objects, data, NRandom, exact, method, solver,
+            NRandom, option, n_refinements, sphcap_shrink, alpha_Dirichlet,
+            cooling_factor, cap_size, start, space, line_solver, bound_gc)
+    elif notion == "projection":
+        zDepth = projection(objects, data, solver, NRandom, option,
+            n_refinements, sphcap_shrink, alpha_Dirichlet, cooling_factor,
+            cap_size, start, space, line_solver, bound_gc)
+    elif notion == "simplicialVolume":
+        zDepth = simplicialVolume(objects, data, exact, k, mah_estimate,
+            mah_parMCD)
+    elif notion == "spatial":
+        zDepth = spatial(objects, data, mah_estimate, mah_parMCD)
+    elif notion == "simplicial":
+        zDepth = simplicial(objects, data, exact, k)
+    elif notion == "zonoid":
+        zDepth = zonoid(objects, data, 0, exact, solver, NRandom, option,
+            n_refinements, sphcap_shrink, alpha_Dirichlet, cooling_factor,
+            cap_size, start, space, line_solver, bound_gc)
+    elif notion == "betaSkeleton":
+        zDepth = betaSkeleton(objects, data, beta, distance, Lp_p,
+            mah_estimate, mah_parMCD)
+    # Shape the grid
+    depth_grid = zDepth.reshape(xs.shape)
+    
+    return xs, ys, depth_grid
+
+def depth_plot2d(data, notion = "halfspace",
+                freq = [100, 100],
+                xlim = None,
+                ylim = None,
+                cmap = "YlOrRd",
+                ret_depth_mesh = False,
+                xs = None,
+                ys = None,
+                val_mesh = None,
+                mah_estimate = "moment",
+                mah_parMCD = 0.75,
+                beta = 2,
+                distance = "Lp",
+                Lp_p = 2,
+                exact = True,
+                method = "recursive",
+                k = 0.05,
                 solver = "neldermead",
                 NRandom = 1000,
                 option = 1,
@@ -57,46 +137,51 @@ def halfspace(x, data, numDirections=1000, exact=True, method="recursive",
                 line_solver = "goldensection",
                 bound_gc = True):
 
-    if exact:
-        if (method =="recursive" or method==1):
-            method=1
-        elif (method =="plane" or method==2):
-            method=2
-        elif (method =="line" or method==3):
-            method=3
+    if xs is None or ys is None or val_mesh is None:
+        # Verify the plot's limits
+        if xlim is None:
+            x_span = max(data[:,0]) - min(data[:,0])
+            cur_xlim = [min(data[:,0]) - x_span * 0.1, max(data[:,0]) + x_span * 0.1]
         else:
-            print("Wrong argument, method=str(recursive) or str(plane) or str(line)")
-            print("recursive by default")
-            method=3
+            cur_xlim = xlim
+        if ylim is None:
+            y_span = max(data[:,1]) - min(data[:,1])
+            cur_ylim = [min(data[:,1]) - y_span * 0.1, max(data[:,1] + y_span * 0.1)]
+        else:
+            cur_ylim = ylim
 
-        points_list=data.flatten()
-        objects_list=x.flatten()
-        points=(c_double*len(points_list))(*points_list)
-        objects=(c_double*len(objects_list))(*objects_list)
-        k=numDirections
+        # Caclulate the depth mesh
+        cur_xs, cur_ys, zDepth = depth_mesh(data, notion, freq, cur_xlim,
+            cur_ylim, mah_estimate, mah_parMCD, beta, distance, Lp_p, exact,
+            method, k, solver, NRandom, option, n_refinements, sphcap_shrink,
+            alpha_Dirichlet, cooling_factor, cap_size, start, space,
+            line_solver, bound_gc)
+        # Shape the grid
+        depth_grid = zDepth.reshape(cur_xs.shape)
+    else:
+        cur_xs, cur_ys, depth_grid = xs, ys, depth_mesh
 
-        points=pointer(points)
-
-        objects=pointer(objects)
-        numPoints=pointer(c_int(len(data)))
-        numObjects=pointer(c_int(len(x)))
-        dimension=pointer(c_int(len(data[0])))
-        algNo=pointer((c_int(method)))
-        depths=pointer((c_double*len(x))(*np.zeros(len(x))))
+    # Introduce colors
+    levels = MaxNLocator(nbins = 100).tick_values(0, 1)
+    if isinstance(cmap, str):
+        col_map = plt.get_cmap(cmap)
+    else:
+        col_map = cmap
+    norm = BoundaryNorm(levels, ncolors = col_map.N, clip = True)
+    # Plot the color mesh
+    depth_mesh_cut = np.copy(depth_grid)
+    depth_mesh_cut[depth_mesh_cut == 0] = float('nan') # white color for zero depth
+    depth_mesh_cut = depth_mesh_cut[:-1,:-1]
+    fig, ax = plt.subplots()
+    im = ax.pcolormesh(cur_xs, cur_ys, depth_mesh_cut, cmap = col_map, norm = norm)
     
-        libr.HDepthEx(points,objects, numPoints,numObjects,dimension,algNo,depths)
-    
-        res=np.zeros(len(x))
-        for i in range(len(x)):
-            res[i]=depths[0][i]
-        return res
-    else:	
-        return depth_approximation(x, data, "halfspace", solver, NRandom ,option, n_refinements,
-        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
-    
+    # Return selected values depending on arguments
+    if ret_depth_mesh:
+        return fig, ax, im, cur_xs, cur_ys, depth_grid
+    else:
+        return fig, ax, im
 
-
-halfspace.__doc__="""
+depth_mesh.__doc__="""
 
 Description
     Calculates the exact and approximated Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a multivariate data set.
@@ -189,7 +274,3 @@ Examples
         [0.    0.005 0.005 0.    0.04  0.01  0.    0.    0.04  0.01 ]
 
 """
-    
-
-    
-

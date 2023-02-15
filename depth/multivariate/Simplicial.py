@@ -74,13 +74,10 @@ def simplicial(x, data, exact=True, k=0.05, seed=0):
         k=pointer((c_int*2)(*longtoint(k)))
     else:
         k=pointer((c_int*2)(*longtoint(k)))
-        
-    
+
     depths=pointer((c_double*len(x))(*np.zeros(len(x))))
 
-
     libr.SimplicialDepth(points,objects, numPoints,numObjects,dimension,seed,exact,k,depths)
-
 
     res=np.zeros(len(x))
     for i in range(len(x)):

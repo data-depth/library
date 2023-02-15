@@ -4,17 +4,18 @@ void OjaDepthsEx(TDMatrix X, TDMatrix x, int d, int n, int nx, int useCov,
                  TDMatrix covEst, double *depths){
 
 	int* counters = new int[d + 1];
-	TDMatrix A =newM(d+1,d+1);
+	TDMatrix A = newM(d+1,d+1);
 	unsigned long long div0 = choose(n, d);
 
 	double S = 1;
 	if (useCov > 0){
-	  TDMatrix covX =newM(d,d);;
-	  for (int k = 0; k < d; k++)
-	    for (int j = 0; j < d; j++)
-	      covX[k][j] = covEst[k][j];
-	  // deleteM(covXtemp); // no need to compute anymore
-	  S = pow(fabs(determinant(covX,d)),-0.5);
+        TDMatrix covX = newM(d,d);;
+        for (int k = 0; k < d; k++)
+            for (int j = 0; j < d; j++)
+                covX[k][j] = covEst[k][j];
+        // deleteM(covXtemp); // no need to compute anymore
+        //S = pow(fabs(determinant(covX,d)),-0.5);
+        S = pow(fabs(getDet(covX, d)), -0.5);
 	}
 
 	for (int obs = 0; obs < nx; obs++){
@@ -39,7 +40,8 @@ void OjaDepthsEx(TDMatrix X, TDMatrix x, int d, int n, int nx, int useCov,
 			for (int k = 0; k < d + 1; k++){
 				A[0][k] = 1;
 			}
-			double volume = fabs(determinant(A,d+1));
+			//double volume = fabs(determinant(A,d+1));
+            double volume = fabs(getDet(A, d + 1));
 			sumVolume += volume;
 			numSimplicesChecked ++;
 		}

@@ -11,6 +11,9 @@ from depth.multivariate.Simplicial import simplicial
 from depth.multivariate.SimplicialVolume import simplicialVolume
 from depth.multivariate.Spatial import spatial
 from depth.multivariate.Zonoid import zonoid
+from depth.multivariate.plot import depth_mesh
+from depth.multivariate.plot import depth_plot2d
+from depth.multivariate.SimplicialVolume import calcDet
 
 __all__ = ["depth_approximation", "betaSkeleton", "halfspace", "L2", "mahalanobis",
-        "potential", "projection", "aprojection", "qhpeeling", "simplicial", "simplicialVolume", "spatial", "zonoid"]
+        "potential", "projection", "aprojection", "qhpeeling", "simplicial", "simplicialVolume", "spatial", "zonoid", "depth_mesh", "depth_plot2d", "calcDet"]

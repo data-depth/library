@@ -58,8 +58,6 @@ def spatial(x, data,mah_estimate='moment',mah_parMcd=0.75):
         cov=np.cov(np.transpose(data))
     elif mah_estimate=='MCD':
         cov=MCD_fun(data,mah_parMcd)
-    print(cov)
-    print(np.isnan(cov))
     if np.sum(np.isnan(cov))==0:
         w,v=np.linalg.eig(cov)
         lambda1=np.linalg.inv(np.matmul(v,np.diag(np.sqrt(w))))
@@ -89,7 +87,7 @@ def spatial(x, data,mah_estimate='moment',mah_parMcd=0.75):
         tmp5=np.power((tmp4),2)
         tmp6=np.sum(tmp5)
         depths_tab.append(1-np.sqrt(tmp6))
-    return depths_tab
+    return np.array(depths_tab)
 
 spatial.__doc__=""" 
 

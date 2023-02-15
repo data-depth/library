@@ -148,9 +148,70 @@ bool solveUnique(TDMatrix A, double* b, double* x, int d){
 	return true;
 }
 
-
-
-
+double getDet(TDMatrix A, int d){
+    int imax, jmax;
+    int* colp = new int[d];
+    double amax;
+    double det = 1; // The final A's determinant value
+    for (int k = 0; k < d - 1; k++) {
+        imax = k;
+        jmax = k;
+        amax = fabs(A[k][k]);
+        colp[k] = k;
+        // Find column maximum
+        for (int i = k + 1; i < d; i++) {
+            if (fabs(A[i][k]) > amax) {
+                amax = fabs(A[i][k]);
+                imax = i;
+            }
+        }
+        // If column maximum = 0, then complete pivoting
+        if (amax < eps_pivot) {
+            for (int j = k + 1; j < d; j++) {
+                for (int i = k; i < d; i++) {
+                    if (fabs(A[i][j]) > amax) {
+                        amax = fabs(A[i][j]);
+                        imax = i;
+                        jmax = j;
+                    }
+                }
+            }
+            if (amax < eps_pivot) {
+                delete[] colp;
+                return 0;
+            }
+            // Column swap
+            for (int i = 0; i < d; i++) {
+                double tmp = A[i][k];
+                A[i][k] = A[i][jmax];
+                A[i][jmax] = tmp;
+            }
+            colp[k] = jmax;
+        }
+        // Row swap
+        if (imax != k) {
+            for (int j = k; j < d; j++) {
+                double tmp = A[k][j];
+                A[k][j] = A[imax][j];
+                A[imax][j] = tmp;
+            }
+            det *= -1;
+        }
+        // Elimination
+        for (int i = k + 1; i < d; i++) {
+            double factor = A[i][k] / A[k][k];
+            for (int j = k + 1; j < d; j++){
+                A[i][j] -= factor * A[k][j];
+            }
+        }
+    }
+    delete[] colp;
+    // Calculate the determinant value
+    for (int i = 0; i < d; i++){
+        det *= A[i][i];
+    }
+    return det;
+}
 
 void lmatrice(TDMatrix A ,TDMatrix B, int n, int l){
 	int li=0;

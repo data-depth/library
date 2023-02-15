@@ -12,8 +12,6 @@ if sys.platform=='linux':
         if i.split('/')[-1]=='site-packages':
             ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
             ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-    
-
 
     libr=CDLL(ddalpha_exact[0])
     libRom=CDLL(ddalpha_approx[0])
@@ -55,8 +53,17 @@ def MCD_fun(data,alpha,NeedLoc=False):
     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
     if NeedLoc:return([cov.covariance_,cov.location_])
     else:return(cov.covariance_)
+    
+def calcDet(A):
+    dim_pointer = pointer(c_int(A.shape[0]))
+    matrix_list = A.flatten()
+    matrix_pointer = (c_double*len(matrix_list))(*matrix_list)
+    res_pointer = pointer(c_double(0))
+    libr.Det(matrix_pointer, dim_pointer, res_pointer)
+    return res_pointer[0]
 
-def simplicialVolume(x,data,exact=True,k=0.05,mah_estimate="moment", mah_parMCD=0.75,seed=0):
+def simplicialVolume(x, data, exact = True, k = 0.05,
+        mah_estimate = "moment", mah_parMCD = 0.75, seed = 0):
     points_list=data.flatten()
     objects_list=x.flatten()
     if (mah_estimate == "none"):
@@ -65,7 +72,6 @@ def simplicialVolume(x,data,exact=True,k=0.05,mah_estimate="moment", mah_parMCD=
     elif (mah_estimate == "moment"):
         useCov = 1
         covEst=np.cov(np.transpose(data))
-    
     elif (mah_estimate == "MCD") :
         useCov = 2
         covEst = MCD_fun(data, mah_parMCD)
@@ -74,18 +80,16 @@ def simplicialVolume(x,data,exact=True,k=0.05,mah_estimate="moment", mah_parMCD=
         print("moment is use")
         useCov = 1
         covEst=np.cov(data)
-        
+
     points=(c_double*len(points_list))(*points_list)
     objects=(c_double*len(objects_list))(*objects_list)
 
-    points=pointer(points)
-    objects=pointer(objects)
     numPoints=pointer(c_int(len(data)))
     numObjects=pointer(c_int(len(x)))
     dimension=pointer(c_int(len(data[0])))
     
-    seed=pointer((c_int(seed)))
-    exact=pointer((c_int(exact)))
+    seed=pointer(c_int(seed))
+    exact=pointer(c_int(exact))
     if k<=0:
         print("k must be positive")
         print("k=1")
@@ -97,24 +101,19 @@ def simplicialVolume(x,data,exact=True,k=0.05,mah_estimate="moment", mah_parMCD=
         k=pointer((c_int*2)(*longtoint(k)))
     else:
         k=pointer((c_int*2)(*longtoint(k)))
-        
-    
-    
+
     useCov=pointer(c_int(useCov))
     covEst=covEst.flatten()
-    covEst=pointer((c_double*len(covEst))(*covEst))
-        
-    depths=pointer((c_double*len(x))(*np.zeros(len(x))))
+    covEst=(c_double*len(covEst))(*covEst)
+
+    depths=(c_double*len(x))(*np.zeros(len(x)))
 
     libr.OjaDepth(points,objects,numPoints,numObjects,dimension,seed, exact, k, useCov, covEst, depths)
 
     res=np.zeros(len(x))
     for i in range(len(x)):
-        res[i]=depths[0][i]
+        res[i]=depths[i]
     return res
-    
-    
-    
 
 simplicialVolume.__doc__="""
 
