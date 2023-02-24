@@ -9,7 +9,7 @@ class custom_build_ext(build_ext):
         # removes the "default" compiler flags that would
         # otherwise get passed on to to the compiler, i.e.,
         # distutils.sysconfig.get_var("CFLAGS").
-        self.compiler.set_executable("compiler_so", "g++ -fpic")
+        self.compiler.set_executable("compiler_so", "g++ -fpic -O2")
         self.compiler.set_executable("compiler_cxx", "g++")
         if sys.platform=='darwin':
         	self.compiler.set_executable("linker_so", "g++ -Wl, -shared -lstdc++")
