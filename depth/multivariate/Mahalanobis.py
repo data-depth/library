@@ -1,52 +1,8 @@
 import numpy as np
-from ctypes import *
 import sklearn.covariance as sk
 from depth.multivariate.Depth_approximation import depth_approximation
-import sys, os, glob
-import platform
-
-
-
-
-if sys.platform=='linux':
-    
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-    
-
-
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-    
-if sys.platform=='darwin':
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-  
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-
-if sys.platform=='win32' and platform.architecture()[0] == "64bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
-    
-if sys.platform=='win32' and platform.architecture()[0] == "32bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
-
+from import_CDLL import libr
+import ctypes as ct
 
 def MCD_fun(data,alpha,NeedLoc=False):
     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
@@ -69,26 +25,23 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                         
                         
     if exact:
-    
-
         points_list=data.flatten()
         objects_list=x.flatten()
         
-        points=(c_double*len(points_list))(*points_list)
-        objects=(c_double*len(objects_list))(*objects_list)
+        points=(ct.c_double*len(points_list))(*points_list)
+        objects=(ct.c_double*len(objects_list))(*objects_list)
 
-        points=pointer(points)
-        objects=pointer(objects)
-        numPoints=pointer(c_int(len(data)))
-        numObjects=pointer(c_int(len(x)))
-        dimension=pointer(c_int(len(data[0])))
-        PY_MatMCD=MCD_fun(data,mah_parMcd)
-        PY_MatMCD=PY_MatMCD.flatten(order='C')
-        mat_MCD=pointer((c_double*len(PY_MatMCD))(*PY_MatMCD))
+        points=ct.pointer(points)
+        objects=ct.pointer(objects)
+        numPoints=ct.pointer(ct.c_int(len(data)))
+        numObjects=ct.pointer(ct.c_int(len(x)))
+        dimension=ct.pointer(ct.c_int(len(data[0])))
+        PY_MatMCD=MCD_fun(data,mah_parMcd).flatten(order='C')
+        mat_MCD=ct.pointer((ct.c_double*len(PY_MatMCD))(*PY_MatMCD))
 
         
         
-        depths=pointer((c_double*len(x))(*np.zeros(len(x))))
+        depths=ct.pointer((ct.c_double*len(x))(*np.zeros(len(x))))
 
         libr.MahalanobisDepth(points,objects,numPoints,numObjects,dimension,mat_MCD,depths)
 

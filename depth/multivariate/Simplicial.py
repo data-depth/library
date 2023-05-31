@@ -1,48 +1,9 @@
 import numpy as np
+import sklearn.covariance as sk
+from depth.multivariate.Depth_approximation import depth_approximation
+from import_CDLL import libr
 from ctypes import *
-from multiprocessing import *
 import scipy.special as scspecial
-import sys, os, glob
-import platform
-
-if sys.platform=='linux':
-    
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-    
-
-
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-    
-if sys.platform=='darwin':
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-  
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-
-if sys.platform=='win32' and platform.architecture()[0] == "64bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
-    
-if sys.platform=='win32' and platform.architecture()[0] == "32bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
 
 def longtoint(k):
   limit = 2000000000

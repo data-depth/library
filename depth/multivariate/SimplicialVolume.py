@@ -1,47 +1,9 @@
 import numpy as np
-from ctypes import *
-from multiprocessing import *
 import sklearn.covariance as sk
+from depth.multivariate.Depth_approximation import depth_approximation
+from import_CDLL import libr
+from ctypes import *
 import scipy.special as scspecial
-import sys, os, glob
-import platform
-
-if sys.platform=='linux':
-    
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-    
-if sys.platform=='darwin':
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-  
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-
-if sys.platform=='win32' and platform.architecture()[0] == "64bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
-    
-if sys.platform=='win32' and platform.architecture()[0] == "32bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
 
 def longtoint(k):
   limit = 2000000000
@@ -157,10 +119,10 @@ Examples
             >>> mat2=[[1, 0, 0],[0, 1, 0],[0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0], mat1, 20)
-            >>> simplicalVolume(x, data, exact=True)
+            >>> simplicialVolume(x, data, exact=True)
             [0.45749049 0.34956166 0.2263421  0.68742137 0.94796538 0.51112415
              0.85250931 0.67914988 0.79165292 0.33192247]
-            >>> simplicalVolume(x, data, exact=False, k=0.2)
+            >>> simplicialVolume(x, data, exact=False, k=0.2)
             [0.46826813 0.40138917 0.23189724 0.69025277 0.938543   0.56005713
              0.8113647  0.72220103 0.82036139 0.33908597]
 """

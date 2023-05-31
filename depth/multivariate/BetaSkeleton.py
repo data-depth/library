@@ -1,48 +1,8 @@
 import numpy as np
-from ctypes import *
-from multiprocessing import *
 import math
 import sklearn.covariance as sk
-import sys, os, glob
-import platform
-
-if sys.platform=='linux':
-    
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-    
-if sys.platform=='darwin':
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-  
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-
-if sys.platform=='win32' and platform.architecture()[0] == "64bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
-    
-if sys.platform=='win32' and platform.architecture()[0] == "32bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
-
+import ctypes as ct
+from import_CDLL import libr
 
 def MCD_fun(data,alpha,NeedLoc=False):
     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
@@ -81,19 +41,19 @@ def betaSkeleton(x, data, beta = 2, distance = "Lp", Lp_p = 2, mah_estimate = "m
 				code = 3
 		else:print("Argument \"distance\" should be either \"Lp\" or \"Mahalanobis\"")
 
-	points=pointer((c_double*len(points_list))(*points_list))
-	objects=pointer((c_double*len(objects_list))(*objects_list))
-	numPoints=pointer(c_int(len(data)))
-	numObjects=pointer(c_int(len(x)))
-	dimension=pointer(c_int(len(data[0])))
+	points=ct.pointer((ct.c_double*len(points_list))(*points_list))
+	objects=ct.pointer((ct.c_double*len(objects_list))(*objects_list))
+	numPoints=ct.pointer(ct.c_int(len(data)))
+	numObjects=ct.pointer(ct.c_int(len(x)))
+	dimension=ct.pointer(ct.c_int(len(data[0])))
 	beta=[beta]
 	
-	beta=pointer((c_double*1)(*beta))
-	code=pointer(c_int(code))
+	beta=ct.pointer((ct.c_double*1)(*beta))
+	code=ct.pointer(ct.c_int(code))
 	Lp_p=[Lp_p]
-	Lp_p=pointer((c_double*1)(*Lp_p))
-	sigma=pointer((c_double*len(sigma.flatten()))(*sigma.flatten()))
-	depth=pointer((c_double*len(x))(*np.zeros(len(x))))
+	Lp_p=ct.pointer((ct.c_double*1)(*Lp_p))
+	sigma=ct.pointer((ct.c_double*len(sigma.flatten()))(*sigma.flatten()))
+	depth=ct.pointer((ct.c_double*len(x))(*np.zeros(len(x))))
 
 	libr.BetaSkeletonDepth(points, objects, numPoints, numObjects, dimension, beta, code, Lp_p, sigma, depth)
     	
@@ -159,7 +119,7 @@ Examples
 			>>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
 			>>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
 			>>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
-			>>> BetaSkeleton(x, data)
+			>>> betaSkeleton(x, data)
 			[0.16467668 0.336002   0.43702102 0.25827828 0.4204044  0.46894895
  			0.27825225 0.11572372 0.4663003  0.18778579]
 

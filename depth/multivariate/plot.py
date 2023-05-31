@@ -1,5 +1,4 @@
 import numpy as np
-from ctypes import *
 from depth.multivariate.Depth_approximation import depth_approximation
 from depth.multivariate.Halfspace import halfspace
 from depth.multivariate.Projection import projection
@@ -8,48 +7,9 @@ from depth.multivariate.Spatial import spatial
 from depth.multivariate.Simplicial import simplicial
 from depth.multivariate.Zonoid import zonoid
 from depth.multivariate.BetaSkeleton import betaSkeleton
-import sys, os, glob
-import platform
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 import matplotlib.pyplot as plt
-
-if sys.platform=='linux':
-    
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-    
-if sys.platform=='darwin':
-    for i in sys.path :
-        if i.split('/')[-1]=='site-packages':
-            ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
-            ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-  
-    libr=CDLL(ddalpha_exact[0])
-    libRom=CDLL(ddalpha_approx[0])
-
-if sys.platform=='win32' and platform.architecture()[0] == "64bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
-    
-if sys.platform=='win32' and platform.architecture()[0] == "32bit":
-    site_packages = next(p for p in sys.path if 'site-packages' in p)
-    
-    os.add_dll_directory(site_packages)
-    ddalpha_exact=glob.glob(site_packages+'/depth/src/*ddalpha*.dll')
-    ddalpha_approx=glob.glob(site_packages+'/depth/src/*depth_wrapper*.dll')
-    libr=CDLL(r""+ddalpha_exact[0])
-    libRom=CDLL(r""+ddalpha_approx[0])
 
 def depth_mesh(data, notion = "halfspace",
                 freq = [100, 100],
