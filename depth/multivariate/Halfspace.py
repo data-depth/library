@@ -1,7 +1,7 @@
 import numpy as np
 import ctypes as ct
 from depth.multivariate.Depth_approximation import depth_approximation
-from import_CDLL import libr
+from depth.multivariate.import_CDLL import libr
 
 def halfspace(x, data, numDirections=1000, exact=True, method="recursive",
                 solver = "neldermead",

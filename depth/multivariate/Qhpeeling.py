@@ -1,7 +1,7 @@
 import numpy as np
 import sklearn.covariance as sk
 from depth.multivariate.Depth_approximation import depth_approximation
-from import_CDLL import libr
+from depth.multivariate.import_CDLL import libr
 from ctypes import *
 import scipy.spatial as scsp
 

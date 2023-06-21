@@ -1,6 +1,6 @@
 import numpy as np
 import sklearn.covariance as sk
-from import_CDLL import libr,libRom
+from depth.multivariate.import_CDLL import libr,libRom
 from ctypes import *
    
 def depth_approximation(z,

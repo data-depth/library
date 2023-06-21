@@ -2,7 +2,7 @@ import numpy as np
 import math
 import sklearn.covariance as sk
 from depth.multivariate.Depth_approximation import depth_approximation
-from import_CDLL import libr
+from depth.multivariate.import_CDLL import libr
 from ctypes import *
 
 ## the moment trabnsform requires MCD func

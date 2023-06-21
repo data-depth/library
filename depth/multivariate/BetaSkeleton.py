@@ -2,7 +2,7 @@ import numpy as np
 import math
 import sklearn.covariance as sk
 import ctypes as ct
-from import_CDLL import libr
+from depth.multivariate.import_CDLL import libr
 
 def MCD_fun(data,alpha,NeedLoc=False):
     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
