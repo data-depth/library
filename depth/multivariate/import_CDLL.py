@@ -3,7 +3,6 @@ import multiprocessing as mp
 import sys, os, glob
 
 def import_CDLL():
-    print(sys.platform)
     if sys.platform=='linux':
         for i in sys.path :         
             if i.split('/')[-1]=='site-packages' or i.split('/')[-1]=='dist-packages':#Add search dist-packages
@@ -28,12 +27,10 @@ def import_CDLL():
 
     if sys.platform=='win32':
         site_packages = [p for p in sys.path if ('site-packages' in p) or ("dist-packages" in p)] #Add search dist-packages
-        print(site_packages)
         for i in site_packages:
             os.add_dll_directory(i)
             ddalpha_exact=glob.glob(i+'/depth/src/*ddalpha*.dll')
             ddalpha_approx=glob.glob(i+'/depth/src/*depth_wrapper*.dll')
-            print(glob.glob(i))
             if ddalpha_exact+ddalpha_approx!=[]:
                 libr=ct.CDLL(r""+ddalpha_exact[0])
                 libRom=ct.CDLL(r""+ddalpha_approx[0])
