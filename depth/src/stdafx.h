@@ -35,6 +35,8 @@ using namespace std;
 #include "LensDepth.h"
 #include "stdafx.cpp"
 #include "HD2.cpp"
+#include "MCD.h"
+
 
 #include "Common.cpp"
 #include "OjaDepth.cpp"
@@ -43,6 +45,9 @@ using namespace std;
 #include "ZonoidDepth.cpp"
 #include "PotentialDepth.cpp"
 #include "SimplicialDepth.cpp"
+#include "PD.cpp"
+#include "MCD.cpp"
+
 
 int random(int x);
 

@@ -262,6 +262,12 @@ void BetaSkeletonDepth(double *points, double *objects, int *numPoints, int *num
   delete[] s;
 }
 
+void MinimumCovarianceDeterminantEstim(double *points, int *numPoints, int *dimension, int *hParam, int *seed, double *mat_MCD, double chisqr05, double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp, bool seeded){
+	TDMatrix X = asMatrix(points, *numPoints, *dimension);
+	Mcd(X, *numPoints,*dimension, *hParam, mat_MCD, chisqr05, chisqr0975, mfull, nstep, hiRegimeCompleteLastComp, seed, seeded);
+	delete[] X;
+}
+
 
 int main() {
     std::cout << random(10);
