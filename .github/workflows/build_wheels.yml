@@ -78,6 +78,7 @@ jobs:
       - name: install requirements for Build-package
         #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: py -m pip install build
+        run: pip3 install setuptools
         #run: g++ --version
         env:
           HOME: ${{ runner.workspace }}/library
