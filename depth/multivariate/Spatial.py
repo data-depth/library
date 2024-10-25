@@ -1,8 +1,10 @@
 import numpy as np
+from ctypes import *
+from multiprocessing import *
+import sys, os, glob
+import platform
 import sklearn.covariance as sk
-from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
-from ctypes import *    
+    
 def MCD_fun(data,alpha,NeedLoc=False):
     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
     if NeedLoc:return([cov.covariance_,cov.location_])

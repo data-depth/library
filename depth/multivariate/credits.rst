@@ -14,6 +14,8 @@ Contributors
 * Rainer Dyckerhoff, <rainer.dyckerhoff at statistik.uni-koeln.de>
 * Oleksii Pokotylo, <alexey.pokotylo at gmail.com>
 * Romain Valla, <romain.valla at telecom-paris.fr>
+* Arturo Castellanos Salinas, <arturo.castellanos at telecom-paris.fr>
 * Pierre-Antoine Amiand Leroy, <pierre-antoine.amiand-leroy at ip-paris.fr> (on behalf of Hi! Paris)
 * Amine Yamoul, <amine.yamoul at capgemini.com> (on behalf of Hi! Paris)
 * Kevin Aggoun, <kevin.aggoun at capgemini.com> (on behalf of Hi! Paris)
+* Contribution of the Starting Grant (JCJC) of the French National Research Agency (ANR <https://anr.fr>) in the category Artificial Intelligence (CE23) is greatly acknowledged (grant number ANR-21-CE23-0029-01).

@@ -24,7 +24,10 @@ Specifications
 
  - :ref:`asymmetric projection <Aprojection>` depth [approximate];
  - :ref:`beta-skeleton <BetaSkeleton>` depth, including spherical and lens depths as special cases [exact];
+ - :ref:`continous expected convex hull <Cexpchull>` depth [approximate];
+ - :ref:`continous modified expected convex hull <Cexpchullstar>` depth [approximate];
  - :ref:`convex hull peeling <Qhpeeling>` (also called onion) depth [exact];
+ - :ref:`geometrical <Geometrical>` depth [approximate];
  - :ref:`halfspace <Halfspace>` (also called Tukey or location) depth [exact and approximate];
  - :ref:`L2 <L2>` depth [exact];
  - :ref:`Mahalanobis <Mahalanobis>` depth [exact and approximate];
@@ -33,7 +36,8 @@ Specifications
  - :ref:`simplicial <Simplicial>` depth [exact and approximate];
  - :ref:`simplicial volume <SimplicialVolume>` (also called Oja) depth [exact and approximate];
  - :ref:`spatial <Spatial>` depth [exact];
- - :ref:`zonoid <Zonoid>` depth [exact and approximate].
+ - :ref:`zonoid <Zonoid>` depth [exact and approximate];
+ - :ref:`mcd <MCD>` minimum covariance determinant estimator.
 
 The mentioned below publications are presenting, from a general point of view, the data depth methodology and some of its most important applications. More references follow in the sections dedicated to particular functions of the :math:`\texttt{data-depth}` library.
 

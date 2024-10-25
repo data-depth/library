@@ -1,9 +1,16 @@
 import numpy as np
+from ctypes import *
+from multiprocessing import *
 import math
 import sklearn.covariance as sk
-from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
-from ctypes import *
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libExact
+
+def MCD_fun(data,alpha,NeedLoc=False):
+    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
+    if NeedLoc:return([cov.covariance_,cov.location_])
+    else:return(cov.covariance_)
 
 ## the moment trabnsform requires MCD func
 def potential(x, data, pretransform = "1Mom", kernel="EDKernel" ,mah_parMcd=0.75, kernel_bandwidth=0):
@@ -46,12 +53,11 @@ def potential(x, data, pretransform = "1Mom", kernel="EDKernel" ,mah_parMcd=0.75
 		
 	depth=pointer((c_double*len(x))(*np.zeros(len(x))))
 
-	libr.PotentialDepthsCount(points,numPoints,dimension,classes,numPoints,points2,numpoints2,KernelType,kernel_bandwidth,ignoreself,depth)
+	libExact.PotentialDepthsCount(points,numPoints,dimension,classes,numPoints,points2,numpoints2,KernelType,kernel_bandwidth,ignoreself,depth)
 	res=np.zeros(len(x))
 	for i in range(len(x)):
 		res[i]=depth[0][i]
 	return res
-			
 
 def Maha_moment (x):
 	x=np.transpose(x)
@@ -60,7 +66,6 @@ def Maha_moment (x):
 	w,v=np.linalg.eig(cov)
 	B_inv=np.linalg.inv(np.matmul(v,np.diag(np.sqrt(w))))
 	return ([mu,B_inv,cov])
-
 
 def Maha_mcd(x, alpha =0.5):
 	[cov,mu] = MCD_fun(x,alpha,1)
@@ -71,8 +76,6 @@ def Maha_mcd(x, alpha =0.5):
 
 def Maha_transform (x, mu, B_inv): 
 	return(np.transpose(np.matmul(B_inv,np.transpose(x-mu))))
-
-	
 
 potential.__doc__="""
 

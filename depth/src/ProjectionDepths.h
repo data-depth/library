@@ -29,12 +29,12 @@ enum class eLineSearchCD { LineSearchUnif, LineSearchGS };
 enum class eLineSearchCDGC { LineSearchUnifGC, LineSearchGSGC };
 
 // Enumeration class for the depth notions
-enum class eDepth { MD, HD, ZD, PD, APD };
+enum class eDepth { MD, HD, ZD, PD, APD, CECHS, CECH, GEOM };
 
 const int nProjMeth = 10;  // number of approximation algorithms
 const int nCDMeth   =  2;  // number of line serach strategies for CoordDesc
 const int nCDGCMeth =  2;  // number of line serach strategies for CoordDescGC
-const int nDepth    =  5;  // number of depth notions
+const int nDepth    =  7;  // number of depth notions
 
 // Structure for finding new records. 'it' is the number of the iteration where 
 // a new record occurred and 'depth' the new record, i.e.m, new minimum depth 

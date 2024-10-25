@@ -1,8 +1,10 @@
 import numpy as np
-import sklearn.covariance as sk
-from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
 from ctypes import *
+from depth.multivariate.Depth_approximation import depth_approximation
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libExact,libApprox
+
 def zonoid(x, data, seed=0, exact=True, solver="neldermead",
                         NRandom=1000,
                         option=1,
@@ -29,7 +31,7 @@ def zonoid(x, data, seed=0, exact=True, solver="neldermead",
         seed=pointer((c_int(seed)))
         depths=pointer((c_double*len(x))(*np.zeros(len(x))))
 
-        libr.ZDepth(points,objects, numPoints,numObjects,dimension,seed,depths)
+        libExact.ZDepth(points,objects, numPoints,numObjects,dimension,seed,depths)
 
         res=np.zeros(len(x))
         for i in range(len(x)):
@@ -38,7 +40,6 @@ def zonoid(x, data, seed=0, exact=True, solver="neldermead",
     else:
         return depth_approximation(x, data, "zonoid", solver, NRandom, option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
-        
 
 zonoid.__doc__= """
 

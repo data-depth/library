@@ -1,8 +1,10 @@
 import numpy as np
+from ctypes import *
 import sklearn.covariance as sk
 from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
-import ctypes as ct
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libExact,libApprox
 
 def MCD_fun(data,alpha,NeedLoc=False):
     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
@@ -23,27 +25,25 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                 line_solver = "goldensection",
                 bound_gc = True):
                         
-                        
     if exact:
         points_list=data.flatten()
         objects_list=x.flatten()
         
-        points=(ct.c_double*len(points_list))(*points_list)
-        objects=(ct.c_double*len(objects_list))(*objects_list)
+        points=(c_double*len(points_list))(*points_list)
+        objects=(c_double*len(objects_list))(*objects_list)
 
-        points=ct.pointer(points)
-        objects=ct.pointer(objects)
-        numPoints=ct.pointer(ct.c_int(len(data)))
-        numObjects=ct.pointer(ct.c_int(len(x)))
-        dimension=ct.pointer(ct.c_int(len(data[0])))
-        PY_MatMCD=MCD_fun(data,mah_parMcd).flatten(order='C')
-        mat_MCD=ct.pointer((ct.c_double*len(PY_MatMCD))(*PY_MatMCD))
+        points=pointer(points)
+        objects=pointer(objects)
+        numPoints=pointer(c_int(len(data)))
+        numObjects=pointer(c_int(len(x)))
+        dimension=pointer(c_int(len(data[0])))
+        PY_MatMCD=MCD_fun(data,mah_parMcd)
+        PY_MatMCD=PY_MatMCD.flatten(order='C')
+        mat_MCD=pointer((c_double*len(PY_MatMCD))(*PY_MatMCD))
 
-        
-        
-        depths=ct.pointer((ct.c_double*len(x))(*np.zeros(len(x))))
+        depths=pointer((c_double*len(x))(*np.zeros(len(x))))
 
-        libr.MahalanobisDepth(points,objects,numPoints,numObjects,dimension,mat_MCD,depths)
+        libExact.MahalanobisDepth(points,objects,numPoints,numObjects,dimension,mat_MCD,depths)
 
         res=np.zeros(len(x))
         for i in range(len(x)):
@@ -52,8 +52,6 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
     else:
         return depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
-    
-    
 
 mahalanobis.__doc__= """
 

@@ -1,5 +1,9 @@
 import numpy as np
+from ctypes import *
+from multiprocessing import *
 import sklearn.covariance as sk
+import sys, os, glob
+import platform
 
 def MCD_fun(data,alpha,NeedLoc=False):
     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
@@ -35,7 +39,6 @@ def L2(x, data,mah_estimate='moment',mah_parMcd=0.75):
 		tmp3=np.sum(tmp2 * tmp1,axis=1)
 		depths[i]=1/(1 + np.mean(np.sqrt(tmp3)))
 	return depths
-
 
 L2.__doc__=""" 
 

@@ -1,9 +1,10 @@
 import numpy as np
-import sklearn.covariance as sk
-from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
 from ctypes import *
+from multiprocessing import *
 import scipy.spatial as scsp
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libExact
 
 def count_convexes(objects,points,cardinalities, seed = 0):
     tmp_x=points.flatten()
@@ -19,7 +20,7 @@ def count_convexes(objects,points,cardinalities, seed = 0):
     length=PY_numObjects*1
     init_zeros=np.zeros(length,dtype=int)
     isInConv=pointer((c_int*length)(*init_zeros))
-    libr.IsInConvexes(tmp_x,dimension,tmp_cardinalities,numClasses,tmp_objects,numObjects,seed,isInConv)
+    libExact.IsInConvexes(tmp_x,dimension,tmp_cardinalities,numClasses,tmp_objects,numObjects,seed,isInConv)
     res=np.zeros(length)
     for i in range(length):
         res[i]=isInConv[0][i]
@@ -46,15 +47,13 @@ def qhpeeling(x, data):
     depths=depths/nrow_data
     return depths
 
-
-
 qhpeeling.__doc__= """
 
 Description
     Calculates the convex hull peeling depth of points w.r.t. a multivariate data set.
 
 Usage
-    depth.qhpeeling(x, data)
+    qhpeeling(x, data)
 
 Arguments
     x

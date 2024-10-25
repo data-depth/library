@@ -1,8 +1,10 @@
 import numpy as np
-import sklearn.covariance as sk
-from depth.multivariate.import_CDLL import libr,libRom
 from ctypes import *
-   
+from math import ceil
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libApprox
+    
 def depth_approximation(z,
                         X,
                         notion = "halfspace",
@@ -80,7 +82,7 @@ def depth_approximation(z,
     objects=pointer(objects)
 
 
-    libRom.depth_approximation(
+    libApprox.depth_approximation(
         objects,
         points,
         c_int(depth_indice),
@@ -137,10 +139,8 @@ def depth_approximation(z,
                 ind_convergence.append((ind_bin_cumsum - ind_bin).tolist())
         return depths, best_directions, depths_iter, directions, ind_convergence
 
-
-
 def check_depth(depth):
-    all_depths = ["mahalanobis", "halfspace", "zonoid", "projection", "aprojection"]
+    all_depths = ["mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"]
     if (depth not in all_depths):
         raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))
     else:
@@ -200,7 +200,7 @@ Arguments
            Data where each row contains a d-variate point, w.r.t. which the depth is to be calculated.
            
     notion 
-           {'halfspace', 'mahalanobis', 'zonoid', 'projection', 'aprojection'}, **optional**
+           {'halfspace', 'mahalanobis', 'zonoid', 'projection', 'aprojection', 'cexpchull'}, **optional**
            Which depth will be computed.
            
     solver 

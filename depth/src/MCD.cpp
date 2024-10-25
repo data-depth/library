@@ -1,10 +1,4 @@
-// #include "MCD.h"
 #include "stdafx.h"
-// #include <algorithm>
-// #include <cfloat>
-// #include "Common.h"
-// #include "PD.cpp"
-// #include "Mahalanobis.h"
 #include <iomanip>
 
 vector<int> split(int n){//split n into (at most 5) bins and return the vector v of number of elements in each bin

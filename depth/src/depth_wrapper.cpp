@@ -1,6 +1,6 @@
 
 
-#include "APD.cpp" 
+#include "APD.cpp"
 #include "auxLinAlg.cpp"
 #include "HD.cpp"
 #include "Matrix.cpp"
@@ -9,8 +9,7 @@
 #include "PD.cpp"
 #include "ProjectionDepths.cpp"
 #include "ZD.cpp"
-
-
+#include "WMD.cpp"
 
 #include <iterator>
 

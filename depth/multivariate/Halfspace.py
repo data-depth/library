@@ -1,7 +1,9 @@
 import numpy as np
-import ctypes as ct
+from ctypes import *
 from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libExact,libApprox
 
 def halfspace(x, data, numDirections=1000, exact=True, method="recursive",
                 solver = "neldermead",
@@ -31,20 +33,20 @@ def halfspace(x, data, numDirections=1000, exact=True, method="recursive",
 
         points_list=data.flatten()
         objects_list=x.flatten()
-        points=(ct.c_double*len(points_list))(*points_list)
-        objects=(ct.c_double*len(objects_list))(*objects_list)
+        points=(c_double*len(points_list))(*points_list)
+        objects=(c_double*len(objects_list))(*objects_list)
         k=numDirections
 
-        points=ct.pointer(points)
+        points=pointer(points)
 
-        objects=ct.pointer(objects)
-        numPoints=ct.pointer(ct.c_int(len(data)))
-        numObjects=ct.pointer(ct.c_int(len(x)))
-        dimension=ct.pointer(ct.c_int(len(data[0])))
-        algNo=ct.pointer((ct.c_int(method)))
-        depths=ct.pointer((ct.c_double*len(x))(*np.zeros(len(x))))
+        objects=pointer(objects)
+        numPoints=pointer(c_int(len(data)))
+        numObjects=pointer(c_int(len(x)))
+        dimension=pointer(c_int(len(data[0])))
+        algNo=pointer((c_int(method)))
+        depths=pointer((c_double*len(x))(*np.zeros(len(x))))
     
-        libr.HDepthEx(points,objects, numPoints,numObjects,dimension,algNo,depths)
+        libExact.HDepthEx(points,objects, numPoints,numObjects,dimension,algNo,depths)
     
         res=np.zeros(len(x))
         for i in range(len(x)):
@@ -53,8 +55,6 @@ def halfspace(x, data, numDirections=1000, exact=True, method="recursive",
     else:	
         return depth_approximation(x, data, "halfspace", solver, NRandom ,option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
-    
-
 
 halfspace.__doc__="""
 

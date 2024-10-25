@@ -6,9 +6,13 @@ Multivariate
 
    Aprojection
    BetaSkeleton
+   Cexpchull
+   Cexpchullstar
+   Geometrical
    Halfspace
    L2
    Mahalanobis
+   plot
    Potential
    Projection
    Qhpeeling
@@ -16,3 +20,4 @@ Multivariate
    SimplicialVolume
    Spatial
    Zonoid
+   MCD

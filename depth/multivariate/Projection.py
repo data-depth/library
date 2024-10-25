@@ -1,8 +1,8 @@
-import numpy as np
-import sklearn.covariance as sk
-from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
 from ctypes import *
+from depth.multivariate.Depth_approximation import depth_approximation
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libApprox
 
 def projection(x, data,
         solver = "neldermead",

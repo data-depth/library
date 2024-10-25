@@ -4,7 +4,7 @@ import sys, os, glob
 import platform
 from depth.multivariate.import_CDLL import libApprox
 
-def aprojection(x, data,
+def cexpchull(x, data,
         solver = "neldermead",
         NRandom = 1000,
         option = 1,
@@ -18,13 +18,13 @@ def aprojection(x, data,
         line_solver = "goldensection",
         bound_gc = True):
 
-    return depth_approximation(x, data, "aprojection", solver, NRandom, option, n_refinements,
+    return depth_approximation(x, data, "cexpchull", solver, NRandom, option, n_refinements,
     sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
 
-aprojection.__doc__="""
+cexpchull.__doc__="""
 
 Description
-    Calculates approximately the asymmetric projection depth of points w.r.t. a multivariate data set.
+    Calculates approximately the continuous explected convex hull depth of points w.r.t. a multivariate data set.
 
 Arguments
     x 			
@@ -81,7 +81,7 @@ Arguments
         For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
 
 References
-    * Dyckerhoff, R. (2004). Data depths satisfying the projection property. *Allgemeines Statistisches Archiv*, 88, 163–190.
+    * Dyckerhoff, R. and Mosler, K. (2011). Weighted-mean trimming of multivariate data. *Journal of Multivariate Analysis*, 102, 405–421.
     
     * Dyckerhoff, R., Mozharovskyi, P., and Nagy, S. (2021). Approximate computation of projection depths. *Computational Statistics and Data Analysis*, 157, 107166.
 
@@ -93,7 +93,7 @@ Examples
             >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
-            >>> aprojection(x, data, NRandom=1000)
+            >>> cexpchull(x, data, NRandom=1000)
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
 """

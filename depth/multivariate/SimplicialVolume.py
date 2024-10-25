@@ -1,9 +1,11 @@
 import numpy as np
-import sklearn.covariance as sk
-from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
 from ctypes import *
+from multiprocessing import *
+import sklearn.covariance as sk
 import scipy.special as scspecial
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libExact
 
 def longtoint(k):
   limit = 2000000000
@@ -70,7 +72,7 @@ def simplicialVolume(x, data, exact = True, k = 0.05,
 
     depths=(c_double*len(x))(*np.zeros(len(x)))
 
-    libr.OjaDepth(points,objects,numPoints,numObjects,dimension,seed, exact, k, useCov, covEst, depths)
+    libExact.OjaDepth(points,objects,numPoints,numObjects,dimension,seed, exact, k, useCov, covEst, depths)
 
     res=np.zeros(len(x))
     for i in range(len(x)):
@@ -119,10 +121,10 @@ Examples
             >>> mat2=[[1, 0, 0],[0, 1, 0],[0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0], mat1, 20)
-            >>> simplicialVolume(x, data, exact=True)
+            >>> simplicalVolume(x, data, exact=True)
             [0.45749049 0.34956166 0.2263421  0.68742137 0.94796538 0.51112415
              0.85250931 0.67914988 0.79165292 0.33192247]
-            >>> simplicialVolume(x, data, exact=False, k=0.2)
+            >>> simplicalVolume(x, data, exact=False, k=0.2)
             [0.46826813 0.40138917 0.23189724 0.69025277 0.938543   0.56005713
              0.8113647  0.72220103 0.82036139 0.33908597]
 """

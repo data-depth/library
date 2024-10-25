@@ -1,16 +1,16 @@
 import numpy as np
-import sklearn.covariance as sk
-from depth.multivariate.Depth_approximation import depth_approximation
-from depth.multivariate.import_CDLL import libr
 from ctypes import *
+from multiprocessing import *
 import scipy.special as scspecial
+import sys, os, glob
+import platform
+from depth.multivariate.import_CDLL import libExact
 
 def longtoint(k):
   limit = 2000000000
   k1 = int(k/limit)
   k2 = int(k - k1*limit)
   return np.array([k1,k2])
-
 
 def simplicial(x, data, exact=True, k=0.05, seed=0):
     points_list=data.flatten()
@@ -38,15 +38,12 @@ def simplicial(x, data, exact=True, k=0.05, seed=0):
 
     depths=pointer((c_double*len(x))(*np.zeros(len(x))))
 
-    libr.SimplicialDepth(points,objects, numPoints,numObjects,dimension,seed,exact,k,depths)
+    libExact.SimplicialDepth(points,objects, numPoints,numObjects,dimension,seed,exact,k,depths)
 
     res=np.zeros(len(x))
     for i in range(len(x)):
         res[i]=depths[0][i]
     return res
-    
-
-    
 
 simplicial.__doc__ = """
 

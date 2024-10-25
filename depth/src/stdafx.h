@@ -2,13 +2,12 @@
   File:             stdafx.h
   Created by:       Oleksii Pokotylo
   First published:  28.02.2013
-  Last revised:     28.02.2013
+  Last revised:     24.10.2024
   
-  Defines the Includes needed.
+  Defines the includes needed.
 */
 
 #pragma once
-
 
 #include <time.h>
 #include <algorithm>
@@ -37,7 +36,6 @@ using namespace std;
 #include "HD2.cpp"
 #include "MCD.h"
 
-
 #include "Common.cpp"
 #include "OjaDepth.cpp"
 #include "LensDepth.cpp"
@@ -48,6 +46,4 @@ using namespace std;
 #include "PD.cpp"
 #include "MCD.cpp"
 
-
 int random(int x);
-

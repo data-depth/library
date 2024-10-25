@@ -1,5 +1,8 @@
 from depth.multivariate.Depth_approximation import depth_approximation
 from depth.multivariate.BetaSkeleton import betaSkeleton
+from depth.multivariate.Cexpchull import cexpchull
+from depth.multivariate.Cexpchullstar import cexpchullstar
+from depth.multivariate.Geometrical import geometrical
 from depth.multivariate.Halfspace import halfspace
 from depth.multivariate.L2 import L2
 from depth.multivariate.Mahalanobis import mahalanobis
@@ -14,6 +17,7 @@ from depth.multivariate.Zonoid import zonoid
 from depth.multivariate.plot import depth_mesh
 from depth.multivariate.plot import depth_plot2d
 from depth.multivariate.SimplicialVolume import calcDet
+from depth.multivariate.MCD import MCD
 
-__all__ = ["depth_approximation", "betaSkeleton", "halfspace", "L2", "mahalanobis",
-        "potential", "projection", "aprojection", "qhpeeling", "simplicial", "simplicialVolume", "spatial", "zonoid", "depth_mesh", "depth_plot2d", "calcDet"]
+__all__ = ["depth_approximation", "betaSkeleton", "cexpchull", "cexpchullstar", "geometrical", "halfspace", "L2", "mahalanobis", "potential", "projection", "aprojection", "qhpeeling", "simplicial", "simplicialVolume", "spatial", "zonoid", "depth_mesh", "depth_plot2d", "calcDet",
+    "MCD"]

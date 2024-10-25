@@ -11,8 +11,8 @@ def import_CDLL():
                 if da!=[] and de!=[]:
                     ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
                     ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-        libr=ct.CDLL(ddalpha_exact[0])
-        libRom=ct.CDLL(ddalpha_approx[0])
+        libExact=ct.CDLL(ddalpha_exact[0])
+        libApprox=ct.CDLL(ddalpha_approx[0])
         
     if sys.platform=='darwin':
         for i in sys.path :
@@ -22,8 +22,8 @@ def import_CDLL():
                 if da!=[] and de!=[]:
                     ddalpha_exact=glob.glob(i+'/*ddalpha*.so')
                     ddalpha_approx=glob.glob(i+'/*depth_wrapper*.so')
-        libr=ct.CDLL(ddalpha_exact[0])
-        libRom=ct.CDLL(ddalpha_approx[0])
+        libExact=ct.CDLL(ddalpha_exact[0])
+        libApprox=ct.CDLL(ddalpha_approx[0])
 
     if sys.platform=='win32':
         site_packages = [p for p in sys.path if ('site-packages' in p) or ("dist-packages" in p)] #Add search dist-packages
@@ -32,8 +32,9 @@ def import_CDLL():
             ddalpha_exact=glob.glob(i+'/depth/src/*ddalpha*.dll')
             ddalpha_approx=glob.glob(i+'/depth/src/*depth_wrapper*.dll')
             if ddalpha_exact+ddalpha_approx!=[]:
-                libr=ct.CDLL(r""+ddalpha_exact[0])
-                libRom=ct.CDLL(r""+ddalpha_approx[0])
-    return libr,libRom
-libr,libRom=import_CDLL()
+                libExact=ct.CDLL(r""+ddalpha_exact[0])
+                libApprox=ct.CDLL(r""+ddalpha_approx[0])
 
+    return libExact,libApprox
+
+libExact,libApprox=import_CDLL()

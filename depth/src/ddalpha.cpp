@@ -1,10 +1,10 @@
 /*
   File:             ddalpha.cpp
-  Created by:       Pavlo Mozharovskyi, Oleksii Pokotylo
+  Created by:       Pavlo Mozharovskyi, Oleksii Pokotylo, Arturo Castellanos
   First published:  28.02.2013
-  Last revised:     20.02.2019
+  Last revised:     24.10.2024
 
-  Defines the exported functions for the 'ddalpha'-package.
+  Defines the exported functions for the former 'ddalpha'-package, now 'data-depth'-library.
 
   For a description of the algorithm, see:
     Lange, T., Mosler, K. and Mozharovskyi, P. (2012). Fast nonparametric classification based on data depth. Statistical Papers.
@@ -263,11 +263,10 @@ void BetaSkeletonDepth(double *points, double *objects, int *numPoints, int *num
 }
 
 void MinimumCovarianceDeterminantEstim(double *points, int *numPoints, int *dimension, int *hParam, int *seed, double *mat_MCD, double chisqr05, double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp, bool seeded){
-	TDMatrix X = asMatrix(points, *numPoints, *dimension);
-	Mcd(X, *numPoints,*dimension, *hParam, mat_MCD, chisqr05, chisqr0975, mfull, nstep, hiRegimeCompleteLastComp, seed, seeded);
-	delete[] X;
+    TDMatrix X = asMatrix(points, *numPoints, *dimension);
+    Mcd(X, *numPoints,*dimension, *hParam, mat_MCD, chisqr05, chisqr0975, mfull, nstep, hiRegimeCompleteLastComp, seed, seeded);
+    delete[] X;
 }
-
 
 int main() {
     std::cout << random(10);

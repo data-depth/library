@@ -23,6 +23,7 @@
 #include "HD.h"
 #include "PD.h"
 #include "APD.h"
+#include "WMD.h"
 #include "ProjectionDepths.h"
 #include "Matrix.h"
 #include "auxLinAlg.h"
@@ -59,13 +60,15 @@ function<double(const double*, const cMatrix, int, int)> multiDepths[]
 	[](const double* z, const cMatrix x, int n, int d) { return HD_Comb2(z, x, n, d); },
 	[](const double* z, const cMatrix x, int n, int d) { return ZD(z, x, n, d, error); },
 	[](const double* z, const cMatrix x, int n, int d) { return -1.; },
-	[](const double* z, const cMatrix x, int n, int d) { return -1.; } };
+	[](const double* z, const cMatrix x, int n, int d) { return -1.; },
+    [](const double* z, const cMatrix x, int n, int d) { return -1.; },
+    [](const double* z, const cMatrix x, int n, int d) { return -1.; },
+    [](const double* z, const cMatrix x, int n, int d) { return -1.; } };
 
 // array of functions for exactly computing univariate depths
 function<double(double, const double*, int)> uniDepths[] 
 	= { MD1, HD1, 
-	[](double z, const double* x, int n){ return ZD1(z, x, n, false); }, PD1, APD1 };
-
+	[](double z, const double* x, int n){ return ZD1(z, x, n, false); }, PD1, APD1, CechStarD1, CechD1, GeomD1 };
 
 /****************************************************************************/
 /*                                                                          */
@@ -1455,6 +1458,3 @@ double cProjection::NelderMeadGCMultiStart(const double* z) {
 	if (debug >= 2) cout << "NMGC: " << _nProjections << endl;
 	return minDepth;
 }
-
-
- 

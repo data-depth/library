@@ -1,5 +1,3 @@
-
-
 double chisqr(double df, double quantile);
 vector<int> split(int n);
 vector<int> best(int p, vector<double>& all_det ,int rep);
