@@ -8,6 +8,8 @@
 */
 #pragma once
 
+#include <climits>
+
 #ifndef PI2
 #define PI2 1.5707963267948966192313216916398
 #endif
