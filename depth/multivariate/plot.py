@@ -151,7 +151,7 @@ def depth_plot2d(data, notion = "halfspace",
         # Shape the grid
         depth_grid = zDepth.reshape(cur_xs.shape)
     else:
-        cur_xs, cur_ys, depth_grid = xs, ys, depth_mesh
+        cur_xs, cur_ys, depth_grid = xs, ys, val_mesh
 
     # Introduce colors
     levels = MaxNLocator(nbins = 100).tick_values(0, 1)
