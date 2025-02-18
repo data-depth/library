@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/*.whl
-          name: artifact-${{ github.run_id }}
+          name: artifact-${{ github.run_id }}-${{ matrix.os }}
           if-no-files-found: warn
           compression-level: 6
           overwrite: false
