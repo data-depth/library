@@ -50,17 +50,19 @@ if sys.platform=='darwin' or sys.platform=='linux':
 	)
 if sys.platform=='win32':
 	setup(
-	    name="data_depth",
-	    version="1.0.1",
-	    author="Pavlo Mozharovskyi",
-	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
-	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
-	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
-	    long_description_content_type="text/markdown",
-	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn'],
-	    include_package_data=True,
-	    data_files=[('depth/src', glob.glob("depth/src/*"))],
-	    zip_safe=False
+		name="data_depth",
+	        version="1.0.1",
+	        author="Pavlo Mozharovskyi",
+	        author_email="pavlo.mozharovskyi@telecom-paris.fr",
+	        description="Procedures for calculating data depth in empirical distributions",
+	        long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	        long_description_content_type="text/markdown",
+	        packages=find_packages(),
+	        install_requires=['numpy', 'scipy', 'scikit-learn'],
+	        include_package_data=True,
+	        package_data={
+	            "depth": ["src/*.dll"],  # <-- ceci inclura les DLL dans la wheel
+	        },
+	        zip_safe=False
 	)
 	
