@@ -25,21 +25,15 @@ def import_CDLL():
         libExact=ct.CDLL(ddalpha_exact[0])
         libApprox=ct.CDLL(ddalpha_approx[0])
 
-    if sys.platform == 'win32':
-        site_packages = [p for p in sys.path if 'site-packages' in p or 'dist-packages' in p]
+    if sys.platform=='win32':
+        site_packages = [p for p in sys.path if ('site-packages' in p) or ("dist-packages" in p)] #Add search dist-packages
         for i in site_packages:
-            print(f"Checking path: {i}")  # Ajout d'une impression pour le débogage
             os.add_dll_directory(i)
-            ddalpha_exact = glob.glob(i + '/depth/src/*ddalpha*.dll')
-            ddalpha_approx = glob.glob(i + '/depth/src/*depth_wrapper*.dll')
-            print(f"Found DLLs: {ddalpha_exact + ddalpha_approx}")  # Ajout d'une impression pour le débogage
-            if ddalpha_exact + ddalpha_approx != []:
-                libExact = ct.CDLL(r"" + ddalpha_exact[0])
-                libApprox = ct.CDLL(r"" + ddalpha_approx[0])
-                print("DLLs loaded successfully.")
-            else:
-                print("No DLLs found.")
-                libExact,libApprox=0,0
+            ddalpha_exact=glob.glob(i+'/depth/src/*ddalpha*.dll')
+            ddalpha_approx=glob.glob(i+'/depth/src/*depth_wrapper*.dll')
+            if ddalpha_exact+ddalpha_approx!=[]:
+                libExact=ct.CDLL(r""+ddalpha_exact[0])
+                libApprox=ct.CDLL(r""+ddalpha_approx[0])
 
     return libExact,libApprox
 
