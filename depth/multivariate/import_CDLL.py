@@ -28,12 +28,14 @@ def import_CDLL():
     if sys.platform=='win32':
         site_packages = [p for p in sys.path if ('site-packages' in p) or ("dist-packages" in p)] #Add search dist-packages
         for i in site_packages:
-            os.add_dll_directory(i)
-            ddalpha_exact=glob.glob(i+'/depth/src/*ddalpha*.dll')
-            ddalpha_approx=glob.glob(i+'/depth/src/*depth_wrapper*.dll')
-            if ddalpha_exact+ddalpha_approx!=[]:
-                libExact=ct.CDLL(r""+ddalpha_exact[0])
-                libApprox=ct.CDLL(r""+ddalpha_approx[0])
+            dll_path = os.path.join(i, 'depth', 'src')
+            if os.path.isdir(dll_path):
+                os.add_dll_directory(dll_path)
+                ddalpha_exact=glob.glob(os.path.join(dll_path, '*ddalpha*.dll'))
+                ddalpha_approx=glob.glob(os.path.join(dll_path, '*depth_wrapper*.dll'))
+                if ddalpha_exact+ddalpha_approx!=[]:
+                    libExact=ct.CDLL(r""+ddalpha_exact[0])
+                    libApprox=ct.CDLL(r""+ddalpha_approx[0])
 
     return libExact,libApprox
 
