@@ -38,19 +38,18 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
         numObjects=pointer(c_int(len(x)))
         dimension=pointer(c_int(len(data[0])))
         PY_MatMCD=MCD_fun(data,mah_parMcd)
-        PY_MatMCD=PY_MatMCD.flatten(order='C')
-        mat_MCD=pointer((c_double*len(PY_MatMCD))(*PY_MatMCD))
+        PY_MatMCD_flat=PY_MatMCD.flatten(order='C')
+        mat_MCD=pointer((c_double*len(PY_MatMCD_flat))(*PY_MatMCD_flat))
 
         depths=pointer((c_double*len(x))(*np.zeros(len(x))))
 
         libExact.MahalanobisDepth(points,objects,numPoints,numObjects,dimension,mat_MCD,depths)
-
         res=np.zeros(len(x))
         for i in range(len(x)):
             res[i]=depths[0][i]
-        return res
+        return PY_MatMCD,res
     else:
-        return depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
+        return None,depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
 
 mahalanobis.__doc__= """

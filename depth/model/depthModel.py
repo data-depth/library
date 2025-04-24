@@ -36,9 +36,12 @@ class depthModel():
     def mahalanobis(self, x: np.ndarray = None, exact: bool = True, mah_estimate: Literal["moment", "mcd"] = "moment",
                     mah_parMcd: float = 0.75,**kwargs)->np.ndarray:
         """Mahalanobis depth
-        
-        
-
+        Parameters
+        ----------
+        x
+        exact
+        mah_estimate
+        mah_parMcd
         """
         # check if values are correct 
         assert(type(x)==np.ndarray),f"x must be a numpy array, got {type(x)}"
@@ -51,13 +54,13 @@ class depthModel():
         
         self._check_dataset() #check if dataset is loaded
 
-        self.mahDepth=mtv.mahalanobis(
+        mcd, self.mahDepth=mtv.mahalanobis(
             x,self.data,exact,mah_estimate,mah_parMcd,
             solver= "neldermead", NRandom= 1000, 
             option= 1, n_refinements= 10, sphcap_shrink=0.5, # non necessary features
-            alpha_Dirichlet= 1.25, cooling_factor=0.95, 
-            cap_size=1, start="mean", space= "sphere", 
-            line_solver="goldensection", bound_gc= True
+            alpha_Dirichlet= 1.25, cooling_factor=0.95, # non necessary features
+            cap_size=1, start="mean", space= "sphere", # non necessary features
+            line_solver="goldensection", bound_gc= True, # non necessary features
                         )
 
         return self.mahDepth
