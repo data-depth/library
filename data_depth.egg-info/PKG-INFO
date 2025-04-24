@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: data_depth
+Version: 1.0.1
+Summary: The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth
+Author: Pavlo Mozharovskyi
+Author-email: pavlo.mozharovskyi@telecom-paris.fr
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: scikit-learn
+Requires-Dist: matplotlib
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: requires-dist
+Dynamic: summary
+
+The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth

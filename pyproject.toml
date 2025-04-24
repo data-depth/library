@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=42",'numpy>=0.0','scipy>=0.0','scikit-learn>=0.0']
+requires = ["setuptools>=42",'numpy>=0.0','scipy>=0.0','scikit-learn>=0.0', 'matplotlib>=3.8.2']
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]

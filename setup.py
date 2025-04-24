@@ -4,18 +4,18 @@ import glob
 import sys
 
 class custom_build_ext(build_ext):
-    def build_extensions(self):
-        # Override the compiler executables. Importantly, this
-        # removes the "default" compiler flags that would
-        # otherwise get passed on to to the compiler, i.e.,
-        # distutils.sysconfig.get_var("CFLAGS").
-        self.compiler.set_executable("compiler_so", "g++ -fpic")
-        self.compiler.set_executable("compiler_cxx", "g++")
-        if sys.platform=='darwin':
-        	self.compiler.set_executable("linker_so", "g++ -Wl, -shared -lstdc++")
-        if sys.platform=='linux':
-        	self.compiler.set_executable("linker_so", "g++ -Wl,--gc-sections -shared -lstdc++")
-        build_ext.build_extensions(self)
+	def build_extensions(self):
+		# Override the compiler executables. Importantly, this
+		# removes the "default" compiler flags that would
+		# otherwise get passed on to to the compiler, i.e.,
+		# distutils.sysconfig.get_var("CFLAGS").
+		self.compiler.set_executable("compiler_so", "g++ -fpic")
+		self.compiler.set_executable("compiler_cxx", "g++")
+		if sys.platform=='darwin':
+			self.compiler.set_executable("linker_so", "g++ -Wl, -shared -lstdc++")
+		if sys.platform=='linux':
+			self.compiler.set_executable("linker_so", "g++ -Wl,--gc-sections -shared -lstdc++")
+		build_ext.build_extensions(self)
 
 if sys.platform=='darwin' or sys.platform=='linux':
 	setup(
@@ -27,7 +27,7 @@ if sys.platform=='darwin' or sys.platform=='linux':
 	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn'],
+	    install_requires=['numpy','scipy','scikit-learn','matplotlib'],
 	    include_package_data=True,
 	    ext_modules=[
 		Extension(
@@ -58,7 +58,7 @@ if sys.platform=='win32':
 	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn'],
+	    install_requires=['numpy','scipy','scikit-learn','matplotlib'],
 	    include_package_data=True,
 	    data_files=[('depth/src', glob.glob("depth/src/*"))],
 	    zip_safe=False
