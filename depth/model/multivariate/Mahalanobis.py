@@ -37,9 +37,12 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
         numPoints=pointer(c_int(len(data)))
         numObjects=pointer(c_int(len(x)))
         dimension=pointer(c_int(len(data[0])))
-        PY_MatMCD=MCD_fun(data,mah_parMcd)
-        PY_MatMCD_flat=PY_MatMCD.flatten(order='C')
-        mat_MCD=pointer((c_double*len(PY_MatMCD_flat))(*PY_MatMCD_flat))
+        if mah_estimate=='moment': # compute cov based on user choice
+            PY_MatMCD=np.cov(np.transpose(data))
+        elif mah_estimate=='MCD': # compute cov based on user choice
+            PY_MatMCD=MCD_fun(data,mah_parMcd)
+        PY_MatMCD=PY_MatMCD.flatten(order='C')
+        mat_MCD=pointer((c_double*len(PY_MatMCD))(*PY_MatMCD))
 
         depths=pointer((c_double*len(x))(*np.zeros(len(x))))
 
@@ -47,9 +50,9 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
         res=np.zeros(len(x))
         for i in range(len(x)):
             res[i]=depths[0][i]
-        return PY_MatMCD,res
+        return res
     else:
-        return None,depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
+        return depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
 
 mahalanobis.__doc__= """

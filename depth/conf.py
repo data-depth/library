@@ -17,8 +17,8 @@ sys.path.insert(0, os.path.abspath('./multivariate'))
 # -- Project information -----------------------------------------------------
 
 project = 'package "data-depth"'
-copyright = '2024, Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Arturo Castellanos Salinas'
-author = 'Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Arturo Castellanos Salinas'
+copyright = '2024, Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Arturo Castellanos Salinas, Leonardo Leone'
+author = 'Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Arturo Castellanos Salinas, Leonardo Leone'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1.1'
