@@ -5,7 +5,7 @@ import sys, os, glob
 import platform
 from .import_CDLL import libExact,libApprox
 
-def halfspace(x, data, numDirections=1000, exact=True, method="recursive",
+def halfspace(x, data, exact=True, method="recursive",
                 solver = "neldermead",
                 NRandom = 1000,
                 option = 1,
@@ -35,7 +35,7 @@ def halfspace(x, data, numDirections=1000, exact=True, method="recursive",
         objects_list=x.flatten()
         points=(c_double*len(points_list))(*points_list)
         objects=(c_double*len(objects_list))(*objects_list)
-        k=numDirections
+        # k=numDirections
 
         points=pointer(points)
 

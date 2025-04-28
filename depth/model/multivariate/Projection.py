@@ -16,10 +16,14 @@ def projection(x, data,
         start = "mean",
         space = "sphere",
         line_solver = "goldensection",
-        bound_gc = True):
-
-    return depth_approximation(x, data, "projection", solver, NRandom, option, n_refinements,
-    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+        bound_gc = True,
+        CUDA=False):
+    if CUDA==False: #check cuda
+        return depth_approximation(x, data, "projection", solver, NRandom, option, n_refinements,
+        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+    else: 
+        return depth_approximation(x, data, "projection", solver, NRandom, option, n_refinements,
+        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc) # return for depth cuda
 
 projection.__doc__="""
 
