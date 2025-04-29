@@ -2,6 +2,7 @@ import numpy as np
 from . import multivariate as mtv
 from typing import Literal, List
 from numba import cuda, float32
+import torch
 import sys, os
 try:os.environ['CUDA_HOME']=os.environ.get('CUDA_PATH').split(";")[0] # Force add cuda path
 except:pass
@@ -101,7 +102,8 @@ class depthModel():
             self.data=data
         else: 
             if cuda.is_available():
-                self.dataCuda=cuda.to_device(data,dtype=float32)
+                self.dataCuda=torch.tensor(data.T,device="cuda:0",dtype=torch.float32) 
+                # Tensor is transposed to facilitate projection and depth  computation
             else:
                 self.data=data
                 print("CUDA is set to True, but cuda is not available, CUDA is automatically set to False")
@@ -558,14 +560,16 @@ class depthModel():
     #     self._check_variables
     #     mtv.calcDet
     #     pass
-    # def _MCD(self, h, seed=None, mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
-    #     """
-    #     TO DO
-    #     """
-    #     self._check_variables
-        
-    #     self.MCD=mtv.MCD(self.data,h,seed,mfull, nstep, hiRegimeCompleteLastComp)
-    #     return 
+    def _MCD(self, h, seed=None, mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
+        """
+        TO DO
+        """
+        self._check_variables
+        if h<self.data.shape[0]*.5:
+            h=int(self.data.shape[0]*.5)
+            
+        self.MCD=mtv.MCD(self.data,h,seed,mfull, nstep, hiRegimeCompleteLastComp)
+        return 
     
     #### auxiliar functions #### 
     def set_seed(self,seed:int=2801)->None:
