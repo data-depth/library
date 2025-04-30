@@ -38,27 +38,28 @@ class depthModel():
     NRandom : int, default=1000
         Total number of directions used for approximate depth
 
-    n_refinements : int, default=10
+    n_refinements : int, default = 10
         Number of iterations used to approximate the depth
         For ``solver='refinedrandom'`` or ``'refinedgrid'`` 
     
-    sphcap_shrink : float, default =
+    sphcap_shrink : float, default = 0.5
     
-    alpha_Dirichlet : float, default =
+    alpha_Dirichlet : float, default = 1.25
     
-    cooling_factor : float, default =
+    cooling_factor : float, default = 0.95
     
-    cap_size : int | float, default =
+    cap_size : int | float, default = 1
     
-    start : str, default =
+    start : str, default = mean 
     
-    space : str, default =
+    space : str, default = sphere 
     
-    line_solver : str, default =
+    line_solver : str, default = goldensection
     
-    bound_gc : bool, default =
+    bound_gc : bool, default = True
     
-    output_option : str, default =
+    output_option : str, default = final_depht_dir
+        Determines what will be computated alongside with the final depth
 
     """
     def __init__(self,):
@@ -87,7 +88,6 @@ class depthModel():
 
         CUDA : bool, default=False
             Determine with device CUDA will be used
-
 
         Returns
         ----------
@@ -200,7 +200,7 @@ class depthModel():
         Beta-skeleton depth : {array like}
         """
         self._check_variables(x=x,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd) #check validity
-        self.betaSkeletonDepth=mtv.betaSkeleton(x=x,data=self.data,beta=beta,distance=distance,
+        self.betaSkeletonDepth=mtv.betaSkeleton(x=x,data=self.data,beta=beta,distance=distance, Lp_p=Lp_p,
                                                 mah_estimate=mah_estimate,mah_parMcd=mah_parMcd) # compute depth
         return self.betaSkeletonDepth
 
@@ -349,8 +349,6 @@ class depthModel():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
-        mah_estimate
-        mah_parMcd
 
         Results
         ----------
@@ -369,6 +367,20 @@ class depthModel():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
+        
+        pretransform: str, default="1Mom"
+    		The method of data scaling.
+			``'1Mom'`` or ``'NMom'`` for scaling using data moments.
+			``'1MCD'`` or ``'NMCD'`` for scaling using robust data moments (Minimum Covariance Determinant (MCD).
+        
+        kernel: str, default="EDKernel"
+			``'EDKernel'`` for the kernel of type 1/(1+kernel.bandwidth*EuclidianDistance2(x,y)),
+			``'GKernel'`` [default and recommended] for the simple Gaussian kernel,
+			``'EKernel'`` exponential kernel: exp(-kernel.bandwidth*EuclidianDistance(x, y)),
+			``'VarGKernel'`` variable Gaussian kernel, where kernel.bandwidth is proportional to the depth.zonoid of a point.
+        
+        kernel_bandwidth: int, default=0
+			the single bandwidth parameter of the kernel. If ``0`` - the Scott`s rule of thumb is used.
 
         Results
         ----------
@@ -414,13 +426,13 @@ class depthModel():
         
     def qhpeeling(self,x:np.ndarray)->np.ndarray:
         """
-        Calculates the convex hull peeling depth
-        
+        Calculates the convex hull peeling depth.
                 
         Parameters
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
+
         Results
         ----------
         Convex hull peeling depth : {array like}
@@ -431,14 +443,18 @@ class depthModel():
 
     def simplicial(self,x:np.ndarray,exact:bool=True,k:float=0.05,)->np.ndarray:
         """
-        Compute simplicial depth
+        Compute simplicial depth.
                 
         Parameters
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
-        exact:
-        k:
+            
+        k: float, default=0.05
+            Number (``k > 1``) or portion (if ``0 < k < 1``) of simplices that are considered if ``exact=False``.
+            If ``k > 1``, then the algorithmic complexity is polynomial in d but is independent of the number of observations in data, given k. 
+            If ``0 < k < 1``,then the algorithmic complexity is exponential in the number of observations in data, 
+                but the calculation precision stays approximately the same.
 
         Results
         ----------
@@ -457,6 +473,12 @@ class depthModel():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
+        
+        k: float, default=0.05
+            Number (``k > 1``) or portion (if ``0 < k < 1``) of simplices that are considered if ``exact=False``.
+            If ``k > 1``, then the algorithmic complexity is polynomial in d but is independent of the number of observations in data, given k. 
+            If ``0 < k < 1``,then the algorithmic complexity is exponential in the number of observations in data, 
+                but the calculation precision stays approximately the same.
 
         Results
         ----------
@@ -524,52 +546,118 @@ class depthModel():
 
         return self.zonoidDepth
     #### Plot ####
-    # def depth_mesh(self,notion = "halfspace",freq = [100, 100],xlim = None,ylim = None,mah_estimate = "moment",mah_parMCD = 0.75,beta = 2,distance = "Lp",Lp_p = 2,exact = True,method = "recursive",
-    #                k = 0.05,solver = "neldermead",NRandom = 1000,n_refinements = 10,sphcap_shrink = 0.5,alpha_Dirichlet = 1.25,cooling_factor = 0.95, cap_size = 1,
-    #                start = "mean", space = "sphere", line_solver = "goldensection", bound_gc = True)->np.ndarray:
-    #     """
-    #     TO DO
-    #     """
-    #     self._check_variables(mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,NRandom=NRandom,n_refinements=n_refinements,
-    #                           sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,)
-    #     xs, ys, depth_grid=mtv.depth_mesh(data=self.data,notion=notion,freq=freq,xlim=xlim,ylim=ylim,mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,beta=beta,option=1,
-    #                    distance=distance,Lp_p=Lp_p,exact=exact,method=method,k=k,solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-    #                    alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,)
-    #     return xs, ys, depth_grid
+    def depth_mesh(self,notion:str = "halfspace",freq:List[int] = [100, 100],xlim:List[int]|None = None,ylim:List[int]|None = None,
+                   mah_estimate:str = "moment",mah_parMCD:float = 0.75,beta:int = 2,distance:str = "Lp",Lp_p:int = 2,exact:bool = True,
+                   method:str = "recursive",k:float = 0.05,solver:str = "neldermead",NRandom:int = 1000,n_refinements:int = 10,
+                   sphcap_shrink:float = 0.5,alpha_Dirichlet:float = 1.25,cooling_factor:float = 0.95, cap_size:float|int = 1,
+                   start:str = "mean", space:str = "sphere", line_solver:str = "goldensection", bound_gc:bool = True
+                   )->tuple[np.ndarray,np.ndarray,np.ndarray]:
+        """
+        Computes the depth mesh
+                
+        Parameters
+        ----------
+        notion: str, default="halfspace"
+            Chosen notion for depth computation. The mesh will be computed using this notion to map the 2D space
+
+        freq: List[int,int], defaul=[100,100]
+            Amount of points to map depth in both dimensions. 
+
+        xlim: List[int,int], default=None
+            Limits for x value computation. 
+            If None, value is determined based on dataset values. 
+        
+        ylim: List[int,int], default=None
+            Limits for y value computation. 
+            If None, value is determined based on dataset values.
+
+        Results
+        ----------
+        xs: np.ndarray
+            x coordinate for plotting
+
+        ys: np.ndarray
+            y coordinate for plotting
+
+        depth_grid: np.ndarray
+            depth values for the grid
+        """
+        self._check_variables(mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,NRandom=NRandom,n_refinements=n_refinements,
+                              sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,)
+        xs, ys, depth_grid=mtv.depth_mesh(data=self.data,notion=notion,freq=freq,xlim=xlim,ylim=ylim,mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,beta=beta,option=1,
+                       distance=distance,Lp_p=Lp_p,exact=exact,method=method,k=k,solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                       alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,)
+        return xs, ys, depth_grid
     
-    # def depth_plot2d(self, notion:str = "halfspace",freq:list = [100, 100], xlim:List[int]|List[float]=None, ylim:List[int]|List[float]=None, cmap:str = "YlOrRd", 
-    #                  ret_depth_mesh:bool= False,xs = None, ys = None,
-    #                  val_mesh = None,mah_estimate = "moment",mah_parMCD = 0.75,beta = 2,distance = "Lp",Lp_p = 2,exact = True,method = "recursive",k = 0.05,
-    #                  solver = "neldermead",NRandom = 1000,n_refinements = 10,sphcap_shrink = 0.5,alpha_Dirichlet = 1.25,cooling_factor = 0.95,
-    #                  cap_size = 1, start = "mean", space = "sphere", line_solver = "goldensection", bound_gc = True):
-    #     """
-    #     TO DO
-    #     """
-    #     self._check_variables(mah_estimate=mah_estimate, mah_parMCD=mah_parMCD, beta=beta, distance=distance, NRandom=NRandom, n_refinements=n_refinements, 
-    #                           sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, cap_size=cap_size,)
-    #     fig, ax, im =mtv.depth_plot2d(data=self.data,
-    #                      notion=notion, freq=freq, xlim=xlim, ylim=ylim, cmap=cmap, ret_depth_mesh=ret_depth_mesh, xs=xs, ys=ys, val_mesh=val_mesh, 
-    #                      mah_estimate=mah_estimate, mah_parMCD=mah_parMCD, beta=beta, distance=distance, Lp_p=Lp_p, exact=exact, method=method, k=k, 
-    #                      solver=solver, NRandom=NRandom, option=1, n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, 
-    #                      cooling_factor=cooling_factor, cap_size=cap_size, start=start, space=space, line_solver=line_solver, bound_gc=bound_gc, )
-    #     return fig, ax, im 
-    # def _calcDet(self,):
-    #     """
-    #     TO DO
-    #     """
-    #     self._check_variables
-    #     mtv.calcDet
-    #     pass
-    def _MCD(self, h, seed=None, mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
+    def depth_plot2d(self, notion:str = "halfspace",freq:list = [100, 100], xlim:List[int]|List[float]=None, ylim:List[int]|List[float]=None, cmap:str = "YlOrRd", 
+                     ret_depth_mesh:bool= False,xs = None, ys = None,
+                     val_mesh = None,mah_estimate = "moment",mah_parMCD = 0.75,beta = 2,distance = "Lp",Lp_p = 2,exact = True,method = "recursive",k = 0.05,
+                     solver = "neldermead",NRandom = 1000,n_refinements = 10,sphcap_shrink = 0.5,alpha_Dirichlet = 1.25,cooling_factor = 0.95,
+                     cap_size = 1, start = "mean", space = "sphere", line_solver = "goldensection", bound_gc = True):
         """
-        TO DO
+        Plots the 2D view of the depth
         """
-        self._check_variables
-        if h<self.data.shape[0]*.5:
-            h=int(self.data.shape[0]*.5)
+        self._check_variables(mah_estimate=mah_estimate, mah_parMCD=mah_parMCD, beta=beta, distance=distance, NRandom=NRandom, n_refinements=n_refinements, 
+                              sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, cap_size=cap_size,)
+        fig, ax, im =mtv.depth_plot2d(data=self.data,
+                         notion=notion, freq=freq, xlim=xlim, ylim=ylim, cmap=cmap, ret_depth_mesh=ret_depth_mesh, xs=xs, ys=ys, val_mesh=val_mesh, 
+                         mah_estimate=mah_estimate, mah_parMCD=mah_parMCD, beta=beta, distance=distance, Lp_p=Lp_p, exact=exact, method=method, k=k, 
+                         solver=solver, NRandom=NRandom, option=1, n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, 
+                         cooling_factor=cooling_factor, cap_size=cap_size, start=start, space=space, line_solver=line_solver, bound_gc=bound_gc, )
+        return fig, ax, im
+
+    ## Det and MCD 
+    def _calcDet(self,mat:np.ndarray):
+        """
+        Computes the determinant of a matrix (?)
+
+        Parametres 
+        -----------
+        mat: {array-like}
+            Matrix to compute the determinant
+
+        Results
+        -----------
+        Det: float
+            determinant of the matrix
+        """
+        # self._check_variables
+        return mtv.calcDet(mat)
+        
+    def computeMCD(self,mat:np.ndarray|None=None, h:int|float=1, mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
+        """
+        Compute Minimum Covariance Determinant (MCD)
+
+        Parametres 
+        -----------
+        mat: {array-like} or None, default=None
+            Matrix to compute MCD. If set to None, compute the MCD of the loaded dataset
+
+        h: int or float, default=1
+            Represents the amount of data of the dataset used to compute the MCD. 
+            If the value is in the interval [0,1], it is treated as the percentage of dataset,
+            if the value is in the interval [n/2,n], it is treated as the amount of sample points.
+            It in the interval ]1,n/2[, the amount is rounded to n/2.
+        
+        mfull: int, default=10
+
+        nstep: int, default=7
+            Amount of steps to compute MCD
+
+        hiRegimeCompleteLastComp: bool, default=True
             
-        self.MCD=mtv.MCD(self.data,h,seed,mfull, nstep, hiRegimeCompleteLastComp)
-        return 
+        Results 
+        -----------
+        Minimum Covariance Determinant (MCD): {array-like}
+        """
+        self._check_variables(h) # check if h is in the acceptable range
+        if h>0 and h<=1: # transform h in the good value for MCD function
+            h=int(h*self._nSamples)
+        elif h<self._nSamples/2:
+            h=int(self._nSamples/2)
+        else:h=int(h)
+        self.MCD=mtv.MCD(self.data,h=h,seed=self.seed,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
+        return self.MCD
     
     #### auxiliar functions #### 
     def set_seed(self,seed:int=2801)->None:
@@ -631,10 +719,14 @@ class depthModel():
             if key=="cap_size":
                 assert type(value)==float or type(value)==int, f"cap_size must be a float or integer, got {type(value)}"
             if key=="output_option":
-                assert type(value)==str, f"output_option must be a float, got {type(value)}"
+                assert type(value)==str, f"output_option must be a str, got {type(value)}"
                 if value not in self.approxOption: 
                     raise ValueError(f"Only output_option possibilities are {self.approxOption}, got {value}.")
-            
+            if key=="h":
+                assert type(value)==int or type(value)==float, f"h must be a float or int, got {type(value)}"
+                if value<=0 or value>self._nSamples: 
+                    raise ValueError(f"h must be in the range from 0 to {self._nSamples}, got {value}.")
+
     def _check_CUDA(self,CUDA,solver):
         if solver not in ["simplerandom", "refinedrandom"] and CUDA==True:
             print(f"CUDA is only available for 'simplerandom', 'refinedrandom', solver is {solver}, CUDA is set to False")
