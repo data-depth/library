@@ -3,6 +3,7 @@ from ctypes import *
 from .Depth_approximation import depth_approximation
 import sys, os, glob
 import platform
+from .CUDA_approximation import cudaApprox
 from .import_CDLL import libExact,libApprox
 
 def halfspace(x, data, exact=True, method="recursive",
@@ -17,8 +18,8 @@ def halfspace(x, data, exact=True, method="recursive",
                 start = "mean",
                 space = "sphere",
                 line_solver = "goldensection",
-                bound_gc = True):
-
+                bound_gc = True,
+                CUDA=False):
     if exact:
         if (method =="recursive" or method==1):
             method=1
@@ -53,8 +54,11 @@ def halfspace(x, data, exact=True, method="recursive",
             res[i]=depths[0][i]
         return res
     else:	
-        return depth_approximation(x, data, "halfspace", solver, NRandom ,option, n_refinements,
+        if CUDA==False:return depth_approximation(x, data, "halfspace", solver, NRandom ,option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+        if CUDA==True:
+            return cudaApprox(data,x, "halfspace", solver, option,NRandom, n_refinements,
+        sphcap_shrink,)
 
 halfspace.__doc__="""
 

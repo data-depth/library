@@ -321,7 +321,7 @@ class depthModel():
     def halfspace(self, x:np.ndarray,exact: bool = True,method: str = "recursive",solver: str = "neldermead",
                   NRandom: int = 1000,n_refinements: int = 10,sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
                   cap_size: int = 1,start: str = "mean",space: str = "sphere",line_solver: str = "goldensection",bound_gc: bool = True,
-                  output_option:Literal["lowest_depth","final_depht_dir",
+                  CUDA:bool=False,output_option:Literal["lowest_depth","final_depht_dir",
                                           "all_depth","all_depth_directions"]="final_depht_dir")->np.ndarray:
         """
         Compute Halfspace depth
@@ -335,14 +335,20 @@ class depthModel():
         ----------
         Halfspace (Tukey) depth : {array like}
         """
+        CUDA=self._check_CUDA(CUDA,solver)
         self._check_variables(x=x,NRandom=NRandom,
                               n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                               alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,) # check if parameters are valid
         option=self._determine_option(x,NRandom,output_option) # determine option number
-        DH=mtv.halfspace(x=x,data=self.data,exact=exact,method=method,
+        if CUDA:DH=mtv.halfspace(x=x,data=self.dataCuda,exact=exact,method=method,
             solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-            space=space,line_solver=line_solver,bound_gc=bound_gc,
+            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
+        )
+        elif CUDA==False:DH=mtv.halfspace(x=x,data=self.data,exact=exact,method=method,
+            solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
+            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
         )
         if option==1:self.halfspaceDepth=DH # assign value
         elif option==2:self.halfspaceDepth,self.halfspaceDir=DH # assign value

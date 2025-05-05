@@ -24,7 +24,7 @@ def projection(x, data,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
     else: 
         return cudaApprox(data,x, "projection", solver, option,NRandom, n_refinements,
-        sphcap_shrink, alpha_Dirichlet,) # return for depth cuda
+        sphcap_shrink,) # return for depth cuda
 
 projection.__doc__="""
 

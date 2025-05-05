@@ -8,7 +8,7 @@ import math
 
 
 def cudaApprox(data:torch.Tensor,x:np.ndarray|torch.Tensor,notion:str,
-            solver:str,option:int,NRandom:int,n_refinements:int,sphcap_shrink:float,cap_size:int|float,
+            solver:str,option:int,NRandom:int,n_refinements:int,sphcap_shrink:float,
             step:int=10000)->torch.Tensor:
     """Main function to compute approximated depth based on chosen notion 
     """
@@ -24,11 +24,15 @@ def cudaApprox(data:torch.Tensor,x:np.ndarray|torch.Tensor,notion:str,
     if option==2:finalDirections=np.empty((x.shape)) # direction matrix
     for ind,z in enumerate(x):
         zCuda=torch.tensor(z.reshape(1,-1),dtype=torch.float32,device="cuda:0")
-        DP=RS(data,zCuda,notion,option,dirRef,n_refinements,sphcap_shrink,step,Pdata,dirs)
+        D=RS(data,zCuda,notion,option,dirRef,n_refinements,sphcap_shrink,step,Pdata,dirs)
         if option==1:
-            finalDepth[ind]=DP
+            finalDepth[ind]=D
         elif option==2:
-            finalDepth[ind],finalDirections[ind]=DP
+            finalDepth[ind],finalDirections[ind]=D
+    
+    torch.cuda.synchronize()
+    del dirs,Pdata,D
+    torch.cuda.empty_cache()
     if option==1:return finalDepth
     elif option==2:return finalDepth,finalDirections
 
@@ -36,10 +40,6 @@ def RS(data:torch.Tensor,z:torch.Tensor,notion:str,
         option:int,dirRef:int,n_refinements:int,sphcap_shrink:float,
         step:int,Pdata,dirs):
     """Compute (refined) Random search
-    
-    Parameters
-    ----------
-    
     """
     eps=torch.tensor([torch.pi/2],dtype=torch.float32,device="cuda:0") # initial cap size
     pole=normalize(z).reshape(z.shape) # first pole 
@@ -53,7 +53,6 @@ def RS(data:torch.Tensor,z:torch.Tensor,notion:str,
         index_min=torch.argmin(Pz, 1,)
         torch.index_select(Pz, 1,index_min,out=dMin)
         pole=torch.index_select(dirs, 0, index_min)
-
     if option==2: # return based on option (1 or 2)
         return dMin[0].cpu(), pole.cpu()
     else:return dMin[0].cpu()
@@ -113,9 +112,9 @@ def poleCuda(dirs:torch.Tensor,num_dir:int,pole:torch.Tensor, eps : float)->torc
         dirs-=torch.matmul(p.reshape(-1,1),lamb.reshape(1,-1))
         dirs=dirs.T
         del lamb, XREF, temp
-        return 
+        return dirs
  
-    randVectorSphCuda(dirs,num_dir, pole[0], eps) # call function
+    dirs=randVectorSphCuda(dirs,num_dir, pole[0], eps) # call function
     for i in range(pole.shape[0]):
         dirs[i] = pole[i] # put pole back in the 
     return dirs
@@ -137,7 +136,15 @@ def depthCompNotion(z,data,Pz,Pdata,notion,step)->torch.Tensor:
         Pz=1/(1+Pz) # Compute final depth
         return Pz
     elif notion=="halfspace":
-        pass
-    elif notion=="projection":
+        refQuant=Pdata.shape[1]
+        ge=torch.greater_equal(Pdata,Pz.T,)
+        le=torch.less_equal(Pdata,Pz.T,)
+        tempGe=torch.sum(ge,1)
+        tempGe=torch.divide(tempGe,refQuant)
+        tempLe=torch.sum(le,1)
+        refCount=torch.minimum(tempGe,tempLe).reshape(z.shape[0],-1)
+        torch.divide(refCount,refQuant,out=Pz)
+        return Pz
+    elif notion=="aprojection":
         pass
     pass
