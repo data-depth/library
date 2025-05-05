@@ -1,1 +1,1 @@
-from depth import *
+from .model import depthModel

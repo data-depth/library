@@ -43,20 +43,28 @@ class depthModel():
         For ``solver='refinedrandom'`` or ``'refinedgrid'`` 
     
     sphcap_shrink : float, default = 0.5
+        For ``solver`` = ``refinedrandom`` or `refinedgrid`, it's the shrinking of the spherical cap.
     
     alpha_Dirichlet : float, default = 1.25
+        For ``solver`` = ``randomsimplices``. it's the parameter of the Dirichlet distribution. 
     
     cooling_factor : float, default = 0.95
+        For ``solver`` = ``randomsimplices``, it's the cooling factor.
     
     cap_size : int | float, default = 1
+        For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the size of the spherical cap.
     
-    start : str, default = mean 
+    start : str {'mean', 'random'}, default = mean 
+        For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the method used to compute the first depth.
     
-    space : str, default = sphere 
+    space : str {'sphere', 'euclidean'}, default = sphere 
+        For ``solver`` = ``coordinatedescent`` or ``neldermead``, it's the type of spacecin which
     
-    line_solver : str, default = goldensection
+    line_solver : str {'uniform', 'goldensection'}, default = goldensection
+        For ``solver`` = ``coordinatedescent``, it's the line searh strategy used by this solver.
     
     bound_gc : bool, default = True
+        For ``solver`` = ``neldermead``, it's ``True`` if the search is limited to the closed hemispher
     
     output_option : str, default = final_depht_dir
         Determines what will be computated alongside with the final depth
@@ -103,6 +111,7 @@ class depthModel():
         else: 
             if cuda.is_available():
                 self.dataCuda=torch.tensor(data.T,device="cuda:0",dtype=torch.float32) 
+                self.data=data
                 # Tensor is transposed to facilitate projection and depth  computation
             else:
                 self.data=data
@@ -413,10 +422,16 @@ class depthModel():
                               alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,) # check if parameters are valid
         CUDA=self._check_CUDA(CUDA,solver)
         option=self._determine_option(x,NRandom,output_option,CUDA) # determine option number
-        DP=mtv.projection(x=x,data=self.data,solver=solver,NRandom=NRandom,option=option,
+
+        if CUDA:DP=mtv.projection(x=x,data=self.dataCuda,solver=solver,NRandom=NRandom,option=option,
                           n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                           alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                          space=space,line_solver=line_solver,bound_gc=bound_gc,
+                          space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
+        )
+        else:DP=mtv.projection(x=x,data=self.data,solver=solver,NRandom=NRandom,option=option,
+                          n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                          alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
+                          space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
         )
         if option==1:self.projectionDepth=DP # assign value
         elif option==2:self.projectionDepth,self.projectionDir=DP # assign value
@@ -659,6 +674,14 @@ class depthModel():
         self.MCD=mtv.MCD(self.data,h=h,seed=self.seed,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
         return self.MCD
     
+    def change_dataset(self,newDataset:np.ndarray,keepOld:bool=False,):
+        """Modify dataset"""
+        if keepOld:
+            if self.data.shape[1]!=newDataset.shape[1]:
+                raise Exception(f"Dimensions must be the same, current dimension is {self.data.shape[1]} and new dimension is {newDataset.shape[1]}")
+            self.data=np.concatenate((self.data,newDataset), axis=0)
+        else:self.data=newDataset
+        return self
     #### auxiliar functions #### 
     def set_seed(self,seed:int=2801)->None:
         """Set seed for computation"""
@@ -732,23 +755,22 @@ class depthModel():
             print(f"CUDA is only available for 'simplerandom', 'refinedrandom', solver is {solver}, CUDA is set to False")
             return False
         return CUDA
-    # aprojection.__doc__=mtv.aprojection.__doc__
-    # betaSkeleton.__doc__=mtv.betaSkeleton.__doc__
-    # cexpchull.__doc__=mtv.cexpchull.__doc__
-    # cexpchullstar.__doc__=mtv.cexpchullstar.__doc__
-    # geometrical.__doc__=mtv.geometrical.__doc__
-    # halfspace.__doc__=mtv.halfspace.__doc__
-    # L2.__doc__=mtv.L2.__doc__
-    # mahalanobis.__doc__=mtv.mahalanobis.__doc__
-    # potential.__doc__=mtv.potential.__doc__
-    # projection.__doc__=mtv.projection.__doc__
-    # qhpeeling.__doc__=mtv.qhpeeling.__doc__
-    # simplicial.__doc__=mtv.simplicial.__doc__
-    # simplicialVolume.__doc__=mtv.simplicialVolume.__doc__
-    # spatial.__doc__=mtv.spatial.__doc__
-    # zonoid.__doc__=mtv.zonoid.__doc__
-    # depth_mesh.__doc__=mtv.depth_mesh.__doc__
-    # depth_plot2d.__doc__=mtv.depth_plot2d.__doc__
-    # _calcDet.__doc__=mtv.calcDet.__doc__
-    # _MCD.__doc__=mtv.MCD.__doc__
+    aprojection.__doc__=mtv.aprojection.__doc__
+    betaSkeleton.__doc__=mtv.betaSkeleton.__doc__
+    cexpchull.__doc__=mtv.cexpchull.__doc__
+    cexpchullstar.__doc__=mtv.cexpchullstar.__doc__
+    geometrical.__doc__=mtv.geometrical.__doc__
+    halfspace.__doc__=mtv.halfspace.__doc__
+    L2.__doc__=mtv.L2.__doc__
+    mahalanobis.__doc__=mtv.mahalanobis.__doc__
+    potential.__doc__=mtv.potential.__doc__
+    projection.__doc__=mtv.projection.__doc__
+    qhpeeling.__doc__=mtv.qhpeeling.__doc__
+    simplicial.__doc__=mtv.simplicial.__doc__
+    simplicialVolume.__doc__=mtv.simplicialVolume.__doc__
+    spatial.__doc__=mtv.spatial.__doc__
+    zonoid.__doc__=mtv.zonoid.__doc__
+    depth_mesh.__doc__=mtv.depth_mesh.__doc__
+    depth_plot2d.__doc__=mtv.depth_plot2d.__doc__
+    _calcDet.__doc__=mtv.calcDet.__doc__
     

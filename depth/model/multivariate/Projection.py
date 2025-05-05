@@ -3,6 +3,7 @@ from .Depth_approximation import depth_approximation
 import sys, os, glob
 import platform
 from .import_CDLL import libApprox
+from .CUDA_approximation import cudaApprox
 
 def projection(x, data,
         solver = "neldermead",
@@ -22,8 +23,8 @@ def projection(x, data,
         return depth_approximation(x, data, "projection", solver, NRandom, option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
     else: 
-        return depth_approximation(x, data, "projection", solver, NRandom, option, n_refinements,
-        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc) # return for depth cuda
+        return cudaApprox(data,x, "projection", solver, option,NRandom, n_refinements,
+        sphcap_shrink, alpha_Dirichlet,) # return for depth cuda
 
 projection.__doc__="""
 
