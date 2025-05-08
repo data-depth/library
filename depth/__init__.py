@@ -1,1 +1,1 @@
-from .model import depthModel
+from .model import MultDepth
