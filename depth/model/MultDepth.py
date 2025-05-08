@@ -1,6 +1,7 @@
 # Authors: Leonardo Leone
 
 import numpy as np
+from . import docHelp
 from . import multivariate as mtv
 from typing import Literal, List
 from numba import cuda, float32
@@ -953,22 +954,22 @@ class MultDepth():
             print(f"CUDA is only available for 'simplerandom', 'refinedrandom', solver is {solver}, CUDA is set to False")
             return False
         return CUDA
-    aprojection.__doc__=mtv.aprojection.__doc__
-    betaSkeleton.__doc__=mtv.betaSkeleton.__doc__
-    cexpchull.__doc__=mtv.cexpchull.__doc__
-    cexpchullstar.__doc__=mtv.cexpchullstar.__doc__
-    geometrical.__doc__=mtv.geometrical.__doc__
-    halfspace.__doc__=mtv.halfspace.__doc__
-    L2.__doc__=mtv.L2.__doc__
-    mahalanobis.__doc__=mtv.mahalanobis.__doc__
-    potential.__doc__=mtv.potential.__doc__
-    projection.__doc__=mtv.projection.__doc__
-    qhpeeling.__doc__=mtv.qhpeeling.__doc__
-    simplicial.__doc__=mtv.simplicial.__doc__
-    simplicialVolume.__doc__=mtv.simplicialVolume.__doc__
-    spatial.__doc__=mtv.spatial.__doc__
-    zonoid.__doc__=mtv.zonoid.__doc__
-    depth_mesh.__doc__=mtv.depth_mesh.__doc__
-    depth_plot2d.__doc__=mtv.depth_plot2d.__doc__
-    _calcDet.__doc__=mtv.calcDet.__doc__
+    mahalanobis.__doc__=docHelp.mahalanobis__doc__
+    aprojection.__doc__=docHelp.aprojection__doc__
+    betaSkeleton.__doc__=docHelp.betaSkeleton__doc__
+    cexpchull.__doc__=docHelp.cexpchull__doc__
+    cexpchullstar.__doc__=docHelp.cexpchullstar__doc__
+    geometrical.__doc__=docHelp.geometrical__doc__
+    halfspace.__doc__=docHelp.halfspace__doc__
+    L2.__doc__=docHelp.L2__doc__
+    potential.__doc__=docHelp.potential__doc__
+    projection.__doc__=docHelp.projection__doc__
+    qhpeeling.__doc__=docHelp.qhpeeling__doc__
+    simplicial.__doc__=docHelp.simplicial__doc__
+    simplicialVolume.__doc__=docHelp.simplicialVolume__doc__
+    spatial.__doc__=docHelp.spatial__doc__
+    zonoid.__doc__=docHelp.zonoid__doc__
+    # depth_mesh.__doc__=mtv.depth_mesh.__doc__
+    # depth_plot2d.__doc__=mtv.depth_plot2d.__doc__
+    # _calcDet.__doc__=mtv.calcDet.__doc__
     

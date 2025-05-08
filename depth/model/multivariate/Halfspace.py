@@ -100,7 +100,7 @@ Arguments
         |		If ``option=3``, depths calculated at every iteration are also returned.
         |		If ``option=4``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
-        n_refinements
+    n_refinements
         Set the maximum of iteration for computing the depth of one point.
         For ``solver='refinedrandom'`` or ``'refinedgrid'``.
                       
