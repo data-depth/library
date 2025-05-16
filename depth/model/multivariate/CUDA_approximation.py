@@ -106,14 +106,15 @@ def poleCuda(dirs:torch.Tensor,num_dir:int,pole:torch.Tensor, eps : float)->torc
         this function maps e1 to p, it is applied to x 
         
         """
+        if p[0]==1:
+            return dirs.T
         temp=torch.matmul(p.reshape(1,-1),dirs).reshape(-1)
-        XREF=dirs[0].reshape(-1)
-        lamb=(temp-XREF) 
+        lamb=(temp-dirs[0].reshape(-1)) 
         lamb=lamb/(1-p[0]) # (<p,x> - x1)/(1-p1) 
         dirs[0] = dirs[0]+lamb
         dirs-=torch.matmul(p.reshape(-1,1),lamb.reshape(1,-1))
         dirs=dirs.T
-        del lamb, XREF, temp
+        del lamb, temp
         return dirs
  
     dirs=randVectorSphCuda(dirs,num_dir, pole[0], eps) # call function
