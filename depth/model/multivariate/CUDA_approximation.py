@@ -149,5 +149,18 @@ def depthCompNotion(z,data,Pz,Pdata,notion,step)->torch.Tensor:
         torch.divide(refCount,refQuant,out=Pz)
         return Pz
     elif notion=="aprojection":
-        pass
-    pass
+        prjMED=torch.empty((1,Pdata.shape[0]), device="cuda") # Memory alloc
+        prjMAD=torch.empty((1,Pdata.shape[0]), device="cuda") # Memory alloc
+        for i in range(0,Pdata.shape[0],step): # Compute median
+            prjMED[0][i:i+step]=torch.median(Pdata[i:i+step],1).values
+        torch.subtract(Pz,prjMED,out=Pz)
+        torch.maximum(Pz, torch.tensor(0, device="cuda"),out=Pz)
+        torch.subtract(Pdata,prjMED.reshape(-1,1),out=Pdata)
+        Pdata[Pdata<=0]=torch.nan
+        for i in range(0,Pdata.shape[0],step): # Compute MAD
+            prjMAD[0][i:i+step]=torch.nanmedian(torch.abs(Pdata[i:i+step]),1).values
+        torch.divide(Pz,prjMAD,out=Pz)
+        torch.abs(Pz,out=Pz)
+        Pz=1/(1+Pz) # Compute final depth
+        return Pz
+        

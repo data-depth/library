@@ -260,7 +260,8 @@ class MultDepth():
                     cooling_factor: float = 0.95,cap_size: int = 1, start: str = "mean", space: str = "sphere", 
                     line_solver: str = "goldensection", bound_gc: bool = True,
                     output_option:Literal["lowest_depth","final_depht_dir",
-                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False)->np.ndarray:
+                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False,
+                                          CUDA:bool=False)->np.ndarray:
         """
         Compute asymmetric projection depth
 
@@ -285,9 +286,13 @@ class MultDepth():
                               ) # check if parameters are valid
         option=self._determine_option(x,NRandom,output_option) # determine option number
 
-        DAP=mtv.aprojection(x=x,data=self.data,solver=solver,NRandom=NRandom,option=option,
+        if CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda,solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                            cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc) #compute depth value
+                            cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value        
+        else:DAP=mtv.aprojection(x=x,data=self.data,solver=solver,NRandom=NRandom,option=option,
+                            n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
+                            cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value
+        
         if evaluate_dataset==False:
             if option==1:self.aprojectionDepth=DAP # assign val option 1
             elif option==2:self.aprojectionDepth,self.aprojectionDir=DAP # assign value option 2

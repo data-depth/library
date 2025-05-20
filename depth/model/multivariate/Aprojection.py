@@ -1,5 +1,6 @@
 from ctypes import *
 from .Depth_approximation import depth_approximation
+from .CUDA_approximation import cudaApprox
 import sys, os, glob
 import platform
 from .import_CDLL import libApprox
@@ -16,10 +17,15 @@ def aprojection(x, data,
         start = "mean",
         space = "sphere",
         line_solver = "goldensection",
-        bound_gc = True):
+        bound_gc = True,
+        CUDA=False):
 
-    return depth_approximation(x, data, "aprojection", solver, NRandom, option, n_refinements,
-    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+    if CUDA==False:
+        return depth_approximation(x, data, "aprojection", solver, NRandom, option, n_refinements,
+                                   sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+    if CUDA==True:
+        return cudaApprox(data,x, "aprojection",  solver, option,NRandom, n_refinements, sphcap_shrink,)
+
 
 aprojection.__doc__="""
 
