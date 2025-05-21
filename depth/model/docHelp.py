@@ -78,13 +78,13 @@ References
 
 Examples
         >>> import numpy as np
-        >>> from depth.model import MultDepth
+        >>> from depth.model import DepthEucl
         >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
         >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
         >>> np.random.seed(0)
         >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
         >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
-        >>> model = MultDepth().load_dataset(data)
+        >>> model = DepthEucl().load_dataset(data)
         >>> model.mahalanobis(x)
         [0.17849871 0.10412453 0.1331417  0.13578021 0.3154836  0.29103769
             0.13398989 0.13913017 0.59339051 0.10556139]
@@ -163,13 +163,13 @@ References
 
 Examples
             >>> import numpy as np
-            >>> from depth.model import MultDepth
+            >>> from depth.model import DepthEucl
             >>> np.random.seed(0)
             >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
             >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
-            >>> model = MultDepth().load_dataset(data)
+            >>> model = DepthEucl().load_dataset(data)
             >>> model.aprojection(x, NRandom=1000)
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
@@ -224,12 +224,12 @@ References
 
 Examples
 			>>> import numpy as np
-			>>> from depth.model import MultDepth
+			>>> from depth.model import DepthEucl
 			>>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
 			>>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
 			>>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
 			>>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
-			>>> model=MultDepth().load_dataset(data)
+			>>> model=DepthEucl().load_dataset(data)
 			>>> model.BetaSkeleton(x)
 			[0.16467668 0.336002   0.43702102 0.25827828 0.4204044  0.46894895
  			0.27825225 0.11572372 0.4663003  0.18778579]
@@ -300,13 +300,13 @@ References
 
 Examples
             >>> import numpy as np
-            >>> from depth.model import MultDepth
+            >>> from depth.model import DepthEucl
             >>> np.random.seed(0)
             >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
             >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
-            >>> mode=MultDepth().load_dataset(data)
+            >>> mode=DepthEucl().load_dataset(data)
             >>> mode.cexpchull(x, data, NRandom=1000)
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
@@ -376,13 +376,13 @@ References
 
 Examples
             >>> import numpy as np
-            >>> from depth.model import MultDepth
+            >>> from depth.model import DepthEucl
             >>> np.random.seed(0)
             >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
             >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
-            >>> model=MultDepth().load_dataset(data)
+            >>> model=DepthEucl().load_dataset(data)
             >>> model.cexpchull(x, NRandom=1000)
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
@@ -452,13 +452,13 @@ References
 
 Examples
             >>> import numpy as np
-            >>> from depth.model import MultDepth
+            >>> from depth.model import DepthEucl
             >>> np.random.seed(0)
             >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
             >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
-            >>> model=MultDepth().load_dataset(data)
+            >>> model=DepthEucl().load_dataset(data)
             >>> model.geometrical(x, NRandom=1000)
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
@@ -548,12 +548,12 @@ References
 
 Examples
         >>> import numpy as np
-        >>> from depth.model import MultDepth
+        >>> from depth.model import DepthEucl
         >>> mat1=[[1, 0, 0],[0, 2, 0],[0, 0, 1]]
         >>> mat2=[[1, 0, 0],[0, 1, 0],[0, 0, 1]]
         >>> x = np.random.multivariate_normal([1,1,1], mat2, 10)
         >>> data = np.random.multivariate_normal([0,0,0], mat1, 200)
-        >>> model=MultDepth().load_dataset(data)
+        >>> model=DepthEucl().load_dataset(data)
         >>> model.halfspace(x,)
         [0.    0.005 0.005 0.    0.04  0.01  0.    0.    0.04  0.01 ]
         >>> model.halfspace(x, exact=True)
@@ -593,11 +593,11 @@ References
    
 Examples
 			>>> import numpy as np
-			>>> from depth.model import MultDepth
+			>>> from depth.model import DepthEucl
 			>>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
 			>>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
 			>>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
-			>>> model=MultDepth().load_dataset(data)
+			>>> model=DepthEucl().load_dataset(data)
 			>>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
 			>>> model.L2(x)
 			[0.2867197  0.19718391 0.18896649 0.24623271 0.20979579 0.22055673
@@ -642,11 +642,11 @@ References
 			
 Examples
 			>>> import numpy as np
-			>>> from depth.model import MultDepth
+			>>> from depth.model import DepthEucl
 			>>> mat1=[[1, 0, 0],[0, 2, 0],[0, 0, 1]]
 			>>> mat2=[[1, 0, 0],[0, 1, 0],[0, 0, 1]]
 			>>> data = np.random.multivariate_normal([0,0,0], mat1, 20)
-			>>> model=MultDepth().load_dataset(data)
+			>>> model=DepthEucl().load_dataset(data)
 			>>> x = np.random.multivariate_normal([1,1,1], mat2, 10)
 			>>> model.potential(x,)
 			[7.51492797 8.34322926 5.42761506 6.25418171 4.25774485 8.09733146
@@ -726,12 +726,12 @@ References
 
 Examples
         >>> import numpy as np
-        >>> from depth.model import MultDepth
+        >>> from depth.model import DepthEucl
         >>> np.random.seed(0)
         >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
         >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
         >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
-        >>> model=MultDepth().load_dataset(data)
+        >>> model=DepthEucl().load_dataset(data)
         >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
         >>> model.projection(x, NRandom=1000)
         [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
@@ -762,12 +762,12 @@ References
     * Eddy, W. F. (1981). Graphics for the multivariate two-sample problem: Comment. *Journal of the American Statistical Association*, 76, 287–289.
             
 Examples
-            >>> from depth.model import MultDepth
+            >>> from depth.model import DepthEucl
             >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
             >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
-            >>> model=MultDepth().load_dataset(data)
+            >>> model=DepthEucl().load_dataset(data)
             >>> model.qhpeeling(x)
             [0.   0.   0.   0.   0.   0.   0.01 0.   0.   0.01]
 
@@ -801,12 +801,12 @@ References
 
 Examples
             >>> import numpy as np
-            >>> from depth.model import MultDepth
+            >>> from depth.model import DepthEucl
             >>> mat1=[[1, 0, 0],[0, 1, 0],[0, 0, 1]]
             >>> mat2=[[1, 0, 0],[0, 1, 0],[0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0], mat1, 25)
-            >>> model=MultDepth().load_dataset(data)
+            >>> model=DepthEucl().load_dataset(data)
             >>> model.simplicial(x,)
             [0.04458498 0.         0.         0.         0.         0.
              0.         0.         0.         0.        ]
@@ -849,12 +849,12 @@ References
 
 Examples
             >>> import numpy as np
-            >>> from depth.model import MultDepth
+            >>> from depth.model import DepthEucl
             >>> mat1=[[1, 0, 0],[0, 2, 0],[0, 0, 1]]
             >>> mat2=[[1, 0, 0],[0, 1, 0],[0, 0, 1]]
             >>> x = np.random.multivariate_normal([1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0], mat1, 20)
-            >>> model=MultDepth().load_dataset(data)
+            >>> model=DepthEucl().load_dataset(data)
             >>> model.simplicalVolume(x, exact=True)
             [0.45749049 0.34956166 0.2263421  0.68742137 0.94796538 0.51112415
              0.85250931 0.67914988 0.79165292 0.33192247]
@@ -892,12 +892,12 @@ References
 
 Examples
         >>> import numpy as np
-        >>> from depth.model import MultDepth
+        >>> from depth.model import DepthEucl
         >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
         >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
         >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
         >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
-        >>> model=MultDepth().load_dataset(data)
+        >>> model=DepthEucl().load_dataset(data)
         >>> model.spatial(x, )
         [0.22548919451212823, 0.14038895785356165, 0.2745517635029123, 0.35450156620496354,
         0.42373722245348566, 0.34562025044812095, 0.3585616673301636, 0.16916309940691643,
@@ -971,12 +971,12 @@ References
 
 Examples
         >>> import numpy as np
-        >>> from depth.model import MultDepth
+        >>> from depth.model import DepthEucl
         >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
         >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
         >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
         >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
-        >>> model=MultDepth().load_dataset(data)
+        >>> model=DepthEucl().load_dataset(data)
         >>> model.zonoid(x,)
         [0.         0.00769552 0.03087017 0.         0.30945453 0.0142515
             0.         0.01970896 0.02169483 0.        ]

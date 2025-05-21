@@ -1,3 +1,3 @@
-from .MultDepth import MultDepth
+from .DepthEucl import DepthEucl
 
-__all__ = ["MultDepth",]
+__all__ = ["DepthEucl",]

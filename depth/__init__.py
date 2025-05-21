@@ -1,2 +1,2 @@
-from library.depth.model import MultDepth
+from library.depth.model import DepthEucl
 from library.depth import *

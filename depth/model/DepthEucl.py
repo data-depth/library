@@ -10,8 +10,7 @@ import sys, os
 try:os.environ['CUDA_HOME']=os.environ.get('CUDA_PATH').split(";")[0] # Force add cuda path
 except:pass
 
-
-class MultDepth():
+class DepthEucl():
     """
     Statistical data depth.
 
@@ -174,16 +173,6 @@ class MultDepth():
         assert(type(data)==np.ndarray), "The dataset must be a numpy array"
         self._nSamples=data.shape[0] # define dataset size - n
         self._spaceDim=data.shape[1] # define space dimension - d
-        if CUDA==False:
-            self.data=data
-        else: 
-            if cuda.is_available():
-                self.dataCuda=torch.tensor(data.T,device="cuda:0",dtype=torch.float32) 
-                self.data=data
-                # Tensor is transposed to facilitate projection and depth  computation
-            else:
-                self.data=data
-                print("CUDA is set to True, but cuda is not available, CUDA is automatically set to False")
         if type(distribution)!=type(None):
             if distribution.shape[0]!=data.shape[0]:
                 raise Exception(f"distribution and dataset must have same length, {distribution.shape[0]}!={data.shape[0]}")
@@ -199,6 +188,16 @@ class MultDepth():
             self.y=y # define y
         else:self.y=None
 
+        if CUDA==False:
+            self.data=data
+        else: 
+            if cuda.is_available():
+                self.dataCuda=torch.tensor(data.T,device="cuda:0",dtype=torch.float32) 
+                self.data=data
+                # Tensor is transposed to facilitate projection and depth  computation
+            else:
+                self.data=data
+                print("CUDA is set to True, but cuda is not available, CUDA is automatically set to False")
         return self
 
     def mahalanobis(self, x: np.ndarray|None = None, exact: bool = True, mah_estimate: Literal["moment", "mcd"] = "moment",
@@ -228,6 +227,8 @@ class MultDepth():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
+            self.mahalanobisDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.mahalanobisDepth=np.empty((self.distRef.shape[0],x.shape[0]))
 
         
         self._check_variables(x=x,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
@@ -235,24 +236,52 @@ class MultDepth():
             alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
             cap_size=cap_size, output_option=output_option, ) # check if parameters are valid
 
-        option=self._determine_option(x,NRandom,output_option) # determine option number 
-        DM=mtv.mahalanobis(
-            x,self.data,exact,mah_estimate.lower(),mah_parMcd,
-            solver=solver, NRandom=NRandom, 
-            n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, 
-            alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-            cap_size=cap_size, start=start, space=space, 
-            line_solver=line_solver, bound_gc=bound_gc,option=option, 
-                        ) #compute depth value
+        option=self._determine_option(x,NRandom,output_option,exact=exact) # determine option number 
+        if option>=2:
+            if evaluate_dataset:self.mahalanobisDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.mahalanobisDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
+
+        for ind, d in enumerate(self.distRef):
+            DM=mtv.mahalanobis(
+                x,self.data[self.distribution==d],exact,mah_estimate.lower(),mah_parMcd,
+                solver=solver, NRandom=NRandom, 
+                n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, 
+                alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
+                cap_size=cap_size, start=start, space=space, 
+                line_solver=line_solver, bound_gc=bound_gc,option=option, 
+                            ) #compute depth value
+            if evaluate_dataset==False:
+                if exact or option==1:self.mahalanobisDepth[ind]=DM # assign value - exact or option 1
+                elif option==2:self.mahalanobisDepth[ind],self.mahalanobisDir[ind]=DM # assign value option 2
+                elif option==3:self.mahalanobisDepth[ind],self.mahalanobisDir[ind],self.allDepth[ind]=DM # assign value option 3
+                elif option==4:self.mahalanobisDepth[ind],self.mahalanobisDir[ind],self.allDepth[ind],self.allDirections[ind],_=DM # assign value option 4
+            elif evaluate_dataset==True:
+                if exact or option==1:self.mahalanobisDepthDS[ind]=DM # assign value - exact or option 1
+                elif option==2:self.mahalanobisDepthDS[ind],self.mahalanobisDirDS[ind]=DM # assign value option 2
+        
+        
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.mahalanobisDepthDS=self.mahalanobisDepthDS[0]
+                if option==2:self.mahalanobisDirDS=self.mahalanobisDirDS[0]
+            else:
+                self.mahalanobisDepth=self.mahalanobisDepth[0]
+                if option>=2:self.mahalanobisDir=self.mahalanobisDir[0]
+            if option>=3:self.allDepth=self.allDepth[0]
+            if option>=4:self.allDirections=self.allDirections[0]
         if evaluate_dataset==False:
-            if exact or option==1:self.mahalanobisDepth=DM # assign value - exact or option 1
-            elif option==2:self.mahalanobisDepth,self.mahalanobisDir=DM # assign value option 2
-            elif option==3:self.mahalanobisDepth,self.mahalanobisDir,allDepth=DM # assign value option 3
-            elif option==4:self.mahalanobisDepth,self.mahalanobisDir,allDepth,allDirections,dirIndiex=DM # assign value option 4
+            if exact or option==1:return self.mahalanobisDepth
+            if option==2:return self.mahalanobisDepth,self.mahalanobisDir
+            if option==3:return self.mahalanobisDepth,self.mahalanobisDir,self.allDepth
+            if option==4:return self.mahalanobisDepth,self.mahalanobisDir,self.allDepth,self.allDirections
         elif evaluate_dataset==True:
-            if exact or option==1:self.mahalanobisDepthDS=DM # assign value - exact or option 1
-            elif option==2:self.mahalanobisDepthDS,self.mahalanobisDirDS=DM # assign value option 2
-        return DM
+            if exact or option==1:return self.mahalanobisDepthDS
+            if option==2:return self.mahalanobisDepthDS,self.mahalanobisDirDS
+        
             
 
     def aprojection(self,x:np.ndarray|None=None,solver: str = "neldermead", NRandom: int = 1000,
@@ -281,27 +310,54 @@ class MultDepth():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
+            self.aprojectionDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.aprojectionDepth=np.empty((self.distRef.shape[0],x.shape[0]))
         self._check_variables(x=x, solver=solver, NRandom=NRandom,n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, 
                               alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor,cap_size=cap_size,
                               ) # check if parameters are valid
         option=self._determine_option(x,NRandom,output_option) # determine option number
+        if option>=2:
+            if evaluate_dataset:self.aprojectionDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.aprojectionDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
 
-        if CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda,solver=solver,NRandom=NRandom,option=option,
-                            n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                            cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value        
-        else:DAP=mtv.aprojection(x=x,data=self.data,solver=solver,NRandom=NRandom,option=option,
-                            n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                            cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value
-        
-        if evaluate_dataset==False:
-            if option==1:self.aprojectionDepth=DAP # assign val option 1
-            elif option==2:self.aprojectionDepth,self.aprojectionDir=DAP # assign value option 2
-            elif option==3:self.aprojectionDepth,self.aprojectionDir,self.allDepth=DAP # assign value option 3
-            elif option==4:self.aprojectionDepth,self.aprojectionDir,self.allDepth,self.allDirections,self.dirIndiex=DAP # assign value option 4    
+        for ind,d in enumerate(self.distRef):
+            if CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+                                n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value        
+            else:DAP=mtv.aprojection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+                                n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value
+            if evaluate_dataset==False:
+                if option==1:self.aprojectionDepth[ind]=DAP # assign val option 1
+                elif option==2:self.aprojectionDepth[ind],self.aprojectionDir[ind]=DAP # assign value option 2
+                elif option==3:self.aprojectionDepth[ind],self.aprojectionDir[ind],self.allDepth[ind]=DAP # assign value option 3
+                elif option==4:self.aprojectionDepth[ind],self.aprojectionDir[ind],self.allDepth[ind],self.allDirections[ind],_=DAP # assign value option 4    
+            elif evaluate_dataset==True:
+                if option==1:self.aprojectionDepthDS[ind]=DAP # assign val option 1
+                elif option==2:self.aprojectionDepthDS[ind],self.aprojectionDirDS[ind]=DAP # assign value option 2
+
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.aprojectionDepthDS=self.aprojectionDepthDS[0]
+                if option==2:self.aprojectionDirDS=self.aprojectionDirDS[0]
+            else:
+                self.aprojectionDepth=self.aprojectionDepth[0]
+                if option>=2:self.aprojectionDir=self.aprojectionDir[0]
+            if option>=3:self.allDepth=self.allDepth[0]
+            if option>=4:self.allDirections=self.allDirections[0]
+        if evaluate_dataset==False: # return correct value
+            if option==1:return self.aprojectionDepth
+            if option==2:return self.aprojectionDepth,self.aprojectionDir
+            if option==3:return self.aprojectionDepth,self.aprojectionDir,self.allDepth
+            if option==4:return self.aprojectionDepth,self.aprojectionDir,self.allDepth,self.allDirections
         elif evaluate_dataset==True:
-            if option==1:self.aprojectionDepthDS=DAP # assign val option 1
-            elif option==2:self.aprojectionDepthDS,self.aprojectionDirDS=DAP # assign value option 2
-        return DAP
+            if option==1:return self.aprojectionDepthDS
+            if option==2:return self.aprojectionDepthDS,self.aprojectionDirDS
+
 
     
     def betaSkeleton(self,x:np.ndarray|None=None, beta:int=2,distance: str = "Lp", 
@@ -332,7 +388,8 @@ class MultDepth():
             if evaluate_dataset==False: self.betaSkeletonDepth[ind]=DB
             if evaluate_dataset==True: self.betaSkeletonDepthDS[ind]=DB
         if self.distRef.shape[0]==1: 
-            return self.betaSkeletonDepthDS[0] if evaluate_dataset==True else self.betaSkeletonDepth[0]
+            if evaluate_dataset==True:self.betaSkeletonDepthDS=self.betaSkeletonDepthDS[0] 
+            else: self.betaSkeletonDepth=self.betaSkeletonDepth[0]
         return self.betaSkeletonDepth if evaluate_dataset==True else self.betaSkeletonDepth
         
 
@@ -362,27 +419,56 @@ class MultDepth():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
+                self.cexpchullDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.cexpchullDepth=np.empty((self.distRef.shape[0],x.shape[0]))
         self._check_variables(
             x=x,NRandom =NRandom,output_option =output_option,n_refinements =n_refinements,
             sphcap_shrink=sphcap_shrink,alpha_Dirichlet =alpha_Dirichlet,
             cooling_factor=cooling_factor,cap_size =cap_size,
         ) # check if parameters are valid
         option=self._determine_option(x,NRandom,output_option) # determine option number 
-        DC=mtv.cexpchull(
-            x=x, data=self.data,solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,
-            sphcap_shrink=sphcap_shrink,alpha_Dirichlet =alpha_Dirichlet,cooling_factor=cooling_factor,
-            cap_size =cap_size,start =start,space =space,line_solver =line_solver,bound_gc =bound_gc,
-            ) # compute depth 
-        if evaluate_dataset==False: 
-            if option==1:self.cexpchullDepth=DC # assign value
-            elif option==2:self.cexpchullDepth,self.cexpchullDir=DC # assign value
-            elif option==3:self.cexpchullDepth,self.cexpchullDir,self.allDepth=DC # assign value
-            elif option==4:self.cexpchullDepth,self.cexpchullDir,self.allDepth,self.allDirections,self.dirIndiex=DC # assign value
-            return self.cexpchullDepth
-        if evaluate_dataset==True: 
-            if option==1:self.cexpchullDepthDS=DC # assign value
-            elif option==2:self.cexpchullDepthDS,self.cexpchullDirDS=DC # assign value
-            return self.cexpchullDepthDS
+        if option>=2:
+            if evaluate_dataset:self.cexpchullDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.cexpchullDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
+        
+        for ind,d in enumerate(self.distRef):
+            DC=mtv.cexpchull(
+                x=x, data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,
+                sphcap_shrink=sphcap_shrink,alpha_Dirichlet =alpha_Dirichlet,cooling_factor=cooling_factor,
+                cap_size =cap_size,start =start,space =space,line_solver =line_solver,bound_gc =bound_gc,
+                ) # compute depth 
+            if evaluate_dataset==False: 
+                if option==1:self.cexpchullDepth[ind]=DC # assign value
+                elif option==2:self.cexpchullDepth[ind],self.cexpchullDir[ind]=DC # assign value
+                elif option==3:self.cexpchullDepth[ind],self.cexpchullDir[ind],self.allDepth[ind]=DC # assign value
+                elif option==4:self.cexpchullDepth[ind],self.cexpchullDir[ind],self.allDepth[ind],self.allDirections[ind],_=DC # assign value
+            if evaluate_dataset==True: 
+                if option==1:self.cexpchullDepthDS[ind]=DC # assign value
+                elif option==2:self.cexpchullDepthDS[ind],self.cexpchullDirDS[ind]=DC # assign value
+
+
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.cexpchullDepthDS=self.cexpchullDepthDS[0]
+                if option==2:self.cexpchullDirDS=self.cexpchullDirDS[0]
+            else:
+                self.cexpchullDepth=self.cexpchullDepth[0]
+                if option>=2:self.cexpchullDir=self.cexpchullDir[0]
+            if option>=3:self.allDepth=self.allDepth[0]
+            if option>=4:self.allDirections=self.allDirections[0]
+        if evaluate_dataset==False: # return correct value
+            if option==1:return self.cexpchullDepth
+            if option==2:return self.cexpchullDepth,self.cexpchullDir
+            if option==3:return self.cexpchullDepth,self.cexpchullDir,self.allDepth
+            if option==4:return self.cexpchullDepth,self.cexpchullDir,self.allDepth,self.allDirections
+        elif evaluate_dataset==True:
+            if option==1:return self.cexpchullDepthDS
+            if option==2:return self.cexpchullDepthDS,self.cexpchullDirDS
+
         
     def cexpchullstar(self,x: np.ndarray|None=None, solver: str = "neldermead", NRandom: int = 1000, 
         option: int = 1, n_refinements: int = 10, sphcap_shrink: float = 0.5, 
@@ -409,24 +495,49 @@ class MultDepth():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
+            self.cexpchullstarDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.cexpchullstarDepth=np.empty((self.distRef.shape[0],x.shape[0]))
         self._check_variables(x=x,NRandom=NRandom, n_refinements=n_refinements, sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet, cooling_factor= cooling_factor, cap_size=cap_size,
                               ) # check if parameters are valid
         option=self._determine_option(x,NRandom,output_option) # determine option number 
+        if option>=2:
+            if evaluate_dataset:self.cexpchullstarDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.cexpchullstarDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
+        for ind,d in enumerate(self.distRef):
+            DC=mtv.cexpchullstar(x=x,data=self.data[self.distribution==d], solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
+                            sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
+                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc)
+            if evaluate_dataset==False:
+                if option==1:self.cexpchullstarDepth[ind]=DC # assign value
+                elif option==2:self.cexpchullstarDepth[ind],self.cexpchullstarDir[ind]=DC # assign value
+                elif option==3:self.cexpchullstarDepth[ind],self.cexpchullstarDir[ind],self.allDepth[ind]=DC # assign value
+                elif option==4:self.cexpchullstarDepth[ind],self.cexpchullstarDir[ind],self.allDepth[ind],self.allDirections[ind],_=DC # assign value
+            if evaluate_dataset==True:
+                if option==1:self.cexpchullstarDepthDS[ind]=DC # assign value
+                elif option==2:self.cexpchullstarDepthDS[ind],self.cexpchullstarDirDS[ind]=DC # assign value
         
-        DC=mtv.cexpchullstar(x=x,data=self.data, solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
-                          sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                          cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc)
-        if evaluate_dataset==False:
-            if option==1:self.cexpchullstarDepth=DC # assign value
-            elif option==2:self.cexpchullstarDepth,self.cexpchullstarDir=DC # assign value
-            elif option==3:self.cexpchullstarDepth,self.cexpchullstarDir,self.allDepth=DC # assign value
-            elif option==4:self.cexpchullstarDepth,self.cexpchullstarDir,self.allDepth,self.allDirections,self.dirIndiex=DC # assign value
-            return self.cexpchullstarDepth
-        if evaluate_dataset==True:
-            if option==1:self.cexpchullstarDepthDS=DC # assign value
-            elif option==2:self.cexpchullstarDepthDS,self.cexpchullstarDirDS=DC # assign value
-            return self.cexpchullstarDepthDS
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.cexpchullstarDepthDS=self.cexpchullstarDepthDS[0]
+                if option==2:self.cexpchullstarDirDS=self.cexpchullstarDirDS[0]
+            else:
+                self.cexpchullstarDepth=self.cexpchullstarDepth[0]
+                if option>=2:self.cexpchullstarDir=self.cexpchullstarDir[0]
+            if option>=3:self.allDepth=self.allDepth[0]
+            if option>=4:self.allDirections=self.allDirections[0]
+        if evaluate_dataset==False: # return correct value
+            if option==1:return self.cexpchullstarDepth
+            if option==2:return self.cexpchullstarDepth,self.cexpchullstarDir
+            if option==3:return self.cexpchullstarDepth,self.cexpchullstarDir,self.allDepth
+            if option==4:return self.cexpchullstarDepth,self.cexpchullstarDir,self.allDepth,self.allDirections
+        elif evaluate_dataset==True:
+            if option==1:return self.cexpchullstarDepthDS
+            if option==2:return self.cexpchullstarDepthDS,self.cexpchullstarDirDS
         
     def geometrical(self,x:np.ndarray|None=None,solver: str = "neldermead", NRandom: int = 1000, n_refinements: int = 10, 
                     sphcap_shrink: float = 0.5, alpha_Dirichlet: float = 1.25, cooling_factor: float = 0.95, 
@@ -452,25 +563,51 @@ class MultDepth():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
+            self.geometricalDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.geometricalDepth=np.empty((self.distRef.shape[0],x.shape[0]))
         self._check_variables(
             x=x, NRandom=NRandom, n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, 
             alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor,cap_size=cap_size,
             )# check if parameters are valid
         option=self._determine_option(x,NRandom,output_option) # determine option number 
+        if option>=2:
+            if evaluate_dataset:self.geometricalDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.geometricalDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
+        for ind,d in enumerate(self.distRef):
+            DG=mtv.geometrical(x=x,data=self.data[self.distribution==d], solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
+                            sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
+                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc)
+            if evaluate_dataset==False:
+                if option==1:self.geometricalDepth[ind]=DG # assign value
+                elif option==2:self.geometricalDepth[ind],self.geometricalDir[ind]=DG # assign value
+                elif option==3:self.geometricalDepth[ind],self.geometricalDir[ind],self.allDepth[ind]=DG # assign value
+                elif option==4:self.geometricalDepth[ind],self.geometricalDir[ind],self.allDepth[ind],self.allDirections[ind],_=DG # assign value
+            if evaluate_dataset==True:
+                if option==1:self.geometricalDepthDS[ind]=DG # assign value
+                elif option==2:self.geometricalDepthDS[ind],self.geometricalDirDS[ind]=DG # assign value
         
-        DG=mtv.geometrical(x=x,data=self.data, solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
-                          sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                          cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc)
-        if evaluate_dataset==False:
-            if option==1:self.geometricalDepth=DG # assign value
-            elif option==2:self.geometricalDepth,self.geometricalDir=DG # assign value
-            elif option==3:self.geometricalDepth,self.geometricalDir,self.allDepth=DG # assign value
-            elif option==4:self.geometricalDepth,self.geometricalDir,self.allDepth,self.allDirections,self.dirIndiex=DG # assign value
-            return self.geometricalDepth
-        if evaluate_dataset==True:
-            if option==1:self.geometricalDepthDS=DG # assign value
-            elif option==2:self.geometricalDepthDS,self.geometricalDirDS=DG # assign value
-            return self.geometricalDepthDS
+
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.geometricalDepthDS=self.geometricalDepthDS[0]
+                if option==2:self.geometricalDirDS=self.geometricalDirDS[0]
+            else:
+                self.geometricalDepth=self.geometricalDepth[0]
+                if option>=2:self.geometricalDir=self.geometricalDir[0]
+            if option>=3:self.allDepth=self.allDepth[0]
+            if option>=4:self.allDirections=self.allDirections[0]
+        if evaluate_dataset==False: # return correct value
+            if option==1:return self.geometricalDepth
+            if option==2:return self.geometricalDepth,self.geometricalDir
+            if option==3:return self.geometricalDepth,self.geometricalDir,self.allDepth
+            if option==4:return self.geometricalDepth,self.geometricalDir,self.allDepth,self.allDirections
+        elif evaluate_dataset==True:
+            if option==1:return self.geometricalDepthDS
+            if option==2:return self.geometricalDepthDS,self.geometricalDirDS
 
     def halfspace(self, x:np.ndarray|None=None,exact: bool = True,method: str = "recursive",solver: str = "neldermead",
                   NRandom: int = 1000,n_refinements: int = 10,sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
@@ -496,31 +633,59 @@ class MultDepth():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
+            self.halfspaceDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.halfspaceDepth=np.empty((self.distRef.shape[0],x.shape[0]))
         CUDA=self._check_CUDA(CUDA,solver)
         self._check_variables(x=x,NRandom=NRandom,
                               n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                               alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,) # check if parameters are valid
-        option=self._determine_option(x,NRandom,output_option) # determine option number
-        if CUDA:DH=mtv.halfspace(x=x,data=self.dataCuda,exact=exact,method=method,
-            solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
-        )
-        elif CUDA==False:DH=mtv.halfspace(x=x,data=self.data,exact=exact,method=method,
-            solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
-        )
-        if evaluate_dataset==False:
-            if option==1 or exact==True:self.halfspaceDepth=DH # assign value
-            elif option==2:self.halfspaceDepth,self.halfspaceDir=DH # assign value
-            elif option==3:self.halfspaceDepth,self.halfspaceDir,self.allDepth=DH # assign value
-            elif option==4:self.halfspaceDepth,self.halfspaceDir,self.allDepth,self.allDirections,self.dirIndiex=DH # assign value
-            return self.halfspaceDepth
-        if evaluate_dataset==True:
-            if option==1:self.halfspaceDepthDS=DH # assign value
-            elif option==2:self.halfspaceDepthDS,self.halfspaceDirDS=DH # assign value
-            return self.halfspaceDepthDS
+        option=self._determine_option(x,NRandom,output_option, CUDA=CUDA,exact=exact) # determine option number
+        if option>=2:
+            if evaluate_dataset:self.halfspaceDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.halfspaceDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
+
+        for ind,d in enumerate(self.distRef):
+            if CUDA:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
+                solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
+            )
+            elif CUDA==False:DH=mtv.halfspace(x=x,data=self.data[self.distribution==d],exact=exact,method=method,
+                solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
+            )
+            if evaluate_dataset==False:
+                if option==1 or exact==True:self.halfspaceDepth[ind]=DH # assign value
+                elif option==2:self.halfspaceDepth[ind],self.halfspaceDir[ind]=DH # assign value
+                elif option==3:self.halfspaceDepth[ind],self.halfspaceDir[ind],self.allDepth[ind]=DH # assign value
+                elif option==4:self.halfspaceDepth[ind],self.halfspaceDir[ind],self.allDepth[ind],self.allDirections[ind],_=DH # assign value
+            if evaluate_dataset==True:
+                if option==1:self.halfspaceDepthDS[ind]=DH # assign value
+                elif option==2:self.halfspaceDepthDS[ind],self.halfspaceDirDS[ind]=DH # assign value
+
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.halfspaceDepthDS=self.halfspaceDepthDS[0]
+                if option==2:self.halfspaceDirDS=self.halfspaceDirDS[0]
+            else:
+                self.halfspaceDepth=self.halfspaceDepth[0]
+                if option>=2:self.halfspaceDir=self.halfspaceDir[0]
+            if option>=3:self.allDepth=self.allDepth[0]
+            if option>=4:self.allDirections=self.allDirections[0]
+        if evaluate_dataset==False: # return correct value
+            if option==1:return self.halfspaceDepth
+            if option==2:return self.halfspaceDepth,self.halfspaceDir
+            if option==3:return self.halfspaceDepth,self.halfspaceDir,self.allDepth
+            if option==4:return self.halfspaceDepth,self.halfspaceDir,self.allDepth,self.allDirections
+        elif evaluate_dataset==True:
+            if option==1:return self.halfspaceDepthDS
+            if option==2:return self.halfspaceDepthDS,self.halfspaceDirDS
+
     
     def L2(self,x: np.ndarray|None=None, mah_estimate: str = 'moment', mah_parMcd: float = 0.75, evaluate_dataset:bool=False)->np.ndarray:
         """
@@ -548,7 +713,8 @@ class MultDepth():
             if evaluate_dataset:self.L2DepthDS[ind]=DL2
             else:self.L2Depth[ind]=DL2
         if self.distRef.shape[0]==1: # Fix size
-            return self.L2DepthDS[0] if evaluate_dataset==True else self.L2Depth[0]
+            if evaluate_dataset==True: self.L2DepthDS=self.L2DepthDS[0] 
+            else: self.L2Depth=self.L2Depth[0]
         return self.L2DepthDS if evaluate_dataset==True else self.L2Depth
 
     def potential(self,x:np.ndarray|None=None,pretransform: str = "1Mom", kernel: str = "EDKernel", 
@@ -593,7 +759,8 @@ class MultDepth():
                 self.potentialDepthDS[ind]=DP
             else:self.potentialDepth[ind]=DP
         if self.distRef.shape[0]==1: # Fix size
-            return self.potentialDepthDS[0] if evaluate_dataset==True else self.potentialDepth[0]
+            if evaluate_dataset==True:self.potentialDepthDS=self.potentialDepthDS[0] 
+            else: self.potentialDepth=self.potentialDepth[0]
         return self.potentialDepthDS if evaluate_dataset==True else self.potentialDepth
         
 
@@ -622,32 +789,59 @@ class MultDepth():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
+            self.projectionDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.projectionDepth=np.empty((self.distRef.shape[0],x.shape[0]))
+
         self._check_variables(x=x,NRandom=NRandom,
                               n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                               alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,) # check if parameters are valid
         CUDA=self._check_CUDA(CUDA,solver)
         option=self._determine_option(x,NRandom,output_option,CUDA) # determine option number
 
-        if CUDA:DP=mtv.projection(x=x,data=self.dataCuda,solver=solver,NRandom=NRandom,option=option,
-                          n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                          alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                          space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
-        )
-        else:DP=mtv.projection(x=x,data=self.data,solver=solver,NRandom=NRandom,option=option,
-                          n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                          alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                          space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
-        )
-        if evaluate_dataset==False:
-            if option==1:self.projectionDepth=DP # assign value
-            elif option==2:self.projectionDepth,self.projectionDir=DP # assign value
-            elif option==3:self.projectionDepth,self.projectionDir,self.allDepth=DP # assign value
-            elif option==4:self.projectionDepth,self.projectionDir,self.allDepth,self.allDirections,self.dirIndiex=DP # assign value
-            return self.projectionDepth
-        if evaluate_dataset==True:
-            if option==1:self.projectionDepthDS=DP # assign value
-            elif option==2:self.projectionDepthDS,self.projectionDirDS=DP # assign value
-            return self.projectionDepthDS
+        if option>=2:
+            if evaluate_dataset:self.projectionDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.projectionDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
+        for ind,d in enumerate(self.distRef):
+            if CUDA:DP=mtv.projection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+                            n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
+            )
+            else:DP=mtv.projection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+                            n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
+            )
+            if evaluate_dataset==False:
+                if option==1:self.projectionDepth[ind]=DP # assign value
+                elif option==2:self.projectionDepth[ind],self.projectionDir[ind]=DP # assign value
+                elif option==3:self.projectionDepth[ind],self.projectionDir[ind],self.allDepth[ind]=DP # assign value
+                elif option==4:self.projectionDepth[ind],self.projectionDir[ind],self.allDepth[ind],self.allDirections[ind],_=DP # assign value
+            if evaluate_dataset==True:
+                if option==1:self.projectionDepthDS[ind]=DP # assign value
+                elif option==2:self.projectionDepthDS[ind],self.projectionDirDS[ind]=DP # assign value
+
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.projectionDepthDS=self.projectionDepthDS[0]
+                if option==2:self.projectionDirDS=self.projectionDirDS[0]
+            else:
+                self.projectionDepth=self.projectionDepth[0]
+                if option>=2:self.projectionDir=self.projectionDir[0]
+            if option>=3:self.allDepth=self.allDepth[0]
+            if option>=4:self.allDirections=self.allDirections[0]
+        if evaluate_dataset==False: # return correct value
+            if option==1:return self.projectionDepth
+            if option==2:return self.projectionDepth,self.projectionDir
+            if option==3:return self.halfspaceDepth,self.projectionDir,self.allDepth
+            if option==4:return self.halfspaceDepth,self.projectionDir,self.allDepth,self.allDirections
+        elif evaluate_dataset==True:
+            if option==1:return self.projectionDepthDS
+            if option==2:return self.projectionDepthDS,self.projectionDirDS
         
     def qhpeeling(self,x:np.ndarray|None=None, evaluate_dataset:bool=False)->np.ndarray:
         """
@@ -674,7 +868,8 @@ class MultDepth():
             if evaluate_dataset==True:self.qhpeelingDepthDS[ind]=DQ
             if evaluate_dataset==False:self.qhpeelingDepth[ind]=DQ
         if self.distRef.shape[0]==1: # Fix size
-            return self.qhpeelingDepthDS[0] if evaluate_dataset==True else self.qhpeelingDepth[0]
+            if evaluate_dataset==True: self.qhpeelingDepthDS=self.qhpeelingDepthDS[0] 
+            else: self.qhpeelingDepth=self.qhpeelingDepth[0]
         return self.qhpeelingDepthDS if evaluate_dataset==True else self.qhpeelingDepth
 
     def simplicial(self,x:np.ndarray|None=None,exact:bool=True,k:float=0.05,evaluate_dataset:bool=False)->np.ndarray:
@@ -710,7 +905,8 @@ class MultDepth():
             if evaluate_dataset==True:
                 self.simplicialDepthDS[ind]=DS
         if self.distRef.shape[0]==1: # Fix size
-            return self.simplicialDepthDS[0] if evaluate_dataset==True else self.simplicialDepth[0]
+            if evaluate_dataset==True: self.simplicialDepthDS=self.simplicialDepthDS[0] 
+            else: self.simplicialDepth=self.simplicialDepth[0]
         return self.simplicialDepthDS if evaluate_dataset==True else self.simplicialDepth
             
          
@@ -748,7 +944,8 @@ class MultDepth():
             if evaluate_dataset==True:self.simplicialVolumeDepthDS[ind]=DS
             elif evaluate_dataset==False:self.simplicialVolumeDepth[ind]=DS
         if self.distRef.shape[0]==1: # Fix size
-            return self.simplicialVolumeDepthDS[0] if evaluate_dataset==True else self.simplicialVolumeDepth[0]
+            if evaluate_dataset==True: self.simplicialVolumeDepthDS=self.simplicialVolumeDepthDS[0] 
+            else: self.simplicialVolumeDepth=self.simplicialVolumeDepth[0]
         return self.simplicialVolumeDepthDS if evaluate_dataset==True else self.simplicialVolumeDepth
         
     def spatial(self,x:np.ndarray|None=None,mah_estimate:str='moment',mah_parMcd:float=0.75,
@@ -777,7 +974,8 @@ class MultDepth():
             if evaluate_dataset==False:self.spatialDepth[ind]=DS
             if evaluate_dataset==True:self.spatialDepthDS[ind]=DS
         if self.distRef.shape[0]==1: # Fix size
-            return self.spatialDepthDS[0] if evaluate_dataset==True else self.spatialDepth[0]
+            if evaluate_dataset==True: self.spatialDepthDS=self.spatialDepthDS[0] 
+            else: self.spatialDepth=self.spatialDepth[0]
         return self.spatialDepthDS if evaluate_dataset==True else self.spatialDepth
         
         
@@ -807,90 +1005,57 @@ class MultDepth():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
+            self.zonoidDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.zonoidDepth=np.empty((self.distRef.shape[0],x.shape[0]))
+
         self._check_variables(x=x,exact=exact, 
             NRandom=NRandom,n_refinements=n_refinements,
             sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,
             cap_size=cap_size,output_option=output_option) # check if parameters are valid
         
         # seedZ=seed if seed!=self.seed else self.seed #set seed value to default if seed is not passed
-        option=self._determine_option(x,NRandom,output_option) # determine option number 
-        DZ=mtv.zonoid(
-            x,self.data,seed=self.seed,exact=exact, 
-            solver=solver,NRandom=NRandom,n_refinements=n_refinements,
-            sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,
-            cap_size=cap_size,start=start,space=space,line_solver=line_solver,
-            bound_gc=bound_gc,option=option) # compute zonoid depth
-        if evaluate_dataset==False:
-            if exact or option==1:self.zonoidDepth=DZ # assign value
-            elif option==2:self.zonoidDepth,self.zonoidDir=DZ # assign value
-            elif option==3:self.zonoidDepth,self.zonoidDir,self.allDepth=DZ # assign value
-            elif option==4:self.zonoidDepth,self.zonoidDir,self.allDepth,self.allDirections,self.dirIndiex=DZ # assign value
-            return self.zonoidDepth
-        if evaluate_dataset==False:
-            if exact or option==1:self.zonoidDepthDS=DZ # assign value
-            elif option==2:self.zonoidDepthDS,self.zonoidDirDS=DZ # assign value
-            return self.zonoidDepthDS
-
-    #### Plot ####
-    def depth_mesh(self,notion:str = "halfspace",freq:List[int] = [100, 100],xlim:List[int]|None = None,ylim:List[int]|None = None,
-                   mah_estimate:str = "moment",mah_parMCD:float = 0.75,beta:int = 2,distance:str = "Lp",Lp_p:int = 2,exact:bool = True,
-                   method:str = "recursive",k:float = 0.05,solver:str = "neldermead",NRandom:int = 1000,n_refinements:int = 10,
-                   sphcap_shrink:float = 0.5,alpha_Dirichlet:float = 1.25,cooling_factor:float = 0.95, cap_size:float|int = 1,
-                   start:str = "mean", space:str = "sphere", line_solver:str = "goldensection", bound_gc:bool = True
-                   )->tuple[np.ndarray,np.ndarray,np.ndarray]:
-        """
-        Computes the depth mesh
-                
-        Parameters
-        ----------
-        notion: str, default="halfspace"
-            Chosen notion for depth computation. The mesh will be computed using this notion to map the 2D space
-
-        freq: List[int], defaul=[100,100]
-            Amount of points to map depth in both dimensions. 
-
-        xlim: List[int], default=None
-            Limits for x value computation. 
-            If None, value is determined based on dataset values. 
+        option=self._determine_option(x,NRandom,output_option,exact=exact) # determine option number
+        if option>=2:
+            if evaluate_dataset:self.zonoidDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.zonoidDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
+        for ind,d in enumerate(self.distRef):
+            DZ=mtv.zonoid(
+                x,self.data[self.distribution==d],seed=self.seed,exact=exact, 
+                solver=solver,NRandom=NRandom,n_refinements=n_refinements,
+                sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,
+                cap_size=cap_size,start=start,space=space,line_solver=line_solver,
+                bound_gc=bound_gc,option=option) # compute zonoid depth
+            if evaluate_dataset==False:
+                if exact or option==1:self.zonoidDepth[ind]=DZ # assign value
+                elif option==2:self.zonoidDepth[ind],self.zonoidDir[ind]=DZ # assign value
+                elif option==3:self.zonoidDepth[ind],self.zonoidDir[ind],self.allDepth[ind]=DZ # assign value
+                elif option==4:self.zonoidDepth[ind],self.zonoidDir[ind],self.allDepth[ind],self.allDirections[ind],_=DZ # assign value
+            if evaluate_dataset==True:
+                if exact or option==1:self.zonoidDepthDS[ind]=DZ # assign value
+                elif option==2:self.zonoidDepthDS[ind],self.zonoidDirDS[ind]=DZ # assign value
         
-        ylim: List[int], default=None
-            Limits for y value computation. 
-            If None, value is determined based on dataset values.
-
-        Results
-        ----------
-        xs: np.ndarray
-            x coordinate for plotting
-
-        ys: np.ndarray
-            y coordinate for plotting
-
-        depth_grid: np.ndarray
-            depth values for the grid
-        """
-        self._check_variables(mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,NRandom=NRandom,n_refinements=n_refinements,
-                              sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,)
-        xs, ys, depth_grid=mtv.depth_mesh(data=self.data,notion=notion,freq=freq,xlim=xlim,ylim=ylim,mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,beta=beta,option=1,
-                       distance=distance,Lp_p=Lp_p,exact=exact,method=method,k=k,solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                       alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,)
-        return xs, ys, depth_grid
-    
-    def depth_plot2d(self, notion:str = "halfspace",freq:list = [100, 100], xlim:List[int]|List[float]=None, ylim:List[int]|List[float]=None, cmap:str = "YlOrRd", 
-                     ret_depth_mesh:bool= False,xs = None, ys = None,
-                     val_mesh = None,mah_estimate = "moment",mah_parMCD = 0.75,beta = 2,distance = "Lp",Lp_p = 2,exact = True,method = "recursive",k = 0.05,
-                     solver = "neldermead",NRandom = 1000,n_refinements = 10,sphcap_shrink = 0.5,alpha_Dirichlet = 1.25,cooling_factor = 0.95,
-                     cap_size = 1, start = "mean", space = "sphere", line_solver = "goldensection", bound_gc = True):
-        """
-        Plots the 2D view of the depth
-        """
-        self._check_variables(mah_estimate=mah_estimate, mah_parMCD=mah_parMCD, beta=beta, distance=distance, NRandom=NRandom, n_refinements=n_refinements, 
-                              sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, cap_size=cap_size,)
-        fig, ax, im =mtv.depth_plot2d(data=self.data,
-                         notion=notion, freq=freq, xlim=xlim, ylim=ylim, cmap=cmap, ret_depth_mesh=ret_depth_mesh, xs=xs, ys=ys, val_mesh=val_mesh, 
-                         mah_estimate=mah_estimate, mah_parMCD=mah_parMCD, beta=beta, distance=distance, Lp_p=Lp_p, exact=exact, method=method, k=k, 
-                         solver=solver, NRandom=NRandom, option=1, n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, 
-                         cooling_factor=cooling_factor, cap_size=cap_size, start=start, space=space, line_solver=line_solver, bound_gc=bound_gc, )
-        return fig, ax, im
+        
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.zonoidDepthDS=self.zonoidDepthDS[0]
+                if option==2:self.zonoidDirDS=self.zonoidDirDS[0]
+            else:
+                self.zonoidDepth=self.zonoidDepth[0]
+                if option>=2:self.zonoidDir=self.zonoidDir[0]
+                if option>=3:self.allDepth=self.allDepth[0]
+                if option>=4:self.allDirections=self.allDirections[0]
+        if evaluate_dataset==False: # return correct value
+            if option==1:return self.zonoidDepth
+            if option==2:return self.zonoidDepth,self.zonoidDir
+            if option==3:return self.zonoidDepth,self.zonoidDir,self.allDepth
+            if option==4:return self.zonoidDepth,self.zonoidDir,self.allDepth,self.allDirections
+        elif evaluate_dataset==True:
+            if option==1:return self.zonoidDepthDS
+            if option==2:return self.zonoidDepthDS,self.zonoidDirDS
 
     ## Det and MCD 
     def _calcDet(self,mat:np.ndarray):
@@ -1008,9 +1173,10 @@ class MultDepth():
         self.MCD=None
         # approximate depth and direction
         # self.allDepth,self.allDirections,self.dirIndiex=None,None,None
-    def _determine_option(self,x:np.ndarray,NRandom:int,output_option:str,CUDA:bool=False)->int:
+    def _determine_option(self,x:np.ndarray,NRandom:int,output_option:str,CUDA:bool=False, exact:bool=False)->int:
         """Determine which is the option number (following the 1 to 4 convention), 
         with a created criteria to compute option 4 - all depths and directions - of 1Gb to the direction matrix"""
+        if exact==True: return 1 # only depth
         option=self.approxOption.index(output_option)+1 # define option for function return 
         memorySize=x.size*x.itemsize*NRandom*self.distRef.shape[0]//1048576 # compute an estimate of the memory amount used for option 4
         if type(self.distribution)==None:
