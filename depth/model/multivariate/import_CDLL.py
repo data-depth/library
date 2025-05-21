@@ -27,7 +27,6 @@ def import_CDLL():
 
     if sys.platform=='win32':
         site_packages = [p for p in sys.path if ('site-packages' in p) or ("dist-packages" in p)] #Add search dist-packages
-        site_packages.append("C:\\Users\\lleone\\Documents\\DepthLibrary\\library") #just for my testings
         for i in site_packages:
             dll_path = os.path.join(i, 'depth', 'src')
             if os.path.isdir(dll_path): #check it is a real dir
