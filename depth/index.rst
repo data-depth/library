@@ -15,28 +15,28 @@ Introduction
 .. toctree::
    :maxdepth: 2
    
-   multivariate/introduction.rst
+   model/introduction.rst
 
 Contents
 --------
 .. toctree::
    :maxdepth: 2
    
-   multivariate/modules.rst
+   model/modules.rst
 
 Credits
 -------
 .. toctree::
    :maxdepth: 2
    
-   multivariate/credits.rst
+   model/credits.rst
 
 License
 -------
 .. toctree::
    :maxdepth: 2
    
-   multivariate/license.rst
+   model/license.rst
 
 Indices and tables
 ------------------
