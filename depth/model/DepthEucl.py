@@ -99,42 +99,6 @@ class DepthEucl():
         Returns the directoion whose {depth-name}DepthDS corresponds using {depth-name} notion.
         Available only for projection-based depths.
         Example: halfspaceDirDS, projectionDirDS
-    
-    Methods
-    ----------
-    load_dataset: Loads dataset for depth computation.
-
-    change_dataset: Modifies or change the existing dataset.
-    
-    mahalanobis: Computes mahalanobis depth.
-    
-    aprojection: Computes aprojection depth.
-    
-    betaSkeleton: Computes betaSkeleton depth.
-    
-    cexpchull: Computes cexpchull depth.
-    
-    cexpchullstar: Computes cexpchullstar depth.
-    
-    geometrical: Computes geometrical depth.
-    
-    halfspace: Computes halfspace depth.
-    
-    L2: Computes L2 depth.
-    
-    potential: Computes potential depth.
-    
-    projection: Computes projection depth.
-    
-    qhpeeling: Computes qhpeeling depth.
-    
-    simplicial: Computes simplicial depth.
-    
-    simplicialVolume: Computes simplicialVolume depth.
-    
-    spatial: Computes spatial depth.
-    
-    zonoid: Computes zonoid. depth
 
     """
     def __init__(self,):
@@ -165,7 +129,7 @@ class DepthEucl():
             Not used, present for API consistency by convention.
 
         Returns
-        ----------
+        ---------
         loaded dataset
         """
         if type(data)==None:
@@ -390,7 +354,7 @@ class DepthEucl():
         if self.distRef.shape[0]==1: 
             if evaluate_dataset==True:self.betaSkeletonDepthDS=self.betaSkeletonDepthDS[0] 
             else: self.betaSkeletonDepth=self.betaSkeletonDepth[0]
-        return self.betaSkeletonDepth if evaluate_dataset==True else self.betaSkeletonDepth
+        return self.betaSkeletonDepthDS if evaluate_dataset==True else self.betaSkeletonDepth
         
 
     def cexpchull(self,x: np.ndarray|None=None,solver:str= "neldermead",NRandom:int = 1000,
@@ -419,7 +383,7 @@ class DepthEucl():
                 print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
                       automaticaly set to lowest_depth")
                 output_option="lowest_depth"
-                self.cexpchullDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+            self.cexpchullDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
         else:self.cexpchullDepth=np.empty((self.distRef.shape[0],x.shape[0]))
         self._check_variables(
             x=x,NRandom =NRandom,output_option =output_option,n_refinements =n_refinements,
@@ -636,6 +600,7 @@ class DepthEucl():
             self.halfspaceDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
         else:self.halfspaceDepth=np.empty((self.distRef.shape[0],x.shape[0]))
         CUDA=self._check_CUDA(CUDA,solver)
+        if CUDA:exact=False
         self._check_variables(x=x,NRandom=NRandom,
                               n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                               alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,) # check if parameters are valid
@@ -1110,8 +1075,31 @@ class DepthEucl():
         self.MCD=mtv.MCD(self.data,h=h,seed=self.seed,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
         return self.MCD
     
-    def change_dataset(self,newDataset:np.ndarray,newY:np.ndarray|None=None, newDistribution:np.ndarray|None=None,keepOld:bool=False,):
-        """Modify dataset"""
+    def change_dataset(self,newDataset:np.ndarray,newY:np.ndarray|None=None, newDistribution:np.ndarray|None=None,keepOld:bool=False,)->None:
+        """
+
+        Description
+        ------------
+            Modify loaded dataset.
+
+        Arguments
+        ------------
+            newDataset:np.ndarray
+                New dataset
+            
+            newDistribution:np.ndarray|None, default=None,
+                Distribution related to the dataset
+            
+            newY:np.ndarray|None, default=None,
+                Only for convention.
+            
+            keepOld:bool, default=False,
+                Boolean to determine if current dataset is kept or not.
+                If True, newDataset is added in the end of the old one.
+        Returns 
+        ------------
+            None
+        """
         if keepOld: # keep old dataset
             if self.data.shape[1]!=newDataset.shape[1]:
                 raise Exception(f"Dimensions must be the same, current dimension is {self.data.shape[1]} and new dimension is {newDataset.shape[1]}")
@@ -1227,21 +1215,22 @@ class DepthEucl():
             return False
         return CUDA
     
-    mahalanobis.__doc__=docHelp.mahalanobis__doc__
-    aprojection.__doc__=docHelp.aprojection__doc__
-    betaSkeleton.__doc__=docHelp.betaSkeleton__doc__
-    cexpchull.__doc__=docHelp.cexpchull__doc__
-    cexpchullstar.__doc__=docHelp.cexpchullstar__doc__
-    geometrical.__doc__=docHelp.geometrical__doc__
-    halfspace.__doc__=docHelp.halfspace__doc__
-    L2.__doc__=docHelp.L2__doc__
-    potential.__doc__=docHelp.potential__doc__
-    projection.__doc__=docHelp.projection__doc__
-    qhpeeling.__doc__=docHelp.qhpeeling__doc__
-    simplicial.__doc__=docHelp.simplicial__doc__
-    simplicialVolume.__doc__=docHelp.simplicialVolume__doc__
-    spatial.__doc__=docHelp.spatial__doc__
-    zonoid.__doc__=docHelp.zonoid__doc__
+DepthEucl.mahalanobis.__doc__=docHelp.mahalanobis__doc__
+DepthEucl.aprojection.__doc__=docHelp.aprojection__doc__
+DepthEucl.betaSkeleton.__doc__=docHelp.betaSkeleton__doc__
+DepthEucl.cexpchull.__doc__=docHelp.cexpchull__doc__
+DepthEucl.cexpchullstar.__doc__=docHelp.cexpchullstar__doc__
+DepthEucl.geometrical.__doc__=docHelp.geometrical__doc__
+DepthEucl.halfspace.__doc__=docHelp.halfspace__doc__
+DepthEucl.L2.__doc__=docHelp.L2__doc__
+DepthEucl.potential.__doc__=docHelp.potential__doc__
+DepthEucl.projection.__doc__=docHelp.projection__doc__
+DepthEucl.qhpeeling.__doc__=docHelp.qhpeeling__doc__
+DepthEucl.simplicial.__doc__=docHelp.simplicial__doc__
+DepthEucl.simplicialVolume.__doc__=docHelp.simplicialVolume__doc__
+DepthEucl.spatial.__doc__=docHelp.spatial__doc__
+DepthEucl.zonoid.__doc__=docHelp.zonoid__doc__
+DepthEucl.change_dataset.__doc__=docHelp.change_dataset__doc__
     # depth_mesh.__doc__=mtv.depth_mesh.__doc__
     # depth_plot2d.__doc__=mtv.depth_plot2d.__doc__
     # _calcDet.__doc__=mtv.calcDet.__doc__

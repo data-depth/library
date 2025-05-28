@@ -1,10 +1,8 @@
 mahalanobis__doc__= """
-Description
------------
-    Calculates the Mahalanobis depth of points w.r.t. a multivariate data set.
+
+Calculates the Mahalanobis depth of points w.r.t. a multivariate data set.
 
 Arguments
----------
     x: array-like or None, default=None 
         Matrix of objects (numerical vector as one object) whose depth is to be calculated;
         each row contains a d-variate point. Should have the same dimension as
@@ -96,14 +94,11 @@ Examples
             0.13291613 0.13792774 0.59094958 0.10491694]
 
 """
-
 aprojection__doc__="""
-Description
------------
-    Calculates approximately the asymmetric projection depth of points w.r.t. a multivariate data set.
+
+Calculates approximately the asymmetric projection depth of points w.r.t. a multivariate data set.
 
 Arguments
-----------
     x: array-like or None, default=None 
         Matrix of objects (numerical vector as one object) whose depth is to be calculated;
         each row contains a d-variate point. Should have the same dimension as
@@ -176,8 +171,7 @@ Examples
 """
 betaSkeleton__doc__= """ 
 
-Description
-	Calculates the beta-skeleton depth of points w.r.t. a multivariate data set.
+Calculates the beta-skeleton depth of points w.r.t. a multivariate data set.
 
 Arguments
     x : {array-like} of shape (n_samples,d).
@@ -238,8 +232,7 @@ Examples
 
 cexpchull__doc__="""
 
-Description
-    Calculates approximately the continuous explected convex hull depth of points w.r.t. a multivariate data set.
+Calculates approximately the continuous explected convex hull depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -314,8 +307,7 @@ Examples
 
 cexpchullstar__doc__="""
 
-Description
-    Calculates approximately the continuous modified explected convex hull depth of points w.r.t. a multivariate data set.
+Calculates approximately the continuous modified explected convex hull depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -390,8 +382,7 @@ Examples
 
 geometrical__doc__="""
 
-Description
-    Calculates approximately the geometrical depth of points w.r.t. a multivariate data set.
+Calculates approximately the geometrical depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -466,8 +457,7 @@ Examples
 
 halfspace__doc__="""
 
-Description
-    Calculates the exact and approximated Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a multivariate data set.
+Calculates the exact and approximated Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -563,8 +553,7 @@ Examples
     
 L2__doc__=""" 
 
-Description
-			Calculates the L2-depth of points w.r.t. a multivariate data set.
+Calculates the L2-depth of points w.r.t. a multivariate data set.
 			
 Arguments
     x: array-like or None, default=None 
@@ -607,8 +596,7 @@ Examples
 
 potential__doc__="""
 
-Description
-	Calculate the potential of the points w.r.t. a multivariate data set. The potential is the kernel-estimated density multiplied by the prior probability of a class. Different from the data depths, a density estimate measures at a given point how much mass is located around it.
+Calculate the potential of the points w.r.t. a multivariate data set. The potential is the kernel-estimated density multiplied by the prior probability of a class. Different from the data depths, a density estimate measures at a given point how much mass is located around it.
 
 Arguments
     x: array-like or None, default=None 
@@ -660,8 +648,8 @@ Examples
 """
 projection__doc__="""
 
-Description
-    Calculates approximately the projection depth of points w.r.t. a multivariate data set.
+
+Calculates approximately the projection depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -740,8 +728,7 @@ Examples
 
 qhpeeling__doc__= """
 
-Description
-    Calculates the convex hull peeling depth of points w.r.t. a multivariate data set.
+Calculates the convex hull peeling depth of points w.r.t. a multivariate data set.
 
 Usage
     qhpeeling(x, data)
@@ -775,8 +762,7 @@ Examples
 
 simplicial__doc__ = """
 
-Description
-    Calculates the simplicial depth of points w.r.t. a multivariate data set.
+Calculates the simplicial depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -814,8 +800,7 @@ Examples
 
 simplicialVolume__doc__="""
 
-Description
-    Calculates the simpicial volume depth of points w.r.t. a multivariate data set.
+Calculates the simpicial volume depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -865,8 +850,7 @@ Examples
 
 spatial__doc__=""" 
 
-Description
-	Calculates the spatial depth of points w.r.t. a multivariate data set.
+Calculates the spatial depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -907,8 +891,7 @@ Examples
 
 zonoid__doc__= """
 
-Description
-    Calculates the zonoid depth of points w.r.t. a multivariate data set.
+Calculates the zonoid depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -982,3 +965,34 @@ Examples
             0.         0.01970896 0.02169483 0.        ]
 
 """
+change_dataset__doc__="""
+
+    Modify loaded dataset.
+
+    Arguments
+        newDataset:np.ndarray
+            New dataset
+        
+        newDistribution:np.ndarray|None, default=None,
+            Distribution related to the dataset
+        
+        newY:np.ndarray|None, default=None,
+            Only for convention.
+        
+        keepOld:bool, default=False,
+            Boolean to determine if current dataset is kept or not.
+            If True, newDataset is added in the end of the old one.
+    Returns 
+        None
+    
+    Examples
+        >>> import numpy as np
+        >>> from depth.model import DepthEucl
+        >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
+        >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
+        >>> np.random.seed(0)
+        >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
+        >>> data2 = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
+        >>> model = DepthEucl().load_dataset(data)
+        >>> model.change_dataset(data2,) 
+    """
