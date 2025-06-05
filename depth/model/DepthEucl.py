@@ -154,9 +154,16 @@ class DepthEucl():
 
         if CUDA==False:
             self.data=data
+            device = torch.device("cpu")
         else: 
-            if cuda.is_available():
-                self.dataCuda=torch.tensor(data.T,device="cuda:0",dtype=torch.float32) 
+            if cuda.is_available() or torch.backends.mps.is_available():
+                if torch.backends.mps.is_available():
+                    device = torch.device("mps")
+                elif torch.cuda.is_available():
+                    device = torch.device("cuda")
+                else:
+                    device = torch.device("cpu")
+                self.dataCuda=torch.tensor(data.T,device=device,dtype=torch.float32) 
                 self.data=data
                 # Tensor is transposed to facilitate projection and depth  computation
             else:

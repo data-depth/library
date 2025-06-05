@@ -8,7 +8,12 @@ from torch.nn.functional import normalize
 import gc
 import math
 
-
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
 def cudaApprox(data:torch.Tensor,x:np.ndarray|torch.Tensor,notion:str,
             solver:str,option:int,NRandom:int,n_refinements:int,sphcap_shrink:float,
             step:int=10000)->torch.Tensor:
@@ -17,15 +22,15 @@ def cudaApprox(data:torch.Tensor,x:np.ndarray|torch.Tensor,notion:str,
     torch.manual_seed(2801)
     # IMPORTANT TO REMEMBER: data is a transposed matrix, spaceDim x nSamples 
     if len(x.shape)==1:x=x.reshape(1,-1)
-    # xCUDA=torch.tensor(x,dtype=torch.float32,device="cuda:0") # transfert x to cuda
+    # xCUDA=torch.tensor(x,dtype=torch.float32,device=device) # transfert x to cuda
     dirRef=math.ceil(NRandom/n_refinements) # amount of direction per refinement
-    Pdata=torch.empty((dirRef,data.shape[1]),dtype=torch.float32, device="cuda:0") # allocate memory for data projection (largest matrix)
-    dirs=torch.empty((dirRef,data.shape[0]),dtype=torch.float32, device="cuda:0") # allocate memory for directions matrix
+    Pdata=torch.empty((dirRef,data.shape[1]),dtype=torch.float32, device=device) # allocate memory for data projection (largest matrix)
+    dirs=torch.empty((dirRef,data.shape[0]),dtype=torch.float32, device=device) # allocate memory for directions matrix
     finalDepth=np.empty((x.shape[0])) # final depth matrix
     if solver=="simplerandom": sphcap_shrink=1
     if option==2:finalDirections=np.empty((x.shape)) # direction matrix
     for ind,z in enumerate(x):
-        zCuda=torch.tensor(z.reshape(1,-1),dtype=torch.float32,device="cuda:0")
+        zCuda=torch.tensor(z.reshape(1,-1),dtype=torch.float32,device=device)
         D=RS(data,zCuda,notion,option,dirRef,n_refinements,sphcap_shrink,step,Pdata,dirs)
         if option==1:
             finalDepth[ind]=D
@@ -43,9 +48,9 @@ def RS(data:torch.Tensor,z:torch.Tensor,notion:str,
         step:int,Pdata,dirs):
     """Compute (refined) Random search
     """
-    eps=torch.tensor([torch.pi/2],dtype=torch.float32,device="cuda:0") # initial cap size
+    eps=torch.tensor([torch.pi/2],dtype=torch.float32,device=device) # initial cap size
     pole=normalize(z).reshape(z.shape) # first pole 
-    dMin=torch.ones((1,1),dtype=torch.float32,device="cuda:0")
+    dMin=torch.ones((1,1),dtype=torch.float32,device=device)
     for ref in range(n_refinements):
         dirs=poleCuda(dirs,num_dir=dirRef, pole=pole,eps=eps,)
         torch.matmul(dirs,data,out=Pdata)
@@ -88,11 +93,11 @@ def poleCuda(dirs:torch.Tensor,num_dir:int,pole:torch.Tensor, eps : float)->torc
         function to generate a random number from a spherical cap of size 'eps' around 'p'
         the new p is the minimium direction
         """
-        torch.zeros(dirs.shape,device="cuda",out=dirs) 
-        dirs[:,1:]=torch.normal(0,1,size=(num_dir*(p.shape[0]-1),), device="cuda").reshape(num_dir, -1)
+        torch.zeros(dirs.shape,device=device,out=dirs) 
+        dirs[:,1:]=torch.normal(0,1,size=(num_dir*(p.shape[0]-1),), device=device).reshape(num_dir, -1)
         torch.nn.functional.normalize(dirs,dim=1,out=dirs)
         dirs=dirs.T
-        dirs[0]=torch.rand(num_dir, device="cuda")
+        dirs[0]=torch.rand(num_dir, device=device)
         dirs[0]*=eps
         dirs[0]=torch.cos(dirs[0])
         raiz=torch.multiply(dirs[0],dirs[0])
@@ -126,8 +131,8 @@ def depthCompNotion(z,data,Pz,Pdata,notion,step)->torch.Tensor:
     """Computes the appproximate depth based on the chosen projection-based notion
     """
     if notion=="projection":
-        prjMED=torch.empty((1,Pdata.shape[0]), device="cuda") # Memory alloc
-        prjMAD=torch.empty((1,Pdata.shape[0]), device="cuda") # Memory alloc
+        prjMED=torch.empty((1,Pdata.shape[0]), device=device) # Memory alloc
+        prjMAD=torch.empty((1,Pdata.shape[0]), device=device) # Memory alloc
         for i in range(0,Pdata.shape[0],step): # Compute median
             prjMED[0][i:i+step]=torch.median(Pdata[i:i+step],1).values
         torch.subtract(Pz,prjMED,out=Pz)
@@ -149,12 +154,12 @@ def depthCompNotion(z,data,Pz,Pdata,notion,step)->torch.Tensor:
         torch.divide(refCount,refQuant,out=Pz)
         return Pz
     elif notion=="aprojection":
-        prjMED=torch.empty((1,Pdata.shape[0]), device="cuda") # Memory alloc
-        prjMAD=torch.empty((1,Pdata.shape[0]), device="cuda") # Memory alloc
+        prjMED=torch.empty((1,Pdata.shape[0]), device=device) # Memory alloc
+        prjMAD=torch.empty((1,Pdata.shape[0]), device=device) # Memory alloc
         for i in range(0,Pdata.shape[0],step): # Compute median
             prjMED[0][i:i+step]=torch.median(Pdata[i:i+step],1).values
         torch.subtract(Pz,prjMED,out=Pz)
-        torch.maximum(Pz, torch.tensor(0, device="cuda"),out=Pz)
+        torch.maximum(Pz, torch.tensor(0, device=device),out=Pz)
         torch.subtract(Pdata,prjMED.reshape(-1,1),out=Pdata)
         Pdata[Pdata<=0]=torch.nan
         for i in range(0,Pdata.shape[0],step): # Compute MAD
