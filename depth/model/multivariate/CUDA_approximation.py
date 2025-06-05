@@ -37,9 +37,15 @@ def cudaApprox(data:torch.Tensor,x:np.ndarray|torch.Tensor,notion:str,
         elif option==2:
             finalDepth[ind],finalDirections[ind]=D
     
-    torch.cuda.synchronize()
-    del dirs,Pdata,D
-    torch.cuda.empty_cache()
+    try:
+        torch.cuda.synchronize()
+        del dirs,Pdata,D
+        torch.cuda.empty_cache()
+    except:
+        torch.mps.synchronize()
+        del dirs,Pdata,D
+        torch.mps.empty_cache()
+
     if option==1:return finalDepth
     elif option==2:return finalDepth,finalDirections
 
