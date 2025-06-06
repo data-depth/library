@@ -35,8 +35,7 @@ plt.show()
 # %%
 # Create model and load dataset for depth computation 
 
-model=DepthEucl().load_dataset
-(dataset)
+model=DepthEucl().load_dataset(dataset)
 depthX=model.projection(X,output_option="lowest_depth") # Compute X Depth w.r.t. the dataset  
 depthDataset=model.projection(evaluate_dataset=True,output_option="lowest_depth") # evaluate the dataset itself
 
