@@ -8,7 +8,6 @@ It will plot samples and dataset based on beta skeleton depth values.
 
 """
 
-# Authors: Leonardo Leone
 
 # %%
 from depth.model.DepthEucl import DepthEucl 

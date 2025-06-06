@@ -8,7 +8,6 @@ It will plot samples based on different depth notions.
 
 """
 
-# Authors: Leonardo Leone
 # %%
 
 from depth.model.DepthEucl import DepthEucl 

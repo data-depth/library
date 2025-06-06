@@ -7,7 +7,6 @@ Contour visualization with different depth notions w.r.t. a dataset.
 
 """
 
-# Authors: Leonardo Leone
 # %%
 from depth.model.DepthEucl import DepthEucl 
 import numpy as np
