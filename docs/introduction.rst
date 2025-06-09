@@ -20,7 +20,7 @@ By exploiting the geometry of data, the depth function is fully non-parametric, 
 Specifications
 --------------
 
-12 multivariate depths are implemented in the :math:`\texttt{data-depth}` library, in both exact and approximate - to avoid excessive computational time - version:
+15 multivariate depths are implemented in the :math:`\texttt{data-depth}` library, in both exact and approximate - to avoid excessive computational time - version:
 
  - :ref:`asymmetric projection <Aprojection>` depth [approximate];
  - :ref:`beta-skeleton <BetaSkeleton>` depth, including spherical and lens depths as special cases [exact];
