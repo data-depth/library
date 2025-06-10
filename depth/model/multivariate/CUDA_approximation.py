@@ -1,7 +1,6 @@
 # Authors: Leonardo Leone
 
 import numpy as np
-from numba import cuda
 import ctypes
 import torch
 from torch.nn.functional import normalize

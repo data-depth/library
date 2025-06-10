@@ -4,7 +4,6 @@ import numpy as np
 from . import docHelp
 from . import multivariate as mtv
 from typing import Literal, List
-from numba import cuda, float32
 import torch
 import sys, os
 try:os.environ['CUDA_HOME']=os.environ.get('CUDA_PATH').split(";")[0] # Force add cuda path
@@ -156,7 +155,7 @@ class DepthEucl():
             self.data=data
             device = torch.device("cpu")
         else: 
-            if cuda.is_available() or torch.backends.mps.is_available():
+            if torch.cuda.is_available() or torch.backends.mps.is_available():
                 if torch.backends.mps.is_available():
                     device = torch.device("mps")
                 elif torch.cuda.is_available():
