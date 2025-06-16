@@ -28,7 +28,7 @@ class DepthEucl():
     exact : bool, delfaut=True
         Whether the depth computation is exact.
     
-    mah_estimate : str, {"moment", "mcd"}, default="moment"
+    mah_estimate : str, {"none", "moment", "mcd"}, default="moment"
         Specifying which estimates to use when calculating the depth
     
     mah_parMcd : float, default=0.75
@@ -170,8 +170,8 @@ class DepthEucl():
                 print("CUDA is set to True, but cuda is not available, CUDA is automatically set to False")
         return self
 
-    def mahalanobis(self, x: np.ndarray|None = None, exact: bool = True, mah_estimate: Literal["moment", "mcd"] = "moment",
-                    mah_parMcd: float = 0.75,solver= "neldermead", NRandom= 1000, 
+    def mahalanobis(self, x: np.ndarray|None = None, exact: bool = True, mah_estimate: Literal["none", "moment", "mcd"] = "moment",
+                    mah_parMcd: float = 0.75,solver= "neldermead", NRandom= 1000,
                     n_refinements= 10, sphcap_shrink=0.5, 
                     alpha_Dirichlet= 1.25, cooling_factor=0.95, 
                     cap_size=1, start="mean", space= "sphere", 
@@ -1198,8 +1198,8 @@ class DepthEucl():
                     raise ValueError(f"exact must be a boolean or [0,1], got {value}.")
             if key=="mah_estimate":
                 assert(type(value)==str), f"mah_estimate must be a string, got {type(value)}" 
-                if value.lower() not in {"moment", "mcd"}: 
-                    raise ValueError(f"Only mah_estimate possibilities are {{'moment', 'mcd'}}, got {value}.")
+                if value.lower() not in {"none", "moment", "mcd"}:
+                    raise ValueError(f"Only mah_estimate possibilities are {{'none', 'moment', 'mcd'}}, got {value}.")
             if key in ["NRandom","n_refinements"]:
                 assert type(value)==int, f"{key} must be an integer, got {type(value)}"
             if key in ["mah_parMcd","sphcap_shrink","alpha_Dirichlet","cooling_factor"]: 
