@@ -16,6 +16,7 @@
 #include <memory>
 #include <numeric>
 #include "Matrix.h"
+#include <cassert>
 
 namespace dyMatrixClass {
 

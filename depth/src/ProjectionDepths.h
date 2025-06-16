@@ -95,6 +95,7 @@ private:
 	                                 // the search
 	double _nLineSearch = 100;       // maximum number of depth evaluations in the line search
 	int n, d;                        // n = number of points, d = dimension
+	int _d_aca;                      // unit sphere dimension decreasing for ACA
 	int _nProjections;               // counter for the number of projections ( = depth evaluations)
 	eDepth _depth;                   // depth notion currently considered
 	eProjMeth _Method;               // approximation method currently considered
@@ -105,6 +106,7 @@ private:
 	std::vector<int> _DirectionsCard;// vector containing the number of directions for every convergence
 	double _lastDepthDuration;       // time used for computing the depth with a ( = time used 
 	const dyMatrixClass::cMatrix& x; // matrix x of data points, x is a n x d matrix
+	dyMatrixClass::cMatrix _basis;   // basis used to represent best direction u in ACA
 	std::unique_ptr<double[]> xp;    // vector conatining the projections of the data points
 	int nRecords;                    // number of records, i.e., entries in array 'records' 
 	cRecord* records;                // array that contains all the records
@@ -167,10 +169,13 @@ public:
 	void SetBoundNM(int boundNM) { _boundNM = boundNM; }
 	void SetEpsGS(double epsGS) { _epsGS = epsGS; }
 	void SetNLineSearch(int nLineSearch) { _nLineSearch = nLineSearch; }
+	void SetD_ACA(int d_aca) { _d_aca = d_aca;}
 	// set the depth notion that will be considered in the following 
 	void SetDepthNotion(eDepth d);
 	// set the approximation method that will be used in the following
 	void SetMethod(eProjMeth m) { _Method = m;};
+	// set the basis used in ACA
+	void SetBasis(dyMatrixClass::cMatrix basis){ _basis = basis;};
 	// getter methods for some of the private members declared above
 	int NProjections() { return _nProjections; };
 	std::vector<double> Depths() { return std::vector<double>(_Depths.begin(), _Depths.end()); };

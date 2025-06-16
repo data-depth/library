@@ -1028,6 +1028,40 @@ class DepthEucl():
             if option==1:return self.zonoidDepthDS
             if option==2:return self.zonoidDepthDS,self.zonoidDirDS
 
+    def ACA(self,dim: int = 1,
+            sample_size: None = None,
+            sample: None = None,
+            notion: str = "projection",
+            solver: str = "neldermead",
+            NRandom: int = 100,
+            n_refinements: int = 10,
+            sphcap_shrink: float = 0.5,
+            alpha_Dirichlet: float = 1.25,
+            cooling_factor: float = 0.95,
+            cap_size: int = 1,
+            start: str = "mean",
+            space: str = "sphere",
+            line_solver: str = "goldensection",
+            bound_gc: bool = True):
+        """
+        """
+        ACA_tab=mtv.ACA(X=self.data,dim=dim,
+                        sample_size=sample_size,
+                        sample=sample,
+                        notion=notion,
+                        solver=solver,
+                        NRandom=NRandom,
+                        n_refinements=n_refinements,
+                        sphcap_shrink=sphcap_shrink,
+                        alpha_Dirichlet=alpha_Dirichlet,
+                        cooling_factor=cooling_factor,
+                        cap_size=cap_size,
+                        start=start,
+                        space=space,
+                        line_solver=line_solver,
+                        bound_gc=bound_gc)
+        return ACA_tab
+
     ## Det and MCD 
     def _calcDet(self,mat:np.ndarray):
         """

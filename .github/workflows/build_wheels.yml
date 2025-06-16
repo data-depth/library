@@ -74,6 +74,27 @@ jobs:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
+          
+      - name: test commands for ACA-wrapper
+        run: g++ -fpic -O2 -std=c++14 -c ${{ runner.workspace }}/library/depth/src/ACA_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: Build shared library ACA-wrapper
+        run: g++ -shared -lstdc++ ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: copy shared library
+        run: cp ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll ${{ runner.workspace }}/library
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
       - name: install requirements for Build-package
         #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
         run: py -m pip install build

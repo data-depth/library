@@ -20,7 +20,7 @@ class custom_build_ext(build_ext):
 if sys.platform=='darwin' or sys.platform=='linux':
 	setup(
 	    name="data_depth",
-	    version="1.1.0",
+	    version="1.1.1",
 	    author="Pavlo Mozharovskyi",
 	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
@@ -44,14 +44,14 @@ if sys.platform=='darwin' or sys.platform=='linux':
 	     
 	   	
 	    ],
-	    data_files=[('depth/multivariate', glob.glob("depth/multivariate/*.rst"))],
+	    data_files=[('depth/src', glob.glob("depth/docs/*.rst"))],
 	    zip_safe=False,
 	    cmdclass={"build_ext": custom_build_ext}
 	)
 if sys.platform=='win32':
 	setup(
 	    name="data_depth",
-	    version="1.1.0",
+	    version="1.1.1",
 	    author="Pavlo Mozharovskyi",
 	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
@@ -60,7 +60,7 @@ if sys.platform=='win32':
 	    packages=find_packages(),
 	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision','torchaudio'],
 	    include_package_data=True,
-	    data_files=[('depth/src', glob.glob("depth/src/*"))],
+	    data_files=[('depth/src', glob.glob("depth/docs/*"))],
 	    zip_safe=False
 	)
 	
