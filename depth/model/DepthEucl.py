@@ -1028,7 +1028,7 @@ class DepthEucl():
             if option==1:return self.zonoidDepthDS
             if option==2:return self.zonoidDepthDS,self.zonoidDirDS
 
-    def ACA(self,dim: int = 1,
+    def ACA(self,dim:int=2,
             sample_size: None = None,
             sample: None = None,
             notion: str = "projection",
@@ -1044,6 +1044,26 @@ class DepthEucl():
             line_solver: str = "goldensection",
             bound_gc: bool = True):
         """
+        Computes the abnormal component analysis
+            
+        Parameters
+        ----------
+        dim: int, default=2
+            Number of dimensions to keep in the reduction
+        
+        sample_size: int, default=None
+            Size of the dataset (uniform sampling) to be used in the ACA calculation
+
+        sample: list[int], default=None
+            Indices for the dataset to be used in the computation 
+        
+        notion: str, default="projection"
+            Chosen notion for depth computation
+
+        Results
+        --------
+            ACA directions for dimensional reduction
+            
         """
         ACA_tab=mtv.ACA(X=self.data,dim=dim,
                         sample_size=sample_size,
@@ -1065,7 +1085,7 @@ class DepthEucl():
     ## Det and MCD 
     def _calcDet(self,mat:np.ndarray):
         """
-        Computes the determinant of a matrix (?)
+        Computes the determinant of a matrix 
 
         Parametres 
         -----------
@@ -1123,7 +1143,7 @@ class DepthEucl():
             Modify loaded dataset.
 
         Arguments
-        ------------
+        ---------
             newDataset:np.ndarray
                 New dataset
             
@@ -1137,7 +1157,7 @@ class DepthEucl():
                 Boolean to determine if current dataset is kept or not.
                 If True, newDataset is added in the end of the old one.
         Returns 
-        ------------
+        -------
             None
         """
         if keepOld: # keep old dataset
@@ -1270,6 +1290,7 @@ DepthEucl.simplicial.__doc__=docHelp.simplicial__doc__
 DepthEucl.simplicialVolume.__doc__=docHelp.simplicialVolume__doc__
 DepthEucl.spatial.__doc__=docHelp.spatial__doc__
 DepthEucl.zonoid.__doc__=docHelp.zonoid__doc__
+DepthEucl.ACA.__doc__=docHelp.ACA__doc__
 DepthEucl.change_dataset.__doc__=docHelp.change_dataset__doc__
     # depth_mesh.__doc__=mtv.depth_mesh.__doc__
     # depth_plot2d.__doc__=mtv.depth_plot2d.__doc__

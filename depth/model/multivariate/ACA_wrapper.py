@@ -17,7 +17,7 @@ def ACA(X, dim = 1, sample_size = None, sample = None, notion = "projection", # 
     z=X
 
     if(sample_size != None and sample == None): # Run method on a (specified) sample
-        ind = np.random.randint(0, X.shape[0], sample_size)
+        ind = np.random.default_rng().choice(X.shape[0], size=sample_size, replace=False)
         X = X[ind]
     elif(sample_size == None and sample is not None):
         ind = sample
@@ -39,19 +39,13 @@ def ACA(X, dim = 1, sample_size = None, sample = None, notion = "projection", # 
     except ValueError:
         n = X.shape[0]
         d = 1
-    
     basis = np.eye(d, dtype=np.double)
     d_aca = d
-
     iter_aca = dim
-    
     n_z = z.shape[0]
-
     for compt in range(iter_aca):
-
         depths = np.empty(n_z, dtype=np.double)
         best_directions = np.empty(((n_z, d)), dtype=np.double)
-
         points_list=X.flatten()
         objects_list=z.flatten()
         points=(ct.c_double*len(points_list))(*points_list)

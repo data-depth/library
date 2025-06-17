@@ -962,7 +962,7 @@ Examples
         >>> model=DepthEucl().load_dataset(data)
         >>> model.zonoid(x,)
         [0.         0.00769552 0.03087017 0.         0.30945453 0.0142515
-            0.         0.01970896 0.02169483 0.        ]
+         0.         0.01970896 0.02169483 0.        ]
 
 """
 change_dataset__doc__="""
@@ -996,3 +996,81 @@ change_dataset__doc__="""
         >>> model = DepthEucl().load_dataset(data)
         >>> model.change_dataset(data2,) 
     """
+
+ACA__doc__="""
+
+    Computes the abnormal component analysis
+            
+    Arguments
+        dim: int, default=2
+            Number of dimensions to keep in the reduction
+        
+        sample_size: int, default=None
+            Size of the dataset (uniform sampling) to be used in the ACA calculation
+
+        sample: list[int], default=None
+            Indices for the dataset to be used in the computation 
+        
+        notion: str {``'projection'``, ``'halfspace'``}, default="projection"
+            Chosen notion for depth computation
+        
+        solver : str  {``'refinedrandom'``, ``'neldermead'``}, default="neldermead"
+            The type of solver used to approximate the depth.
+    
+        NRandom : int, default=1000
+            The total number of iterations to compute the depth. Some solvers are converging
+            faster so they are run several time to achieve ``NRandom`` iterations.         
+
+        n_refinements : int, default = 10
+            Set the maximum of iteration for computing the depth of one point.
+            For ``solver='refinedrandom'`` or ``'refinedgrid'``.
+                        
+        sphcap_shrink : float, default = 0.5
+            It's the shrinking of the spherical cap. For ``solver='refinedrandom'`` or ``'refinedgrid'``.
+
+        alpha_Dirichlet : float, default = 1.25
+            It's the parameter of the Dirichlet distribution. For ``solver='randomsimplices'``.
+
+        cooling_factor : float, default = 0.95
+            It's the cooling factor. For ``solver='simulatedannealing'``.
+
+        cap_size : int | float, default = 1
+            It's the size of the spherical cap. For ``solver='simulatedannealing'`` or ``'neldermead'``.
+
+        start : str {'mean', 'random'}, default = mean 
+            For ``solver='simulatedannealing'`` or ``'neldermead'``, it's the method used to compute the first depth.
+                        
+        space : str {'sphere', 'euclidean'}, default = 'sphere' 
+            For ``solver='coordinatedescent'`` or ``'neldermead'``, it's the type of spacecin which the solver is running.
+                        
+        line_solver : str {'uniform', 'goldensection'}, default = goldensection
+            For ``solver='coordinatedescent'``, it's the line searh strategy used by this solver.
+                        
+        bound_gc : bool, default = True
+            For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
+
+    Results
+        ACA directions for dimensional reduction
+    
+    References
+        * Valla, R., Mozharovskyi, P., & d'Alché-Buc, F. (2023). Anomaly component analysis. arXiv preprint arXiv:2312.16139.
+  
+    Examples
+        >>> import numpy as np
+        >>> from depth.model import DepthEucl
+        >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
+        >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
+        >>> np.random.seed(0)
+        >>> data1 = np.random.multivariate_normal([0,0,0,0,0], mat1, 990)
+        >>> data2 = np.random.multivariate_normal([0,1,1,0,0], mat2, 10)
+        >>> data=np.concat((data1,data2),axis=0)
+        >>> model = DepthEucl().load_dataset(data)
+        >>> model.ACA(dim=2, sample_size=900)
+            array([[-0.13558675, -0.13558675],
+                    [ 2.65800844,  2.65800844],
+                    [-1.38230018, -1.38230018],
+                    [-0.11503065, -0.11503065],
+                    [ 0.55349281,  0.55349281]])
+
+    """
+
