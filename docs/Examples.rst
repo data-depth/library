@@ -24,3 +24,4 @@ Examples using data-depth library
    auto_examples/plot_DepthCuda
    auto_examples/plot_contours
    auto_examples/plot_multiDist
+   auto_examples/plot_ACA

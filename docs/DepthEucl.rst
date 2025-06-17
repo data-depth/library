@@ -25,4 +25,5 @@ Depth in Euclidean space (multivariate depth)
    notions/SimplicialVolume
    notions/Spatial
    notions/Zonoid
+   notions/ACA
    notions/change_dataset

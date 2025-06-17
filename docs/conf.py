@@ -22,7 +22,7 @@ copyright = '2024, Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Roma
 author = 'Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Leonardo Leone, Arturo Castellanos Salinas'
 
 # The full version, including alpha/beta/rc tags
-release = '1.1.0'
+release = '1.1.1'
 
 
 # -- General configuration ---------------------------------------------------
