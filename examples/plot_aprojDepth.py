@@ -3,7 +3,7 @@
 Aprojection depth 
 ==================
 
-Sample usage of Aprojection depth computation.
+Sample usage of asymmetric projection depth computation.
 It will plot samples and dataset based on mahalanobis depth values.
 
 """

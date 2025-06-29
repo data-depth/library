@@ -1,10 +1,10 @@
 """
-===========================================================================
-Cuda application for halfspace, projection and asymmectric projection depth 
-===========================================================================
+==========================================================================
+Cuda application for halfspace, projection and asymmetric projection depth 
+==========================================================================
 
-Sample usage of halfspace depth computation.
-It will plot samples and dataset based on halfspace depth values.
+Sample usage of halfspace, projection and asymmetric projection depth computation.
+It will plot samples and dataset based on depth computation using Graphical processing units.
 
 """
 

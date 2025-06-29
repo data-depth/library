@@ -1,10 +1,9 @@
 """
-==================
-Aprojection depth 
-==================
+===========================
+Abnormal component analysis
+===========================
 
-Sample usage of Aprojection depth computation.
-It will plot samples and dataset based on mahalanobis depth values.
+Sample usage of abnormal component analysis for dimension reduction.
 
 """
 
