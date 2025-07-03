@@ -15,11 +15,11 @@ from matplotlib import pyplot as plt
 
 ## Creating dataset and samples
 np.random.seed(2801)
-mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
-mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
+mat1=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
+mat2=[[0.25, 0, 0, 0, 0],[0, 0.25, 0, 0, 0],[0, 0, 0.25, 0, 0],[0, 0, 0, 0.25, 0],[0, 0, 0, 0, 0.25]]
 data1 = np.random.multivariate_normal([0,0,0,0,0], mat1, 990)
-data2 = np.random.multivariate_normal([1,2,2,1,1], mat2, 10)
-dataset=np.concat((data1,data2),axis=0)
+data2 = np.random.multivariate_normal([7.5,7.5,0,0,0], mat2, 10)
+dataset=np.concatenate((data1,data2),axis=0)
 
 # %%
 # Create model and load dataset for depth computation 
