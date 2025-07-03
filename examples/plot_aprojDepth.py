@@ -1,6 +1,6 @@
 """
 ==================
-Aprojection depth 
+Asymmetric projection depth 
 ==================
 
 Sample usage of asymmetric projection depth computation.
