@@ -75,6 +75,7 @@ int depth_approximation(double *z, double *x, int notion, int solver,
 	cProjection Proj(X, n, d, NRandom);
 	Proj.SetDepthNotion((eDepth)notion);
 	Proj.SetMethod((eProjMeth)solver);
+	Proj.SetD_ACA(d);
 
 	int setparam;
 	setparam = SetDepthPars(Proj, n_refinements, sphcap_shrink, alpha_Dirichlet,

@@ -14,7 +14,7 @@ def ACA(X, dim = 1, sample_size = None, sample = None, notion = "projection", # 
         alpha_Dirichlet = 1.25, cooling_factor = 0.95, cap_size = 1, start = "mean",
         space = "sphere", line_solver = "goldensection", bound_gc = True):
     
-    z=X
+    z=X.copy()
 
     if(sample_size != None and sample == None): # Run method on a (specified) sample
         ind = np.random.default_rng().choice(X.shape[0], size=sample_size, replace=False)
@@ -73,7 +73,8 @@ def ACA(X, dim = 1, sample_size = None, sample = None, notion = "projection", # 
             ct.c_void_p(depths.ctypes.data),
             ct.c_void_p(best_directions.ctypes.data),
             ct.c_void_p(basis.ctypes.data),
-            ct.c_int(d_aca)
+            ct.c_int(d_aca),
+            ct.c_int(2),
             )
         
         best_directions = np.array(best_directions, dtype=np.double)
@@ -81,7 +82,6 @@ def ACA(X, dim = 1, sample_size = None, sample = None, notion = "projection", # 
         u1 = np.array(best_directions[min_score], dtype=np.double).reshape(1,-1) # Direction corresponding to highest anomaly score
         if(np.sum(z[min_score]*u1) < np.sum(z[min_score]*(-u1))): # Get a direction "pointing" to most abnormal point
             u1 = -u1
-            
         if(compt == 0):
             ACA_tab = u1
         else:

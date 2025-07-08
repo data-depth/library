@@ -16,9 +16,10 @@ extern "C"
 int SetDepthPars(cProjection& depthObj, int n_refinements,
 				double sphcap_shrink, double alpha_Dirichlet,
 				double cooling_factor, double cap_size,
-				int start, int line_solver, int bound_gc){
+				int start, int line_solver, int bound_gc, int option){
 	
 	// Set cProjection variables
+	depthObj.SetOption(option);
 	switch(depthObj.GetMethod()){
 	case eProjMeth::RefinedRandom:
 		depthObj.SetMaxRefinesRand(n_refinements);
@@ -57,7 +58,7 @@ int SetDepthPars(cProjection& depthObj, int n_refinements,
 void ACA(double *z, double *x, int notion, int solver, int NRandom, int n_refinements,
 		double sphcap_shrink, double alpha_Dirichlet, double cooling_factor,
 		double cap_size, int start, int line_solver, int bound_gc, int n, int d,
-		int n_z, double *depths, double *best_directions, double *basis_py, int d_aca){
+		int n_z, double *depths, double *best_directions, double *basis_py, int d_aca, int option){
 
 	dyMatrixClass::cMatrix X(n ,d); // Fill data matrice with numpy array
 	for(int i=0; i<n; i++){
@@ -76,14 +77,15 @@ void ACA(double *z, double *x, int notion, int solver, int NRandom, int n_refine
 	cProjection Proj(X, n, d, NRandom);
 	Proj.SetDepthNotion((eDepth)notion);
 	Proj.SetMethod((eProjMeth)solver);
+	Proj.SetOption(option);
 	Proj.SetBasis(basis);
 	Proj.SetD_ACA(d_aca);
 
 	int setparam;
 	setparam = SetDepthPars(Proj, n_refinements, sphcap_shrink, alpha_Dirichlet,
-								cooling_factor, cap_size, start, line_solver, bound_gc);
+								cooling_factor, cap_size, start, line_solver, bound_gc,option);
 
-	std::vector<double> vec_depths;
+	// std::vector<double> vec_depths;
 	std::vector<double> vec_best_direction;
 	
 	for(int i=0; i<n_z; i++){

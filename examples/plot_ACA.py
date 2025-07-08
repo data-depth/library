@@ -17,15 +17,15 @@ from matplotlib import pyplot as plt
 np.random.seed(2801)
 mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
 mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
-data1 = np.random.multivariate_normal([0,0,0,0,0], mat1, 990)
-data2 = np.random.multivariate_normal([1,2,2,1,1], mat2, 10)
+data1 = np.random.multivariate_normal([0,0,0,0,0], mat1, 995)
+data2 = np.random.multivariate_normal([5,2,2,-1,5], mat2, 5)
 dataset=np.concat((data1,data2),axis=0)
 
 # %%
 # Create model and load dataset for depth computation 
 
 model=DepthEucl().load_dataset(dataset)
-baseACA=model.ACA(dim=2, sample_size=900) # evaluate the dataset itself
+baseACA=model.ACA(dim=2,) # evaluate the dataset itself
 
 # %%
 
