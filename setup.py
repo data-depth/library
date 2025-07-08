@@ -20,7 +20,7 @@ class custom_build_ext(build_ext):
 if sys.platform=='darwin' or sys.platform=='linux':
 	setup(
 	    name="data_depth",
-	    version="1.1.1",
+	    version="1.1.2",
 	    author="Pavlo Mozharovskyi",
 	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
@@ -40,9 +40,12 @@ if sys.platform=='darwin' or sys.platform=='linux':
 		    sources=["depth/src/depth_wrapper.cpp"],
 		    extra_compile_args=["-I.",'-std=c++14','-fPIC','-O2'],
 		    extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
-		)
-	     
-	   	
+		),Extension(
+            "ACA_wrapper",
+            sources=["depth/src/ACA_wrapper.cpp"],
+            extra_compile_args=["-I.",'-std=c++14','-fPIC','-O2'],
+            extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
+        )
 	    ],
 	    data_files=[('depth/src', glob.glob("depth/docs/*.rst"))],
 	    zip_safe=False,
@@ -51,7 +54,7 @@ if sys.platform=='darwin' or sys.platform=='linux':
 if sys.platform=='win32':
 	setup(
 	    name="data_depth",
-	    version="1.1.1",
+	    version="1.1.2",
 	    author="Pavlo Mozharovskyi",
 	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
@@ -63,4 +66,3 @@ if sys.platform=='win32':
 	    data_files=[('depth/src', glob.glob("depth/docs/*"))],
 	    zip_safe=False
 	)
-	
