@@ -808,8 +808,8 @@ class DepthEucl():
         if evaluate_dataset==False: # return correct value
             if option==1:return self.projectionDepth
             if option==2:return self.projectionDepth,self.projectionDir
-            if option==3:return self.halfspaceDepth,self.projectionDir,self.allDepth
-            if option==4:return self.halfspaceDepth,self.projectionDir,self.allDepth,self.allDirections
+            if option==3:return self.projectionDepth,self.projectionDir,self.allDepth
+            if option==4:return self.projectionDepth,self.projectionDir,self.allDepth,self.allDirections
         elif evaluate_dataset==True:
             if option==1:return self.projectionDepthDS
             if option==2:return self.projectionDepthDS,self.projectionDirDS
@@ -1227,17 +1227,13 @@ class DepthEucl():
         if exact==True: return 1 # only depth
         option=self.approxOption.index(output_option)+1 # define option for function return 
         memorySize=x.size*x.itemsize*NRandom*self.distRef.shape[0]//1048576 # compute an estimate of the memory amount used for option 4
-        if type(self.distribution)==None:
+        if type(self.distribution)==type(None):
             if memorySize>1 and option==4:
                 print("output_option demands too much memory, output_option automatically set to 'final_direction'")
                 option=2
             if CUDA and option>2:
                 option=1
                 print(f"{output_option} is not available for CUDA computation, output_option automatically set to 'lowest_depth'")
-        else:
-            if option>2:
-                option=1
-                print(f"{output_option} is not available for multiple distributions, output_option automatically set to 'lowest_depth'")
 
         return option
     
