@@ -11,10 +11,10 @@ jobs:
         os: [windows-2022]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       
       - name: setup python 3.6
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
       
