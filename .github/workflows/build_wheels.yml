@@ -21,7 +21,7 @@ jobs:
       - name: Install MSYS2
         run: choco install mingw
         
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v5
       
       - name: test commands ddalpha
         run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/library/depth/src/ddalpha.o
