@@ -27,7 +27,7 @@ if sys.platform=='darwin' or sys.platform=='linux':
 	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision','torchaudio'],
+	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision',],
 	    include_package_data=True,
 	    ext_modules=[
 		Extension(
@@ -61,7 +61,7 @@ if sys.platform=='win32':
 	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision','torchaudio'],
+	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision',],
 	    include_package_data=True,
 	    data_files=[('depth/src', glob.glob("depth/docs/*"))],
 	    zip_safe=False
