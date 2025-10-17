@@ -269,9 +269,10 @@ void MinimumCovarianceDeterminantEstim(double *points, int *numPoints, int *dime
 }
 
 int main() {
-    std::cout << random(10);
+    std::cout << "Hello Ddalpha!";
     return 0;
 }
+
 #ifdef __cplusplus
 }
 #endif

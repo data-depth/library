@@ -13,8 +13,11 @@
 
 #include <iterator>
 
-extern "C"
-{
+#define EOF (-1)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int SetDepthPars(cProjection& depthObj, int n_refinements,
 				double sphcap_shrink, double alpha_Dirichlet,
@@ -125,9 +128,10 @@ int depth_approximation(double *z, double *x, int notion, int solver,
 }
 
 int main() {
-    std::cout << "Hello World!";
+    std::cout << "Hello Approximation!";
     return 0;
 }
 
-
-};
+#ifdef __cplusplus
+}
+#endif
