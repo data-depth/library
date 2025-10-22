@@ -4,7 +4,8 @@ import numpy as np
 from . import docHelp
 from . import multivariate as mtv
 from typing import Literal, List
-import torch
+try:import torch
+except:torch=None
 import sys, os
 try:os.environ['CUDA_HOME']=os.environ.get('CUDA_PATH').split(";")[0] # Force add cuda path
 except:pass
@@ -151,10 +152,12 @@ class DepthEucl():
             self.y=y # define y
         else:self.y=None
 
-        if CUDA==False:
+        self.CUDA=CUDA
+        if self.CUDA==False:
             self.data=data
-            device = torch.device("cpu")
-        else: 
+            if type(torch)!=type(None):
+                device = torch.device("cpu")
+        elif self.CUDA==True and type(torch)!=type(None): 
             if torch.cuda.is_available() or torch.backends.mps.is_available():
                 if torch.backends.mps.is_available():
                     device = torch.device("mps")
@@ -167,7 +170,12 @@ class DepthEucl():
                 # Tensor is transposed to facilitate projection and depth  computation
             else:
                 self.data=data
+                self.CUDA=False
                 print("CUDA is set to True, but cuda is not available, CUDA is automatically set to False")
+        else:
+            self.data=data
+            self.CUDA=False
+            print("CUDA is set to True, but troch is not installed, CUDA is automatically set to False")
         return self
 
     def mahalanobis(self, x: np.ndarray|None = None, exact: bool = True, mah_estimate: Literal["none", "moment", "mcd"] = "moment",
@@ -295,7 +303,7 @@ class DepthEucl():
                 self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
 
         for ind,d in enumerate(self.distRef):
-            if CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+            if CUDA and self.CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
                                 cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value        
             else:DAP=mtv.aprojection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
@@ -620,7 +628,7 @@ class DepthEucl():
                 self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
 
         for ind,d in enumerate(self.distRef):
-            if CUDA:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
+            if CUDA and self.CUDA:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
                 space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
@@ -777,7 +785,7 @@ class DepthEucl():
             if option==4:
                 self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
         for ind,d in enumerate(self.distRef):
-            if CUDA:DP=mtv.projection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+            if CUDA and self.CUDA:DP=mtv.projection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
                             space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
