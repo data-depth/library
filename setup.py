@@ -20,14 +20,14 @@ class custom_build_ext(build_ext):
 if sys.platform=='darwin' or sys.platform=='linux':
 	setup(
 	    name="data_depth",
-	    version="1.1.0",
+	    version="1.1.2.6",
 	    author="Pavlo Mozharovskyi",
 	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn','matplotlib','numba','torch','torchvision','torchaudio'],
+	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision',],
 	    include_package_data=True,
 	    ext_modules=[
 		Extension(
@@ -40,27 +40,29 @@ if sys.platform=='darwin' or sys.platform=='linux':
 		    sources=["depth/src/depth_wrapper.cpp"],
 		    extra_compile_args=["-I.",'-std=c++14','-fPIC','-O2'],
 		    extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
-		)
-	     
-	   	
+		),Extension(
+            "ACA_wrapper",
+            sources=["depth/src/ACA_wrapper.cpp"],
+            extra_compile_args=["-I.",'-std=c++14','-fPIC','-O2'],
+            extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
+        )
 	    ],
-	    data_files=[('depth/multivariate', glob.glob("depth/multivariate/*.rst"))],
+	    data_files=[('depth/src', glob.glob("depth/docs/*.rst"))],
 	    zip_safe=False,
 	    cmdclass={"build_ext": custom_build_ext}
 	)
 if sys.platform=='win32':
 	setup(
 	    name="data_depth",
-	    version="1.1.0",
+	    version="1.1.2.6",
 	    author="Pavlo Mozharovskyi",
 	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn','matplotlib','numba','torch','torchvision','torchaudio'],
+	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision',],
 	    include_package_data=True,
-	    data_files=[('depth/src', glob.glob("depth/src/*"))],
+	    data_files=[('depth/src', glob.glob("depth/docs/*"))],
 	    zip_safe=False
 	)
-	

@@ -39,7 +39,7 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
         dimension=pointer(c_int(len(data[0])))
         if mah_estimate=='moment': # compute cov based on user choice
             PY_MatMCD=np.cov(np.transpose(data))
-        elif mah_estimate=='MCD': # compute cov based on user choice
+        else: # compute cov based on user choice
             PY_MatMCD=MCD_fun(data,mah_parMcd)
         PY_MatMCD=PY_MatMCD.flatten(order='C')
         mat_MCD=pointer((c_double*len(PY_MatMCD))(*PY_MatMCD))

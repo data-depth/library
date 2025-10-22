@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="./depth/_static/depth-logo.jpg" width="200">
+<img src="./docs/_static/depth-logo.jpg" width="200">
 </h1><br>
 
 Data depth package

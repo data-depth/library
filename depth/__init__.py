@@ -1,3 +1,3 @@
-from depth.model import DepthEucl
-from depth.plotDepth import depth_mesh, depth_plot2d
-from depth import *
+from .model import DepthEucl
+from .plotDepth import depth_mesh, depth_plot2d
+from . import *

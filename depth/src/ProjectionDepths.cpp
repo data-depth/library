@@ -18,6 +18,7 @@
 #include <cstring>
 #include <algorithm>
 #include <numeric>
+#include <chrono>
 #include "MD.h"
 #include "ZD.h"
 #include "HD.h"
@@ -191,13 +192,30 @@ double cProjection::ExactDepth(const double* z) {
 /*******************************************************************************/
 
 double cProjection::ProjectedDepth(const double* z, const double u[]) {
+	
+	double ufull[d];
+
+	if(_d_aca != d){
+		for(int j = 0; j < d; j++){
+			double sum = 0.0;
+			for(int k = 0; k < _d_aca; k++){
+				sum += _basis[j][k] * u[k];
+			}
+			ufull[j] = sum;
+		}
+	}
+	else{
+		for(int i = 0; i < d; i++){
+				ufull[i] = u[i];
+		}
+	}
 
 	// Increment number of used direcions (= projections)
 	_nProjections++;
 	// compute projections of data points 'x[i]' in direction 'u'
-	for (int i = 0; i < n; i++) xp[i] = InnerProduct(x[i], u, d);
+	for (int i = 0; i < n; i++) xp[i] = InnerProduct(x[i], ufull, d);
 	// compute projection of 'z' in direction 'u'
-	double zp = InnerProduct(z, u, d);
+	double zp = InnerProduct(z, ufull, d);
 	// compute the univariate depth
 	double prjDepth = UniDepth(zp, xp.get(), n);
 	// save statistics (if necessary)
@@ -208,7 +226,7 @@ double cProjection::ProjectedDepth(const double* z, const double u[]) {
         case 2:
             if (_nProjections <= 1 || prjDepth < _MinDepths[_nProjections - 2]) {
                 _MinDepths.push_back(prjDepth);
-                _BestDirection = std::vector<double>(u, u + d);
+                _BestDirection = std::vector<double>(ufull, ufull + d);
             }
             else {
                 _MinDepths.push_back(_MinDepths[_nProjections - 2]);
@@ -218,7 +236,7 @@ double cProjection::ProjectedDepth(const double* z, const double u[]) {
             _Depths.push_back(prjDepth);
             if (_nProjections <= 1 || prjDepth < _MinDepths[_nProjections - 2]) {
                 _MinDepths.push_back(prjDepth);
-                _BestDirection = std::vector<double>(u, u + d);
+                _BestDirection = std::vector<double>(ufull, ufull + d);
             }
             else {
                 _MinDepths.push_back(_MinDepths[_nProjections - 2]);
@@ -226,10 +244,10 @@ double cProjection::ProjectedDepth(const double* z, const double u[]) {
             break;
         case 4:
             _Depths.push_back(prjDepth);
-            _Directions.push_back(std::vector<double>(u, u + d));
+            _Directions.push_back(std::vector<double>(ufull, ufull + d));
             if (_nProjections <= 1 || prjDepth < _MinDepths[_nProjections - 2]) {
                 _MinDepths.push_back(prjDepth);
-                _BestDirection = std::vector<double>(u, u + d);
+                _BestDirection = std::vector<double>(ufull, ufull + d);
             }
             else {
                 _MinDepths.push_back(_MinDepths[_nProjections - 2]);
@@ -251,7 +269,7 @@ double cProjection::ProjectedDepth(const double* z, const double u[]) {
 
 double cProjection::SimpleRandom(const double* z) {
 	// random numbers from a uniform distribution on the sphere
-	cUniformSphere rndSphere(d);  
+	cUniformSphere rndSphere(_d_aca);  
 	double minDepth = DBL_MAX;
 	_nProjections = 0;
 	for (int i = 0; i < _nRandom; i++) {
@@ -274,9 +292,9 @@ double cProjection::SimpleRandom(const double* z) {
 double cProjection::RefinedRandom(const double* z) {
 	nRecords = 0;
 	records = nullptr;
-	unique_ptr<double[]> uOpt{ new double[d] {} };
+	unique_ptr<double[]> uOpt{ new double[_d_aca] {} };
 	// We start with a spherical cap that is an entire hemisphere
-	cRandomPolarCap rndPolarCap(d, M_PI / 2); 
+	cRandomPolarCap rndPolarCap(_d_aca, M_PI / 2); 
 	// and that is centered at the north pole, i.e, u_opt = (1,0,...,0)
 	uOpt[0] = 1;                              
 	double MinDepth{ DBL_MAX };
@@ -749,20 +767,20 @@ double cProjection::CoordinateDescent(const double* z) {
 			Normalize(u.get(), d);
 		}
 	}
-	unique_ptr<double[]> uOld{ new double[d] {} };
+	unique_ptr<double[]> uOld{ new double[_d_aca] {} };
 	double depth{ DBL_MAX };
 	do {
-		for (int i = 0; i < d; i++) uOld[i] = u[i];
+		for (int i = 0; i < _d_aca; i++) uOld[i] = u[i];
 		// perform d line searches along the d coordinate axes 
-		for (int j = 1; j < d; j++) {
+		for (int j = 1; j < _d_aca; j++) {
 			if (_nProjections < _nRandom) {
-				unique_ptr<double[]> v{ new double[d] {} };
+				unique_ptr<double[]> v{ new double[_d_aca] {} };
 				v[j] = 1;
 				// perform the line search along axis j
 				depth = min(MethodCD[(int)_lineSearchCD](z, u.get(), v.get()), depth);
 			}
 		}
-	} while ((distance(u.get(), uOld.get(), d) >= eps) && (_nProjections < _nRandom));
+	} while ((distance(u.get(), uOld.get(), _d_aca) >= eps) && (_nProjections < _nRandom));
 	// stop, when the distance between two successive points is less than 'eps'
 	// or when the maximum number of depth evaluations is reached
 	if (debug >= 2) cout << "CD:   " << _nProjections << endl;
@@ -958,24 +976,24 @@ double cProjection::CoordinateDescentGC(const double* z) {
 			Normalize(u.get(), d);
 		}
 	}
-	unique_ptr<double[]> uOld{ new double[d] {} };
+	unique_ptr<double[]> uOld{ new double[_d_aca] {} };
 	double depth{ DBL_MAX };
 	do {
-		for (int i = 0; i < d; i++) uOld[i] = u[i];
+		for (int i = 0; i < _d_aca; i++) uOld[i] = u[i];
 		// perform d-1 line searches along the directions of an orthonormal
 		// base of the tangent hyperplane at u
-		for (int j = 0; j < d-1; j++) {
+		for (int j = 0; j < _d_aca-1; j++) {
 			if (_nProjections < _nRandom) {
 				// compute the j-th direction v
-				auto v = make_unique<double[]>(d);
-				for (int k = 0; k < d - 1; k++) v[k] = -uOld[j] * uOld[k] / (1 - uOld[d - 1]);
+				auto v = make_unique<double[]>(_d_aca);
+				for (int k = 0; k < _d_aca - 1; k++) v[k] = -uOld[j] * uOld[k] / (1 - uOld[_d_aca - 1]);
 				v[j] += 1;
-				v[d - 1] = uOld[j];
+				v[_d_aca - 1] = uOld[j];
 				// and perform the line search along the great circle defined by u and v
 				depth = min(MethodCDGC[(int)_lineSearchCDGC](z, u.get(), v.get()), depth);
 			}
 		}
-	} while ((distance(u.get(), uOld.get(), d) >= eps) && (_nProjections < _nRandom));
+	} while ((distance(u.get(), uOld.get(), _d_aca) >= eps) && (_nProjections < _nRandom));
 	// stop, when the distance between two successive points is less than 'eps'
 	// or when the maximum number of depth evaluations is reached
 	if (debug >= 2) cout << "CDGC: " << _nProjections << endl;
@@ -1089,18 +1107,18 @@ double cProjection::NelderMead(const double* z){
 	double sigma = 0.5;
 	double eps = 1e-4;
 	// Allocate memory
-	Feval* fevals = new Feval[d + 1]; // function evaluations
-	for (int i = 0; i < d + 1; i++){
-		fevals[i].arg = new double[d];
+	Feval* fevals = new Feval[_d_aca + 1]; // function evaluations
+	for (int i = 0; i < _d_aca + 1; i++){
+		fevals[i].arg = new double[_d_aca];
 	}
-	double* x_o = new double[d]; // centroid
-	double* x_r = new double[d]; double f_r; // reflected point
-	double* x_e = new double[d]; double f_e; // expanded point
-	double* x_c = new double[d]; double f_c; // contracted point
-	double* x_h = new double[d]; double f_h; // best of x_r and x_{N+1}
+	double* x_o = new double[_d_aca]; // centroid
+	double* x_r = new double[_d_aca]; double f_r; // reflected point
+	double* x_e = new double[_d_aca]; double f_e; // expanded point
+	double* x_c = new double[_d_aca]; double f_c; // contracted point
+	double* x_h = new double[_d_aca]; double f_h; // best of x_r and x_{N+1}
 	// Generate and evaluate initial simplex
-	cUniformSphere rndSphere(d);
-	for (int i = 0; i < d + 1; i++){
+	cUniformSphere rndSphere(_d_aca);
+	for (int i = 0; i < _d_aca + 1; i++){
 		rndSphere.vector(fevals[i].arg, gen);
 		fevals[i].val = ProjectedDepth(z, fevals[i].arg);
 		if(_nProjections >= _nRandom) break;
@@ -1111,11 +1129,11 @@ double cProjection::NelderMead(const double* z){
 	while (!converged && (_nProjections < _nRandom)) {
 		iter++;
 		// Order the values
-		sort(fevals, fevals + d+1, Compare);
+		sort(fevals, fevals + _d_aca+1, Compare);
 		// Check convergence criterium
 		double maxDist = 0;
-		for (int i = 0; i < d; i++) {
-			double tmpVal = fabs(fevals[0].arg[i] - fevals[d].arg[i]);
+		for (int i = 0; i < _d_aca; i++) {
+			double tmpVal = fabs(fevals[0].arg[i] - fevals[_d_aca].arg[i]);
 			if (tmpVal > maxDist) {
 				maxDist = tmpVal;
 			}
@@ -1125,59 +1143,59 @@ double cProjection::NelderMead(const double* z){
 			break;
 		}
 		// Calculate the centroid of the d best points
-		centroid(fevals, d, d, x_o);
+		centroid(fevals, _d_aca, _d_aca, x_o);
 		// Calculate and evaluate reflected point
-		linComb(x_o, fevals[d].arg, d, -alpha, x_r);
+		linComb(x_o, fevals[_d_aca].arg, _d_aca, -alpha, x_r);
 		f_r = ProjectedDepth(z, x_r);
 		if(_nProjections >= _nRandom) break;
 		
 		// Choose what to do
-		if ((fevals[0].val <= f_r) && (f_r < fevals[d - 1].val)) {
+		if ((fevals[0].val <= f_r) && (f_r < fevals[_d_aca - 1].val)) {
 			// Reflection
-			memcpy(fevals[d].arg, x_r, d * sizeof(double));
-			fevals[d].val = f_r;
+			memcpy(fevals[_d_aca].arg, x_r, _d_aca * sizeof(double));
+			fevals[_d_aca].val = f_r;
 		}
 		else {
 			if (f_r < fevals[0].val) {
 				// Calculate and evaluate expanded point
-				linComb(x_o, x_r, d, gamma, x_e);
+				linComb(x_o, x_r, _d_aca, gamma, x_e);
 				f_e = ProjectedDepth(z, x_e);
 				if(_nProjections >= _nRandom) break;
 				
 				if (f_e < f_r) {
 					// Expansion
-					memcpy(fevals[d].arg, x_e, d * sizeof(double));
-					fevals[d].val = f_e;
+					memcpy(fevals[_d_aca].arg, x_e, _d_aca * sizeof(double));
+					fevals[_d_aca].val = f_e;
 				}
 				else {
 					// Still (just) reflection
-					memcpy(fevals[d].arg, x_r, d * sizeof(double));
-					fevals[d].val = f_r;
+					memcpy(fevals[_d_aca].arg, x_r, _d_aca * sizeof(double));
+					fevals[_d_aca].val = f_r;
 				}
 			}
 			else {
-				if (f_r < fevals[d].val) {
-					memcpy(x_h, x_r, d * sizeof(double));
+				if (f_r < fevals[_d_aca].val) {
+					memcpy(x_h, x_r, _d_aca * sizeof(double));
 					f_h = f_r;
 				}
 				else {
-					memcpy(x_h, fevals[d].arg, d * sizeof(double));
-					f_h = fevals[d].val;
+					memcpy(x_h, fevals[_d_aca].arg, _d_aca * sizeof(double));
+					f_h = fevals[_d_aca].val;
 				}
 				// Calculate and evaluate contracted point
-				linComb(x_o, x_h, d, beta, x_c);
+				linComb(x_o, x_h, _d_aca, beta, x_c);
 				f_c = ProjectedDepth(z, x_c);
 				if(_nProjections >= _nRandom) break;
 				
-				if (f_c < fevals[d].val) {
+				if (f_c < fevals[_d_aca].val) {
 					// Contraction
-					memcpy(fevals[d].arg, x_c, d * sizeof(double));
-					fevals[d].val = f_c;
+					memcpy(fevals[_d_aca].arg, x_c, _d_aca * sizeof(double));
+					fevals[_d_aca].val = f_c;
 				}
 				else {
 					// Reduction
-					for (int i = 1; i < d + 1; i++) {
-						linComb(fevals[0].arg, fevals[i].arg, d, sigma, fevals[i].arg);
+					for (int i = 1; i < _d_aca + 1; i++) { 
+						linComb(fevals[0].arg, fevals[i].arg, _d_aca, sigma, fevals[i].arg);
 						fevals[i].val = ProjectedDepth(z, fevals[i].arg);
 						if(_nProjections >= _nRandom) break;
 					}
@@ -1186,7 +1204,7 @@ double cProjection::NelderMead(const double* z){
 		}
 	}
 	// Extract result
-	sort(fevals, fevals + d+1, Compare);
+	sort(fevals, fevals + _d_aca+1, Compare);
 	double res = fevals[0].val;
 	// Release memory
 	delete[] fevals;
@@ -1325,8 +1343,8 @@ double cProjection::NelderMeadGC(const double z[]) {
 	// Set optimization parameters
 	const double alpha{ 1 }, gamma{ 2 }, rho{ 0.5 }, sigma{ 0.5 }, eps{ 1e-4 };
 	// Allocate memory
-	fVal* fevals = new fVal[d]; // function evaluations
-	fVal x_o(d), x_r(d), x_e(d), x_c(d), *x_h;
+	fVal* fevals = new fVal[_d_aca]; // function evaluations
+	fVal x_o(_d_aca), x_r(_d_aca), x_e(_d_aca), x_c(_d_aca), *x_h;
 	int iter{ 0 }; // number of iterations
 	// Generate and evaluate initial simplex
 	cUniformSphere rndSphere(d);
@@ -1342,18 +1360,18 @@ double cProjection::NelderMeadGC(const double z[]) {
 			Normalize(u.get(), d);
 		}
 	}
-	cRandomPolarCap rndPolarCap(d, (M_PI / 2) / _betaNM);
+	cRandomPolarCap rndPolarCap(_d_aca, (M_PI / 2) / _betaNM);
 	// Generate and evaluate initial simplex
-	for (int i = 0; i < d; i++) {
+	for (int i = 0; i < _d_aca; i++) {
 		fevals[i].arg = unique_ptr<double[]>{ rndPolarCap(gen, u.get()) };
 		fevals[i].val = ProjectedDepth(z, fevals[i].p());
 		if(_nProjections >= _nRandom) break;
 	}
 	
 	// sort the points of the simplex according to their depth
-	sort(fevals, fevals + d, cmp);
+	sort(fevals, fevals + _d_aca, cmp);
 	if (debug >= 3) {
-		for (int i = 0; i < d; i++) cout << fevals[i].val << "  ";
+		for (int i = 0; i < _d_aca; i++) cout << fevals[i].val << "  ";
 		cout << endl;
 	}
 	// Main optimization cycle
@@ -1362,64 +1380,64 @@ double cProjection::NelderMeadGC(const double z[]) {
 		if(_nProjections >= _nRandom) break;
 		iter++;
 		if (debug >= 3) {
-			for (int i = 0; i < d; i++) cout << fevals[i].val << "  ";
+			for (int i = 0; i < _d_aca; i++) cout << fevals[i].val << "  ";
 			cout << endl;
 		}
 		// Calculate the spherical mean of the d-1 best points
-		x_o.arg = sphericalMean(fevals, d - 1, d);
+		x_o.arg = sphericalMean(fevals, _d_aca - 1, _d_aca);
 		// Calculate and evaluate reflected point
-		x_r.arg = greatCircle(x_o.p(), fevals[d-1].p(), d, -alpha);
+		x_r.arg = greatCircle(x_o.p(), fevals[_d_aca-1].p(), _d_aca, -alpha);
 		x_r.val = ProjectedDepth(z, x_r.p());
 		if(_nProjections >= _nRandom) break;
 		// Choose what to do
-		if ((fevals[0].val <= x_r.val) && (x_r.val < fevals[d - 2].val)) {
-			fevals[d - 1] = move(x_r); // Reflection
+		if ((fevals[0].val <= x_r.val) && (x_r.val < fevals[_d_aca - 2].val)) {
+			fevals[_d_aca - 1] = move(x_r); // Reflection
 			if (debug >= 3) cout << "Reflection" << endl;
 		}
 		else {
 			if (x_r.val < fevals[0].val) { // Calculate and evaluate expanded point
-				x_e.arg = greatCircle(x_o.p(), x_r.p(), d, gamma);
+				x_e.arg = greatCircle(x_o.p(), x_r.p(), _d_aca, gamma);
 				x_e.val = ProjectedDepth(z, x_e.p());
 				if(_nProjections >= _nRandom) break;	
-				if (x_e.val < x_r.val) fevals[d - 1] = move(x_e);
-				else fevals[d - 1] = move(x_r);
+				if (x_e.val < x_r.val) fevals[_d_aca - 1] = move(x_e);
+				else fevals[_d_aca - 1] = move(x_r);
 				if (debug >= 3) cout << "Expansion" << endl;
 			}
 			else {
-				if (x_r.val < fevals[d - 1].val) x_h = &x_r; else x_h = &(fevals[d - 1]);
+				if (x_r.val < fevals[_d_aca - 1].val) x_h = &x_r; else x_h = &(fevals[_d_aca - 1]);
 				// Calculate and evaluate contracted point
-				x_c.arg = greatCircle(x_o.p(), x_h->p(), d, rho);
+				x_c.arg = greatCircle(x_o.p(), x_h->p(), _d_aca, rho);
 				x_c.val = ProjectedDepth(z, x_c.p());
 				if(_nProjections >= _nRandom) break;
 				
-				if (x_c.val < fevals[d - 1].val) {
-					fevals[d - 1] = move(x_c);
+				if (x_c.val < fevals[_d_aca - 1].val) {
+					fevals[_d_aca - 1] = move(x_c);
 					if (debug >= 3) cout << "Contraction" << endl;
 				}
 				else { // Reduction
 					int MaxDim = 0;
-					if(_nProjections < _nRandom - d){
-						MaxDim = d;
+					if(_nProjections < _nRandom - _d_aca){
+						MaxDim = _d_aca;
 					}
 					else{
 						MaxDim = _nRandom - _nProjections;
 					}
 					for (int i = 1; i < MaxDim; i++) {
-						fevals[i].arg = greatCircle(fevals[0].p(), fevals[i].p(), d, sigma);
+						fevals[i].arg = greatCircle(fevals[0].p(), fevals[i].p(), _d_aca, sigma);
 						fevals[i].val = ProjectedDepth(z, fevals[i].p());
 						if(_nProjections >= _nRandom) break;
 						
 					}
-					sort(fevals, fevals + d-1, cmp);
+					sort(fevals, fevals + _d_aca-1, cmp);
 					if (debug >= 3) cout << "Shrink" << endl;
 				}
 			}
 		}
-		inplace_merge(fevals, fevals + d - 1, fevals + d, cmp);
+		inplace_merge(fevals, fevals + _d_aca - 1, fevals + _d_aca, cmp);
 		// Check convergence criterium
 		maxDist = 0;
-		for (int i = 0; i < d; i++) {
-			double tmpVal = fabs(fevals[0].arg[i] - fevals[d - 1].arg[i]);
+		for (int i = 0; i < _d_aca; i++) {
+			double tmpVal = fabs(fevals[0].arg[i] - fevals[_d_aca - 1].arg[i]);
 			if (tmpVal > maxDist) maxDist = tmpVal;
 		}
 	}while ((maxDist >= eps) && (_nProjections < _nRandom));

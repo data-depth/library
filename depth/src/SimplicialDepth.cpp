@@ -33,7 +33,9 @@ void SimplicialDepthsEx(TDMatrix X, TDMatrix x, int d, int n, int nx,
 			for (int k = 0; k < d + 1; k++){
 				A[d][k] = 1;
 			}
+			if (d*sizeof(double) <= PTRDIFF_MAX){
 			memcpy(b, x[obs], d*sizeof(double)); b[d] = 1;
+			}
 			if (solveUnique(A, b, z, d + 1)){
 				bool isInside = true;
 				for (int j = 0; j < d + 1; j++){
@@ -95,7 +97,10 @@ void SimplicialDepthsApx(TDMatrix X, TDMatrix x, int d, int n, int nx,
 		for (int l = 0; l < d + 1; l++){
 			A[d][l] = 1;
 		}
-		memcpy(b, x[obs], d*sizeof(double)); b[d] = 1;
+		if (d*sizeof(double) <= PTRDIFF_MAX)
+		{
+			memcpy(b, x[obs], d*sizeof(double)); b[d] = 1;
+		}
 		// Check whether 'x' lies inside of this simplex
 		solveUnique(A, b, z, d + 1);
 		bool isInside = true;

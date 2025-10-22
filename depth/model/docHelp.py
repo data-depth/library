@@ -1,10 +1,8 @@
 mahalanobis__doc__= """
-Description
------------
-    Calculates the Mahalanobis depth of points w.r.t. a multivariate data set.
+
+Calculates the Mahalanobis depth of points w.r.t. a multivariate data set.
 
 Arguments
----------
     x: array-like or None, default=None 
         Matrix of objects (numerical vector as one object) whose depth is to be calculated;
         each row contains a d-variate point. Should have the same dimension as
@@ -96,14 +94,11 @@ Examples
             0.13291613 0.13792774 0.59094958 0.10491694]
 
 """
-
 aprojection__doc__="""
-Description
------------
-    Calculates approximately the asymmetric projection depth of points w.r.t. a multivariate data set.
+
+Calculates approximately the asymmetric projection depth of points w.r.t. a multivariate data set.
 
 Arguments
-----------
     x: array-like or None, default=None 
         Matrix of objects (numerical vector as one object) whose depth is to be calculated;
         each row contains a d-variate point. Should have the same dimension as
@@ -176,8 +171,7 @@ Examples
 """
 betaSkeleton__doc__= """ 
 
-Description
-	Calculates the beta-skeleton depth of points w.r.t. a multivariate data set.
+Calculates the beta-skeleton depth of points w.r.t. a multivariate data set.
 
 Arguments
     x : {array-like} of shape (n_samples,d).
@@ -238,8 +232,7 @@ Examples
 
 cexpchull__doc__="""
 
-Description
-    Calculates approximately the continuous explected convex hull depth of points w.r.t. a multivariate data set.
+Calculates approximately the continuous explected convex hull depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -314,8 +307,7 @@ Examples
 
 cexpchullstar__doc__="""
 
-Description
-    Calculates approximately the continuous modified explected convex hull depth of points w.r.t. a multivariate data set.
+Calculates approximately the continuous modified explected convex hull depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -390,8 +382,7 @@ Examples
 
 geometrical__doc__="""
 
-Description
-    Calculates approximately the geometrical depth of points w.r.t. a multivariate data set.
+Calculates approximately the geometrical depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -466,8 +457,7 @@ Examples
 
 halfspace__doc__="""
 
-Description
-    Calculates the exact and approximated Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a multivariate data set.
+Calculates the exact and approximated Tukey (=halfspace, location) depth (Tukey, 1975) of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -563,8 +553,7 @@ Examples
     
 L2__doc__=""" 
 
-Description
-			Calculates the L2-depth of points w.r.t. a multivariate data set.
+Calculates the L2-depth of points w.r.t. a multivariate data set.
 			
 Arguments
     x: array-like or None, default=None 
@@ -607,8 +596,7 @@ Examples
 
 potential__doc__="""
 
-Description
-	Calculate the potential of the points w.r.t. a multivariate data set. The potential is the kernel-estimated density multiplied by the prior probability of a class. Different from the data depths, a density estimate measures at a given point how much mass is located around it.
+Calculate the potential of the points w.r.t. a multivariate data set. The potential is the kernel-estimated density multiplied by the prior probability of a class. Different from the data depths, a density estimate measures at a given point how much mass is located around it.
 
 Arguments
     x: array-like or None, default=None 
@@ -660,8 +648,8 @@ Examples
 """
 projection__doc__="""
 
-Description
-    Calculates approximately the projection depth of points w.r.t. a multivariate data set.
+
+Calculates approximately the projection depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -740,8 +728,7 @@ Examples
 
 qhpeeling__doc__= """
 
-Description
-    Calculates the convex hull peeling depth of points w.r.t. a multivariate data set.
+Calculates the convex hull peeling depth of points w.r.t. a multivariate data set.
 
 Usage
     qhpeeling(x, data)
@@ -775,8 +762,7 @@ Examples
 
 simplicial__doc__ = """
 
-Description
-    Calculates the simplicial depth of points w.r.t. a multivariate data set.
+Calculates the simplicial depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -814,8 +800,7 @@ Examples
 
 simplicialVolume__doc__="""
 
-Description
-    Calculates the simpicial volume depth of points w.r.t. a multivariate data set.
+Calculates the simpicial volume depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -865,8 +850,7 @@ Examples
 
 spatial__doc__=""" 
 
-Description
-	Calculates the spatial depth of points w.r.t. a multivariate data set.
+Calculates the spatial depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -907,8 +891,7 @@ Examples
 
 zonoid__doc__= """
 
-Description
-    Calculates the zonoid depth of points w.r.t. a multivariate data set.
+Calculates the zonoid depth of points w.r.t. a multivariate data set.
 
 Arguments
     x: array-like or None, default=None 
@@ -979,6 +962,115 @@ Examples
         >>> model=DepthEucl().load_dataset(data)
         >>> model.zonoid(x,)
         [0.         0.00769552 0.03087017 0.         0.30945453 0.0142515
-            0.         0.01970896 0.02169483 0.        ]
+         0.         0.01970896 0.02169483 0.        ]
 
 """
+change_dataset__doc__="""
+
+    Modify loaded dataset.
+
+    Arguments
+        newDataset:np.ndarray
+            New dataset
+        
+        newDistribution:np.ndarray|None, default=None,
+            Distribution related to the dataset
+        
+        newY:np.ndarray|None, default=None,
+            Only for convention.
+        
+        keepOld:bool, default=False,
+            Boolean to determine if current dataset is kept or not.
+            If True, newDataset is added in the end of the old one.
+    Returns 
+        None
+    
+    Examples
+        >>> import numpy as np
+        >>> from depth.model import DepthEucl
+        >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
+        >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
+        >>> np.random.seed(0)
+        >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
+        >>> data2 = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
+        >>> model = DepthEucl().load_dataset(data)
+        >>> model.change_dataset(data2,) 
+    """
+
+ACA__doc__="""
+
+    Computes the abnormal component analysis
+            
+    Arguments
+        dim: int, default=2
+            Number of dimensions to keep in the reduction
+        
+        sample_size: int, default=None
+            Size of the dataset (uniform sampling) to be used in the ACA calculation
+
+        sample: list[int], default=None
+            Indices for the dataset to be used in the computation 
+        
+        notion: str {``'projection'``, ``'halfspace'``}, default="projection"
+            Chosen notion for depth computation
+        
+        solver : str  {``'refinedrandom'``, ``'neldermead'``}, default="neldermead"
+            The type of solver used to approximate the depth.
+    
+        NRandom : int, default=1000
+            The total number of iterations to compute the depth. Some solvers are converging
+            faster so they are run several time to achieve ``NRandom`` iterations.         
+
+        n_refinements : int, default = 10
+            Set the maximum of iteration for computing the depth of one point.
+            For ``solver='refinedrandom'`` or ``'refinedgrid'``.
+                        
+        sphcap_shrink : float, default = 0.5
+            It's the shrinking of the spherical cap. For ``solver='refinedrandom'`` or ``'refinedgrid'``.
+
+        alpha_Dirichlet : float, default = 1.25
+            It's the parameter of the Dirichlet distribution. For ``solver='randomsimplices'``.
+
+        cooling_factor : float, default = 0.95
+            It's the cooling factor. For ``solver='simulatedannealing'``.
+
+        cap_size : int | float, default = 1
+            It's the size of the spherical cap. For ``solver='simulatedannealing'`` or ``'neldermead'``.
+
+        start : str {'mean', 'random'}, default = mean 
+            For ``solver='simulatedannealing'`` or ``'neldermead'``, it's the method used to compute the first depth.
+                        
+        space : str {'sphere', 'euclidean'}, default = 'sphere' 
+            For ``solver='coordinatedescent'`` or ``'neldermead'``, it's the type of spacecin which the solver is running.
+                        
+        line_solver : str {'uniform', 'goldensection'}, default = goldensection
+            For ``solver='coordinatedescent'``, it's the line searh strategy used by this solver.
+                        
+        bound_gc : bool, default = True
+            For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
+
+    Results
+        ACA directions for dimensional reduction
+    
+    References
+        * Valla, R., Mozharovskyi, P., & d'Alché-Buc, F. (2023). Anomaly component analysis. arXiv preprint arXiv:2312.16139.
+  
+    Examples
+        >>> import numpy as np
+        >>> from depth.model import DepthEucl
+        >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
+        >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
+        >>> np.random.seed(0)
+        >>> data1 = np.random.multivariate_normal([0,0,0,0,0], mat1, 990)
+        >>> data2 = np.random.multivariate_normal([0,1,1,0,0], mat2, 10)
+        >>> data=np.concat((data1,data2),axis=0)
+        >>> model = DepthEucl().load_dataset(data)
+        >>> model.ACA(dim=2, sample_size=900)
+            array([[-0.13558675, -0.13558675],
+                    [ 2.65800844,  2.65800844],
+                    [-1.38230018, -1.38230018],
+                    [-0.11503065, -0.11503065],
+                    [ 0.55349281,  0.55349281]])
+
+    """
+

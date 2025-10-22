@@ -1,0 +1,8 @@
+.. _L2:
+
+L2-depth
+========
+
+.. automethod:: depth.model.DepthEucl.DepthEucl.L2
+   :noindex:
+  

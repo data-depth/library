@@ -21,14 +21,14 @@ def betaSkeleton(x, data, beta = 2, distance = "Lp", Lp_p = 2, mah_estimate = "m
 			sigma = np.eye(len(data[0]))
 		else:
 			if(mah_estimate == "moment"):
-				cov = np.cov(np.transpose(data))
+				tmpCov = np.cov(np.transpose(data))
 			elif (mah_estimate == "MCD"):
-				cov = MCD_fun(data, mah_parMcd)
+				tmpCov = MCD_fun(data, mah_parMcd)
 			else:
 				print("Wrong argument \"mah_estimate\", should be one of \"moment\", \"MCD\", \"none\"")
 			
-			if (np.sum(np.isnan(cov)) == 0):
-				sigma = np.linalg.inv(cov)
+			if (np.sum(np.isnan(tmpCov)) == 0):
+				sigma = np.linalg.inv(tmpCov)
 			else:
 				sigma = np.eye(len(data[0]))
 				print("Covariance estimate not found, no affine-invariance-adjustment")

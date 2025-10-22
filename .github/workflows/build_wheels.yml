@@ -8,23 +8,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-latest]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       
       - name: setup python 3.6
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.x'
+          python-version: ${{matrix.python-version}}
       
       - name: Install MSYS2
         run: choco install mingw
         
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v5
       
       - name: test commands ddalpha
-        run: g++ -fpic -O2 -std=c++11 -c ${{ runner.workspace }}/library/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/library/depth/src/ddalpha.o
+        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/library/depth/src/ddalpha.o
         #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
         #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
         #run: g++ --version
@@ -34,7 +34,7 @@ jobs:
           CI: true
         
       - name: Build shared library ddalpha.dll
-        run: g++ -shared -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
+        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
         #run: g++ --version
         env:
           HOME: ${{ runner.workspace }}/library
@@ -50,7 +50,7 @@ jobs:
           CI: true
           
       - name: test commands for depth-wrapper
-        run: g++ -fpic -O2 -std=c++14 -c ${{ runner.workspace }}/library/depth/src/depth_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.o
+        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/depth_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.o
         #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
         #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
         #run: g++ --version
@@ -60,7 +60,7 @@ jobs:
           CI: true
           
       - name: Build shared library depth-wrapper
-        run: g++ -shared -lstdc++ ${{ runner.workspace }}/library/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll
+        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll
         #run: g++ --version
         env:
           HOME: ${{ runner.workspace }}/library
@@ -70,6 +70,27 @@ jobs:
       - name: copy shared library
         run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll ${{ runner.workspace }}/library
         #run: g++ --version
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: test commands for ACA-wrapper
+        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ACA_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: Build shared library ACA-wrapper
+        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: copy shared library
+        run: cp ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll ${{ runner.workspace }}/library
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
@@ -159,4 +180,3 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           path: ${{ runner.workspace }}/library/dist/*.whl
-        
