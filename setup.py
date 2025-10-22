@@ -61,8 +61,27 @@ if sys.platform=='win32':
 	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision',],
+	    install_requires=['numpy','scipy','scikit-learn','matplotlib',
+					   "torch; python_version <= '3.12'","torchvision; python_version <= '3.12'",],
 	    include_package_data=True,
-	    data_files=[('depth/src', glob.glob("depth/docs/*"))],
+	    ext_modules=[
+		Extension(
+		    name="ddalpha", 
+		    sources=["depth/src/ddalpha.cpp"],
+			language="c++",
+		    extra_compile_args=["/O2","/std:c++17"],
+		),Extension(
+		    name="depth_wrapper", 
+		    sources=["depth/src/depth_wrapper.cpp"],
+			language="c++",
+		    extra_compile_args=["/O2","/std:c++17"],
+		),Extension(
+            name="ACA_wrapper",
+            sources=["depth/src/ACA_wrapper.cpp"],
+			language="c++",
+            extra_compile_args=["/O2","/std:c++17"],
+        )
+	    ],
+		# data_files=[('depth/src', glob.glob("depth/docs/*"))],
 	    zip_safe=False
 	)

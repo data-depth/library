@@ -2,18 +2,21 @@
 
 import numpy as np
 import ctypes
-import torch
-from torch.nn.functional import normalize
 import gc
 import math
 
+try:
+    import torch
+    from torch.nn.functional import normalize
+except:
+    raise ImportError('Torch is not installed')
 if torch.backends.mps.is_available():
     device = torch.device("mps")
 elif torch.cuda.is_available():
     device = torch.device("cuda")
 else:
     device = torch.device("cpu")
-def cudaApprox(data:torch.Tensor,x:np.ndarray|torch.Tensor,notion:str,
+def cudaApprox(data:torch.Tensor,x:torch.Tensor,notion:str,
             solver:str,option:int,NRandom:int,n_refinements:int,sphcap_shrink:float,
             step:int=10000)->torch.Tensor:
     """Main function to compute approximated depth based on chosen notion 
@@ -36,11 +39,11 @@ def cudaApprox(data:torch.Tensor,x:np.ndarray|torch.Tensor,notion:str,
         elif option==2:
             finalDepth[ind],finalDirections[ind]=D
     
-    try:
+    if device == torch.device("cuda"):
         torch.cuda.synchronize()
         del dirs,Pdata,D
         torch.cuda.empty_cache()
-    except:
+    elif device == torch.device("mps"):
         torch.mps.synchronize()
         del dirs,Pdata,D
         torch.mps.empty_cache()

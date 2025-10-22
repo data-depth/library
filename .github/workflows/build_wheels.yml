@@ -8,175 +8,196 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows-latest, windows-11-arm,]
 
     steps:
       - uses: actions/checkout@v5
       
-      - name: setup python 3.6
-        uses: actions/setup-python@v6
+      - name: setup python
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{matrix.python-version}}
+          python-version: ${{ matrix.python-version }}
       
-      - name: Install MSYS2
-        run: choco install mingw
-        
-      - uses: actions/checkout@v5
+      - name: Install build dependencies
+        run: python -m install --upgrade pip build wheel setuptools
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==3.2.1
       
-      - name: test commands ddalpha
-        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/library/depth/src/ddalpha.o
-        #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
-        #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-        
-      - name: Build shared library ddalpha.dll
-        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: copy shared library
-        run: cp ${{ runner.workspace }}/library/depth/src/ddalpha.dll ${{ runner.workspace }}/library
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: test commands for depth-wrapper
-        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/depth_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.o
-        #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
-        #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build shared library depth-wrapper
-        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: copy shared library
-        run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll ${{ runner.workspace }}/library
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: test commands for ACA-wrapper
-        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ACA_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build shared library ACA-wrapper
-        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: copy shared library
-        run: cp ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll ${{ runner.workspace }}/library
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-      - name: install requirements for Build-package
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: py -m pip install build
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: install requirements for setuptools
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: py -m pip install setuptools
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build-package run
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: pip3 install wheel
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build-package run
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: python3 setup.py bdist_wheel --plat-name=win-amd64 --python-tag=cp31 --py-limited-api=cp31
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build-package run
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: python3 setup.py bdist_wheel --plat-name=win32 --python-tag=cp31 --py-limited-api=cp31
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build-package run
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: python3 setup.py bdist_wheel --plat-name=win-arm64 --python-tag=cp31 --py-limited-api=cp31
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build-package run
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: python3 setup.py bdist_wheel --plat-name=win-amd64 --python-tag=py3
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build-package run
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: python3 setup.py bdist_wheel --plat-name=win32 --python-tag=py3
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
-          
-      - name: Build-package run
-        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
-        run: python3 setup.py bdist_wheel --plat-name=win-arm64 --python-tag=py3 
-        #run: g++ --version
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir dist
       
-          
       - uses: actions/upload-artifact@v4
         with:
-          path: ${{ runner.workspace }}/library/dist/*.whl
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./dist/*.whl
+          # path: ${{ runner.workspace }}/library/dist/*.whl
+
+
+
+
+
+
+      
+      # - name: Install MSYS2
+      #   run: choco install mingw
+        
+      # - uses: actions/checkout@v5
+      
+      # - name: test commands ddalpha
+      #   run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/library/depth/src/ddalpha.o
+      #   #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
+      #   #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+        
+      # - name: Build shared library ddalpha.dll
+      #   run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: copy shared library
+      #   run: cp ${{ runner.workspace }}/library/depth/src/ddalpha.dll ${{ runner.workspace }}/library
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: test commands for depth-wrapper
+      #   run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/depth_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.o
+      #   #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
+      #   #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build shared library depth-wrapper
+      #   run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: copy shared library
+      #   run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll ${{ runner.workspace }}/library
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: test commands for ACA-wrapper
+      #   run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ACA_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build shared library ACA-wrapper
+      #   run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: copy shared library
+      #   run: cp ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll ${{ runner.workspace }}/library
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+      # - name: install requirements for Build-package
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: py -m pip install build
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: install requirements for setuptools
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: py -m pip install setuptools
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build-package run
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: pip3 install wheel
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build-package run
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: python3 setup.py bdist_wheel --plat-name=win-amd64 --python-tag=cp31 --py-limited-api=cp31
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build-package run
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: python3 setup.py bdist_wheel --plat-name=win32 --python-tag=cp31 --py-limited-api=cp31
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build-package run
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: python3 setup.py bdist_wheel --plat-name=win-arm64 --python-tag=cp31 --py-limited-api=cp31
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build-package run
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: python3 setup.py bdist_wheel --plat-name=win-amd64 --python-tag=py3
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build-package run
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: python3 setup.py bdist_wheel --plat-name=win32 --python-tag=py3
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+          
+      # - name: Build-package run
+      #   #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+      #   run: python3 setup.py bdist_wheel --plat-name=win-arm64 --python-tag=py3 
+      #   #run: g++ --version
+      #   env:
+      #     HOME: ${{ runner.workspace }}/library
+      #     MINGW_INSTALLS: ${{ matrix.task.installs }}
+      #     CI: true
+      
+          
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     path: ${{ runner.workspace }}/library/dist/*.whl
