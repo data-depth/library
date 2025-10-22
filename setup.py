@@ -62,7 +62,7 @@ if sys.platform=='win32':
 	    long_description_content_type="text/markdown",
 	    packages=find_packages(),
 	    install_requires=['numpy','scipy','scikit-learn','matplotlib',
-					   "torch; python_version <= '3.12'","torchvision; python_version <= '3.12'",],
+					   "torch;python_version< '3.12'","torchvision; python_version < '3.12'",],
 	    include_package_data=True,
 	    ext_modules=[
 		Extension(
