@@ -14,7 +14,6 @@ jobs:
       CXX: g++
       CIBW_BEFORE_BUILD: |
         choco install mingw -y
-        setx PATH "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin;%PATH"
 
     steps:
       - uses: actions/checkout@v5
@@ -26,6 +25,10 @@ jobs:
       
       - name: Install build dependencies
         run: python3 -m pip install build wheel setuptools
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
 
       # - name: Install cibuildwheel
       #   run: python3 -m pip install cibuildwheel
