@@ -6,8 +6,6 @@ build-backend = "setuptools.build_meta"
 name="data-depth"
 requires-python = ">=3.8"
 version="1.1.2.6"
-author="Pavlo Mozharovskyi"
-author_email="pavlo.mozharovskyi@telecom-paris.fr"
 description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth"
 readme="README.md"
 dependencies=[
