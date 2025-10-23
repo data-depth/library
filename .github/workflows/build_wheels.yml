@@ -27,20 +27,88 @@ jobs:
       - name: Install build dependencies
         run: python3 -m pip install build wheel setuptools
 
-      - name: Install cibuildwheel
-        run: python3 -m pip install cibuildwheel
+      # - name: Install cibuildwheel
+      #   run: python3 -m pip install cibuildwheel
       
-      - name: Build wheels
-        run: python3 -m cibuildwheel --output-dir wheelhouse
+      # - name: Build wheels
+      #   run: python3 -m cibuildwheel --output-dir wheelhouse
       
+      - name: Build-package run
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+        run: pip3 install wheel
+        #run: g++ --version
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: Build-package run
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+        run: python3 setup.py bdist_wheel --plat-name=win-amd64 --python-tag=cp31 --py-limited-api=cp31
+        #run: g++ --version
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: Build-package run
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+        run: python3 setup.py bdist_wheel --plat-name=win32 --python-tag=cp31 --py-limited-api=cp31
+        #run: g++ --version
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: Build-package run
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+        run: python3 setup.py bdist_wheel --plat-name=win-arm64 --python-tag=cp31 --py-limited-api=cp31
+      #   #run: g++ --version
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: Build-package run
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+        run: python3 setup.py bdist_wheel --plat-name=win-amd64 --python-tag=py3
+        #run: g++ --version
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: Build-package run
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+        run: python3 setup.py bdist_wheel --plat-name=win32 --python-tag=py3
+        #run: g++ --version
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+          
+      - name: Build-package run
+        #run: cp ${{ runner.workspace }}/library/depth/src/depth_wrapper.so ${{ runner.workspace }}/library
+        run: python3 setup.py bdist_wheel --plat-name=win-arm64 --python-tag=py3 
+        #run: g++ --version
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+      
+          
       - uses: actions/upload-artifact@v4
         with:
-          # name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          name: dist-${{ matrix.name }}
-          path: ./wheelhouse/*.whl
+          path: ${{ runner.workspace }}/library/dist/*.whl
+
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     # name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+      #     name: dist-${{ matrix.name }}
+      #     path: ./wheelhouse/*.whl
           # path: dist/*.whl
           # path: ${{ runner.workspace }}/library/dist/*.whl
-
+      
 
 
 
