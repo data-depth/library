@@ -1,5 +1,5 @@
 from setuptools.command.build_ext import build_ext
-from setuptools import Extension, setup, find_packages
+from setuptools import Extension, setup, find_packages,find_namespace_packages
 import glob
 import sys
 
@@ -21,12 +21,12 @@ if sys.platform=='darwin' or sys.platform=='linux':
 	setup(
 	    # name="data_depth",
 	    # version="1.1.2.6",
-	    author="Pavlo Mozharovskyi",
-	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
+	    # author="Pavlo Mozharovskyi",
+	    # author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    # description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    # long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    # long_description_content_type="text/markdown",
-	    packages=find_packages(),
+	    packages=find_namespace_packages(),
 	    # install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision',],
 	    include_package_data=True,
 	    ext_modules=[
@@ -55,12 +55,12 @@ if sys.platform=='win32':
 	setup(
 	    # name="data_depth",
 	    # version="1.1.2.6",
-	    author="Pavlo Mozharovskyi",
-	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
+	    # author="Pavlo Mozharovskyi",
+	    # author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    # description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    # long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    # long_description_content_type="text/markdown",
-	    packages=find_packages(),
+	    packages=find_namespace_packages(),
 	    # install_requires=['numpy','scipy','scikit-learn','matplotlib',
 		# 			   "torch;python_version< '3.12'",
 		# 			   "torchvision; python_version < '3.12'",],
@@ -70,19 +70,19 @@ if sys.platform=='win32':
 		    name="ddalpha", 
 		    sources=["depth/src/ddalpha.cpp"],
 			language="c++",
-		    extra_compile_args=["/O2","/std:c++17"],
+		    extra_compile_args=["-O2","-std=c++17","-fPIC"],
 		),Extension(
 		    name="depth_wrapper", 
 		    sources=["depth/src/depth_wrapper.cpp"],
 			language="c++",
-		    extra_compile_args=["/O2","/std:c++17"],
+		    extra_compile_args=["-O2","-std=c++17","-fPIC"],
 		),Extension(
             name="ACA_wrapper",
             sources=["depth/src/ACA_wrapper.cpp"],
 			language="c++",
-            extra_compile_args=["/O2","/std:c++17"],
+            extra_compile_args=["-O2","-std=c++17","-fPIC"],
         )
 	    ],
-		# data_files=[('depth/src', glob.glob("depth/docs/*"))],
+		data_files=[('depth/src', glob.glob("depth/docs/*"))],
 	    zip_safe=False
 	)
