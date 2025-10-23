@@ -4,7 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name="data-depth"
+dynamic = ["version"]
 requires-python = ">=3.8"
+authors = [
+  {name = "Pavlo Mozharovskyi", email = "pavlo.mozharovskyi@telecom-paris.fr"},
+]
+maintainers = [
+  {name = "Pavlo Mozharovskyi", email = "pavlo.mozharovskyi@telecom-paris.fr"}
+]
 version="1.1.2.6"
 description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth"
 readme="README.md"
@@ -13,6 +20,11 @@ dependencies=[
             'scikit-learn>0.0','matplotlib>0.0',
             'torch>0.0; python_version>="3.8" and python_version < "3.12"',
             'torchvision>=0.0;  python_version>="3.8" and python_version < "3.12"']
+
+[project.urls]
+Homepage = "https://data-depth.github.io/"
+Documentation = "https://data-depth.github.io/"
+Repository = "https://github.com/data-depth/library"
 
 
 [tool.cibuildwheel]
