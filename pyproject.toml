@@ -1,11 +1,15 @@
 [build-system]
-requires = ["setuptools>=42","wheel","cibuildwheel",
-            ]
+requires = ["setuptools>=42","wheel","cibuildwheel",]
 build-backend = "setuptools.build_meta"
 
 [project]
 name="data-depth"
+requires-python = ">=3.8"
 version="1.1.2.6"
+author="Pavlo Mozharovskyi"
+author_email="pavlo.mozharovskyi@telecom-paris.fr"
+description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth"
+readme="README.md"
 dependencies=[
             'numpy>0.0','scipy>0.0',
             'scikit-learn>0.0','matplotlib>0.0',

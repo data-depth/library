@@ -19,15 +19,15 @@ class custom_build_ext(build_ext):
 
 if sys.platform=='darwin' or sys.platform=='linux':
 	setup(
-	    name="data_depth",
-	    version="1.1.2.6",
-	    author="Pavlo Mozharovskyi",
-	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
-	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
-	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
-	    long_description_content_type="text/markdown",
+	    # name="data_depth",
+	    # version="1.1.2.6",
+	    # author="Pavlo Mozharovskyi",
+	    # author_email="pavlo.mozharovskyi@telecom-paris.fr",
+	    # description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	    # long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	    # long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision',],
+	    # install_requires=['numpy','scipy','scikit-learn','matplotlib','torch','torchvision',],
 	    include_package_data=True,
 	    ext_modules=[
 		Extension(
@@ -53,17 +53,17 @@ if sys.platform=='darwin' or sys.platform=='linux':
 	)
 if sys.platform=='win32':
 	setup(
-	    name="data_depth",
-	    version="1.1.2.6",
-	    author="Pavlo Mozharovskyi",
-	    author_email="pavlo.mozharovskyi@telecom-paris.fr",
-	    description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
-	    long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
-	    long_description_content_type="text/markdown",
+	    # name="data_depth",
+	    # version="1.1.2.6",
+	    # author="Pavlo Mozharovskyi",
+	    # author_email="pavlo.mozharovskyi@telecom-paris.fr",
+	    # description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	    # long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
+	    # long_description_content_type="text/markdown",
 	    packages=find_packages(),
-	    install_requires=['numpy','scipy','scikit-learn','matplotlib',
-					   "torch;python_version< '3.12'",
-					   "torchvision; python_version < '3.12'",],
+	    # install_requires=['numpy','scipy','scikit-learn','matplotlib',
+		# 			   "torch;python_version< '3.12'",
+		# 			   "torchvision; python_version < '3.12'",],
 	    include_package_data=True,
 	    ext_modules=[
 		Extension(
