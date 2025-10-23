@@ -4,6 +4,8 @@ requires = ["setuptools>=42","wheel","cibuildwheel",
 build-backend = "setuptools.build_meta"
 
 [project]
+name="data-depth"
+version="1.1.2.6"
 dependencies=[
             'numpy>0.0','scipy>0.0',
             'scikit-learn>0.0','matplotlib>0.0',
