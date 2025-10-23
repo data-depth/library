@@ -17,8 +17,8 @@ readme="README.md"
 dependencies=[
             'numpy>0.0','scipy>0.0',
             'scikit-learn>0.0','matplotlib>0.0',
-            'torch>0.0; python_version>="3.8" and python_version < "3.12"',
-            'torchvision>=0.0;  python_version>="3.8" and python_version < "3.12"']
+            'torch>0.0',
+            'torchvision>0.0']
 
 [project.urls]
 Homepage = "https://data-depth.github.io/"
