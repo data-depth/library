@@ -13,12 +13,7 @@ jobs:
       CC: gcc
       CXX: g++
       CIBW_BEFORE_BUILD: |
-        choco install mingw --version=13.2.0 --params "'/exception:seh /threads:posix /arch:x86_64'" -y --no-progress
-        echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $GITHUB_PATH
-        dir "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\lib*.dll"
-        set "MINGW_BIN=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
-        mkdir -p "${{ runner.workspace }}/library/depth/src"
-        copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/library/depth/src" /Y
+        choco install mingw -y
 
 
     steps:
@@ -29,6 +24,43 @@ jobs:
         with:
           python-version: "3.x"
       
+      - name: echo GitHub Path
+        run: 
+          echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $GITHUB_PATH
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+      - name: check dll
+        run: 
+          dir "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\lib*.dll"
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+
+      - name: set bin
+        run: 
+          set "MINGW_BIN=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+      - name: check src dir
+        run: 
+          mkdir -p "${{ runner.workspace }}/library/depth/src"
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+      - name: copy dll
+        run: 
+          copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/library/depth/src" /Y
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+
       - name: Install build dependencies
         run: python3 -m pip install build wheel setuptools
         env:
