@@ -13,7 +13,7 @@ jobs:
       CC: gcc
       CXX: g++
       CIBW_BEFORE_BUILD: |
-        choco install mingw -y
+        choco install mingw 
 
 
     steps:
@@ -26,14 +26,14 @@ jobs:
       
       - name: echo GitHub Path
         run: 
-          echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $GITHUB_PATH
+          echo "C:\Program Files\Git\mingw64\bin" >> $GITHUB_PATH
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
       - name: check dll
         run: 
-          dir "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\lib*.dll"
+          dir "C:\Program Files\Git\mingw64\bin\lib*.dll"
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
@@ -41,7 +41,7 @@ jobs:
 
       - name: set bin
         run: 
-          set "MINGW_BIN=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
+          set "MINGW_BIN=C:\Program Files\Git\mingw64\bin"
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
