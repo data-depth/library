@@ -32,6 +32,7 @@ def import_CDLL():
         libACA=ct.CDLL(ACA_approx[0])
 
     if sys.platform=='win32':
+        os.add_dll_directory(r"C:\msys64\mingw64\bin")
         site_packages = [p for p in sys.path if ('site-packages' in p) or ("dist-packages" in p)] #Add search dist-packages 
         for i in site_packages:
             dll_path = os.path.join(i, 'depth', 'src')

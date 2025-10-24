@@ -9,9 +9,6 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-    env:
-      MSYSTEM: MINGW64
-      CHERE_INVOKING: 1
     # env:
     #   CC: gcc
     #   CXX: g++
@@ -20,22 +17,15 @@ jobs:
 
 
     steps:
-      - uses: actions/checkout@v5
-      
-      - name: setup python 3.6
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{matrix.python-version}}
-      
       - name: Install MSYS2
         run: choco install mingw
         
-      - name: Set up shell
-        run: echo "C:\msys64\usr\bin\" >> $env:GITHUB_PATH
-        shell: pwsh
-        
       - uses: actions/checkout@v5
       
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
       - name: Install build dependencies
         run: python3 -m pip install build wheel setuptools
