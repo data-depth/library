@@ -27,33 +27,26 @@ jobs:
       - name: echo GitHub Path
         run: 
           echo "C:\Program Files\Git\mingw64\bin" >> $GITHUB_PATH
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
+
       - name: check dll
         run: 
           dir "C:\Program Files\Git\mingw64\bin\lib*.dll"
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
 
       - name: set bin
         run: 
           set "MINGW_BIN=C:\Program Files\Git\mingw64\bin"
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
+        # env:
+          # HOME: ${{ runner.workspace }}/library
+          # MINGW_INSTALLS: ${{ matrix.task.installs }}
+          # CI: true
 
       - name: copy dll
         run: 
-          copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/depth/src"
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
+          copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/library/depth/src"
+        # env:
+        #   HOME: ${{ runner.workspace }}
+        #   MINGW_INSTALLS: ${{ matrix.task.installs }}
+        #   CI: true
 
       - name: Install build dependencies
         run: python3 -m pip install build wheel setuptools
