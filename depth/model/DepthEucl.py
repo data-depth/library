@@ -110,7 +110,7 @@ class DepthEucl():
         self.set_seed() # set initial seed  
         self._create_selfRef() # create self. referecnces for storing depth and directions
 
-    def load_dataset(self,data:np.ndarray=None,distribution:np.ndarray|None=None, CUDA:bool=False,y:np.ndarray|None=None):
+    def load_dataset(self,data:np.ndarray=None,distribution:np.ndarray=None, CUDA:bool=False,y:np.ndarray=None):
         """
         Load the dataset X for reference calculations. Depth is computed with respect to this dataset.
 
@@ -178,7 +178,7 @@ class DepthEucl():
             print("CUDA is set to True, but troch is not installed, CUDA is automatically set to False")
         return self
 
-    def mahalanobis(self, x: np.ndarray|None = None, exact: bool = True, mah_estimate: Literal["none", "moment", "mcd"] = "moment",
+    def mahalanobis(self, x: np.ndarray = None, exact: bool = True, mah_estimate: Literal["none", "moment", "mcd"] = "moment",
                     mah_parMcd: float = 0.75,solver= "neldermead", NRandom= 1000,
                     n_refinements= 10, sphcap_shrink=0.5, 
                     alpha_Dirichlet= 1.25, cooling_factor=0.95, 
@@ -262,7 +262,7 @@ class DepthEucl():
         
             
 
-    def aprojection(self,x:np.ndarray|None=None,solver: str = "neldermead", NRandom: int = 1000,
+    def aprojection(self,x:np.ndarray=None,solver: str = "neldermead", NRandom: int = 1000,
                     n_refinements: int = 10, sphcap_shrink: float = 0.5, alpha_Dirichlet: float = 1.25, 
                     cooling_factor: float = 0.95,cap_size: int = 1, start: str = "mean", space: str = "sphere", 
                     line_solver: str = "goldensection", bound_gc: bool = True,
@@ -338,7 +338,7 @@ class DepthEucl():
 
 
     
-    def betaSkeleton(self,x:np.ndarray|None=None, beta:int=2,distance: str = "Lp", 
+    def betaSkeleton(self,x:np.ndarray=None, beta:int=2,distance: str = "Lp", 
                      Lp_p: int = 2, mah_estimate: str = "moment", mah_parMcd: float = 0.75, evaluate_dataset:bool=False):
         """
         Calculates the beta-skeleton depth.
@@ -371,10 +371,10 @@ class DepthEucl():
         return self.betaSkeletonDepthDS if evaluate_dataset==True else self.betaSkeletonDepth
         
 
-    def cexpchull(self,x: np.ndarray|None=None,solver:str= "neldermead",NRandom:int = 1000,
+    def cexpchull(self,x: np.ndarray=None,solver:str= "neldermead",NRandom:int = 1000,
                   n_refinements:int = 10, sphcap_shrink:float = 0.5,
                   alpha_Dirichlet:float = 1.25,cooling_factor:float = 0.95,
-                  cap_size:int|float = 1,start:str = "mean",space:str = "sphere",
+                  cap_size:float = 1,start:str = "mean",space:str = "sphere",
                   line_solver:str = "goldensection",bound_gc:bool = True,
                   output_option:Literal["lowest_depth","final_depht_dir",
                                           "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False):
@@ -448,7 +448,7 @@ class DepthEucl():
             if option==2:return self.cexpchullDepthDS,self.cexpchullDirDS
 
         
-    def cexpchullstar(self,x: np.ndarray|None=None, solver: str = "neldermead", NRandom: int = 1000, 
+    def cexpchullstar(self,x: np.ndarray=None, solver: str = "neldermead", NRandom: int = 1000, 
         option: int = 1, n_refinements: int = 10, sphcap_shrink: float = 0.5, 
         alpha_Dirichlet: float = 1.25, cooling_factor: float = 0.95, cap_size: int = 1,
         start: str = "mean", space: str = "sphere", line_solver: str = "goldensection", bound_gc: bool = True,
@@ -517,7 +517,7 @@ class DepthEucl():
             if option==1:return self.cexpchullstarDepthDS
             if option==2:return self.cexpchullstarDepthDS,self.cexpchullstarDirDS
         
-    def geometrical(self,x:np.ndarray|None=None,solver: str = "neldermead", NRandom: int = 1000, n_refinements: int = 10, 
+    def geometrical(self,x:np.ndarray=None,solver: str = "neldermead", NRandom: int = 1000, n_refinements: int = 10, 
                     sphcap_shrink: float = 0.5, alpha_Dirichlet: float = 1.25, cooling_factor: float = 0.95, 
                     cap_size: int = 1, start: str = "mean", space: str = "sphere", line_solver: str = "goldensection", bound_gc: bool = True,
                     output_option:Literal["lowest_depth","final_depht_dir",
@@ -587,7 +587,7 @@ class DepthEucl():
             if option==1:return self.geometricalDepthDS
             if option==2:return self.geometricalDepthDS,self.geometricalDirDS
 
-    def halfspace(self, x:np.ndarray|None=None,exact: bool = True,method: str = "recursive",solver: str = "neldermead",
+    def halfspace(self, x:np.ndarray=None,exact: bool = True,method: str = "recursive",solver: str = "neldermead",
                   NRandom: int = 1000,n_refinements: int = 10,sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
                   cap_size: int = 1,start: str = "mean",space: str = "sphere",line_solver: str = "goldensection",bound_gc: bool = True,
                   CUDA:bool=False,output_option:Literal["lowest_depth","final_depht_dir",
@@ -666,7 +666,7 @@ class DepthEucl():
             if option==2:return self.halfspaceDepthDS,self.halfspaceDirDS
 
     
-    def L2(self,x: np.ndarray|None=None, mah_estimate: str = 'moment', mah_parMcd: float = 0.75, evaluate_dataset:bool=False):
+    def L2(self,x: np.ndarray=None, mah_estimate: str = 'moment', mah_parMcd: float = 0.75, evaluate_dataset:bool=False):
         """
         Compute L2 depth 
                 
@@ -696,7 +696,7 @@ class DepthEucl():
             else: self.L2Depth=self.L2Depth[0]
         return self.L2DepthDS if evaluate_dataset==True else self.L2Depth
 
-    def potential(self,x:np.ndarray|None=None,pretransform: str = "1Mom", kernel: str = "EDKernel", 
+    def potential(self,x:np.ndarray=None,pretransform: str = "1Mom", kernel: str = "EDKernel", 
                   mah_parMcd: float = 0.75, kernel_bandwidth: int = 0, evaluate_dataset:bool=False):
         """
         Compute potential depth
@@ -744,7 +744,7 @@ class DepthEucl():
         
 
     
-    def projection(self,x:np.ndarray|None=None,solver: str = "neldermead",NRandom: int = 1000,n_refinements: int = 10,
+    def projection(self,x:np.ndarray=None,solver: str = "neldermead",NRandom: int = 1000,n_refinements: int = 10,
                   sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
                   cap_size: int = 1,start: str = "mean",space: str = "sphere",line_solver: str = "goldensection",bound_gc: bool = True,
                   CUDA:bool=False, output_option:Literal["lowest_depth","final_depht_dir",
@@ -822,7 +822,7 @@ class DepthEucl():
             if option==1:return self.projectionDepthDS
             if option==2:return self.projectionDepthDS,self.projectionDirDS
         
-    def qhpeeling(self,x:np.ndarray|None=None, evaluate_dataset:bool=False):
+    def qhpeeling(self,x:np.ndarray=None, evaluate_dataset:bool=False):
         """
         Calculates the convex hull peeling depth.
                 
@@ -851,7 +851,7 @@ class DepthEucl():
             else: self.qhpeelingDepth=self.qhpeelingDepth[0]
         return self.qhpeelingDepthDS if evaluate_dataset==True else self.qhpeelingDepth
 
-    def simplicial(self,x:np.ndarray|None=None,exact:bool=True,k:float=0.05,evaluate_dataset:bool=False):
+    def simplicial(self,x:np.ndarray=None,exact:bool=True,k:float=0.05,evaluate_dataset:bool=False):
         """
         Compute simplicial depth.
                 
@@ -889,7 +889,7 @@ class DepthEucl():
         return self.simplicialDepthDS if evaluate_dataset==True else self.simplicialDepth
             
          
-    def simplicialVolume(self,x:np.ndarray|None=None,exact: bool = True, k: float = 0.05, 
+    def simplicialVolume(self,x:np.ndarray=None,exact: bool = True, k: float = 0.05, 
                          mah_estimate: str = "moment", mah_parMCD: float = 0.75,
                          evaluate_dataset:bool=False):
         """
@@ -927,7 +927,7 @@ class DepthEucl():
             else: self.simplicialVolumeDepth=self.simplicialVolumeDepth[0]
         return self.simplicialVolumeDepthDS if evaluate_dataset==True else self.simplicialVolumeDepth
         
-    def spatial(self,x:np.ndarray|None=None,mah_estimate:str='moment',mah_parMcd:float=0.75,
+    def spatial(self,x:np.ndarray=None,mah_estimate:str='moment',mah_parMcd:float=0.75,
                 evaluate_dataset:bool=False):
         """
         Compute spatial depth
@@ -958,7 +958,7 @@ class DepthEucl():
         return self.spatialDepthDS if evaluate_dataset==True else self.spatialDepth
         
         
-    def zonoid(self,x:np.ndarray|None=None, exact:bool=True,
+    def zonoid(self,x:np.ndarray=None, exact:bool=True,
                solver="neldermead",NRandom=1000,n_refinements=10,
                sphcap_shrink=0.5,alpha_Dirichlet=1.25,cooling_factor=0.95,cap_size=1,
                start="mean",space="sphere",line_solver="goldensection",bound_gc=True,
@@ -1108,7 +1108,7 @@ class DepthEucl():
         # self._check_variables
         return mtv.calcDet(mat)
         
-    def computeMCD(self,mat:np.ndarray|None=None, h:int|float=1, mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
+    def computeMCD(self,mat:np.ndarray=None, h:float=1, mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
         """
         Compute Minimum Covariance Determinant (MCD)
 
@@ -1143,7 +1143,7 @@ class DepthEucl():
         self.MCD=mtv.MCD(self.data,h=h,seed=self.seed,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
         return self.MCD
     
-    def change_dataset(self,newDataset:np.ndarray,newY:np.ndarray|None=None, newDistribution:np.ndarray|None=None,keepOld:bool=False,)->None:
+    def change_dataset(self,newDataset:np.ndarray,newY:np.ndarray=None, newDistribution:np.ndarray=None,keepOld:bool=False,)->None:
         """
 
         Description
