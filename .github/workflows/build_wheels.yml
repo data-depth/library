@@ -49,7 +49,7 @@ jobs:
 
       - name: copy dll
         run: 
-          copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/depth/src" /Y
+          copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/depth/src"
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
