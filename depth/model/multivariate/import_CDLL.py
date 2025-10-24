@@ -41,9 +41,9 @@ def import_CDLL():
                 ddalpha_approx=glob.glob(os.path.join(dll_path, '*depth_wrapper*.dll'))
                 ACA_approx=glob.glob(os.path.join(dll_path, '*ACA_wrapper*.dll'))
                 if ddalpha_exact!=[] and ddalpha_approx!=[] and ACA_approx!=[]:
-                    libExact=ct.CDLL(r""+ddalpha_exact[0])
-                    libApprox=ct.CDLL(r""+ddalpha_approx[0])
-                    libACA=ct.CDLL(r""+ACA_approx[0])
+                    libExact=ct.CDLL(r""+ddalpha_exact[0],winmode=1)
+                    libApprox=ct.CDLL(r""+ddalpha_approx[0],winmode=1)
+                    libACA=ct.CDLL(r""+ACA_approx[0],winmode=1)
     return libExact,libApprox,libACA
 
 libExact,libApprox,libACA=import_CDLL()

@@ -23,30 +23,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-      
-      - name: echo GitHub Path
-        run: 
-          echo "C:/Program Files/Git/mingw64/bin" >> $GITHUB_PATH
-
-      - name: check dll
-        run: 
-          dir "C:/Program Files/Git/mingw64/bin/lib*.dll"
-
-      - name: set bin
-        run: 
-          set "MINGW_BIN=C:/Program Files/Git/mingw64/bin"
-        # env:
-          # HOME: ${{ runner.workspace }}/library
-          # MINGW_INSTALLS: ${{ matrix.task.installs }}
-          # CI: true
-
-      - name: copy dll
-        run: 
-          copy "%MINGW_BIN%/lib*.dll" "/depth/src"
-        env:
-          HOME: ${{ runner.workspace }}
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
 
       - name: Install build dependencies
         run: python3 -m pip install build wheel setuptools
