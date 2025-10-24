@@ -46,16 +46,10 @@ jobs:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
-      - name: check src dir
-        run: 
-          mkdir -p "${{ runner.workspace }}/library/depth/src"
-        env:
-          HOME: ${{ runner.workspace }}/library
-          MINGW_INSTALLS: ${{ matrix.task.installs }}
-          CI: true
+
       - name: copy dll
         run: 
-          copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/library/depth/src" /Y
+          copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/depth/src" /Y
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
