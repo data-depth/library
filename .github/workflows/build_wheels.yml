@@ -13,7 +13,13 @@ jobs:
       CC: gcc
       CXX: g++
       CIBW_BEFORE_BUILD: |
-        choco install mingw -y
+        choco install mingw --version=13.2.0 --params "'/exception:seh /threads:posix /arch:x86_64'" -y --no-progress
+        echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $GITHUB_PATH
+        dir "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\lib*.dll"
+        set "MINGW_BIN=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
+        mkdir -p "${{ runner.workspace }}/library/depth/src"
+        copy "%MINGW_BIN%\lib*.dll" "${{ runner.workspace }}/library/depth/src" /Y
+
 
     steps:
       - uses: actions/checkout@v5
