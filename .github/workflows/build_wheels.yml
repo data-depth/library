@@ -26,12 +26,12 @@ jobs:
         with:
           python-version: "3.x"
             
-      - name: where is MSYS2
-        run: where g++
-      
+
       - name: shutil is MSYS2
         run: python -c "import shutil; print(shutil.which('g++'))"
-      
+        
+      - name: copy from mingw bin
+        run: cp C:\mingw64\bin\libatomic-1.dll  build\lib\depth\src\libatomic-1.dll -v
 
       - name: Install build dependencies
         run: python3 -m pip install build wheel setuptools
