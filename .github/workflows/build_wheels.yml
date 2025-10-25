@@ -31,7 +31,52 @@ jobs:
         run: python -c "import shutil; print(shutil.which('g++'))"
         
       - name: copy from mingw bin
-        run: cp C:\mingw64\bin\libatomic-1.dll  ${{ runner.workspace }}/library/depth/src -v
+        run: cp C:\mingw64\bin\{libatomic-1.dll,libgcc_s_dw2-1.dll,\
+              libgcc_s_seh-1.dll,libgfortran-3.dll,libgmp-10.dll,libgmpxx-4.dll,libgomp-1.dll,\
+              libgomp-plugin-host_nonshm-1.dll,libquadmath-0.dll,libssp-0.dll,libstdc++-6.dll,\
+              libvtv-0.dll,libvtv_stubs-0.dll,libwinpthread-1.dll} \
+               ${{ runner.workspace }}/library/depth/src -v
+      
+      
+      - name: ddalpha
+        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/library/depth/src/ddalpha.o
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+      - name: Build shared library ddalpha.dll
+        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+      
+      - name: test commands depth_wrapper
+        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/depth_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.o
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true        
+      - name: Build shared library depth_wrapper.dll
+        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+
+      - name: test commands ACA_wrapper
+        run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ACA_wrapper.cpp -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+      - name: Build shared library ACA_wrapper.dll
+        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll
+        env:
+          HOME: ${{ runner.workspace }}/library
+          MINGW_INSTALLS: ${{ matrix.task.installs }}
+          CI: true
+
 
       - name: Install build dependencies
         run: python3 -m pip install build wheel setuptools
@@ -132,9 +177,6 @@ jobs:
       
       # - name: test commands ddalpha
       #   run: g++ -fpic -O2 -std=c++17 -c ${{ runner.workspace }}/library/depth/src/ddalpha.cpp -o ${{ runner.workspace }}/library/depth/src/ddalpha.o
-      #   #run: python3 ${{ runner.workspace }}/library/setup.py bdist_wheel --compiler=mingw32 
-      #   #run: python3 ${{ runner.workspace }}/library/setup.py --help-commands
-      #   #run: g++ --version
       #   env:
       #     HOME: ${{ runner.workspace }}/library
       #     MINGW_INSTALLS: ${{ matrix.task.installs }}
@@ -142,7 +184,6 @@ jobs:
         
       # - name: Build shared library ddalpha.dll
       #   run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
-      #   #run: g++ --version
       #   env:
       #     HOME: ${{ runner.workspace }}/library
       #     MINGW_INSTALLS: ${{ matrix.task.installs }}
@@ -150,7 +191,6 @@ jobs:
           
       # - name: copy shared library
       #   run: cp ${{ runner.workspace }}/library/depth/src/ddalpha.dll ${{ runner.workspace }}/library
-      #   #run: g++ --version
       #   env:
       #     HOME: ${{ runner.workspace }}/library
       #     MINGW_INSTALLS: ${{ matrix.task.installs }}
