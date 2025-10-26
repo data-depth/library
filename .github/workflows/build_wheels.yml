@@ -53,7 +53,7 @@ jobs:
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
       - name: Build shared library ddalpha.dll
-        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
+        run: g++ -shared -lstdc++ ${{ runner.workspace }}/library/depth/src/ddalpha.o -o ${{ runner.workspace }}/library/depth/src/ddalpha.dll
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
@@ -66,7 +66,7 @@ jobs:
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true        
       - name: Build shared library depth_wrapper.dll
-        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll
+        run: g++ -shared -lstdc++ ${{ runner.workspace }}/library/depth/src/depth_wrapper.o -o ${{ runner.workspace }}/library/depth/src/depth_wrapper.dll
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
@@ -79,7 +79,7 @@ jobs:
           MINGW_INSTALLS: ${{ matrix.task.installs }}
           CI: true
       - name: Build shared library ACA_wrapper.dll
-        run: g++ -static -lstdc++ ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll
+        run: g++ -shared -lstdc++ ${{ runner.workspace }}/library/depth/src/ACA_wrapper.o -o ${{ runner.workspace }}/library/depth/src/ACA_wrapper.dll
         env:
           HOME: ${{ runner.workspace }}/library
           MINGW_INSTALLS: ${{ matrix.task.installs }}
