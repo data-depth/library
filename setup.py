@@ -85,8 +85,8 @@ if sys.platform=='win32':
 	    # long_description_content_type="text/markdown",
 	    packages=find_packages(),
 	    # install_requires=['numpy','scipy','scikit-learn','matplotlib',
-		# 			   "torch;python_version< '3.12'",
-		# 			   "torchvision; python_version < '3.12'",],
+		# 			   "torch",
+		# 			   "torchvision",],
 	    include_package_data=True,
 		data_files=[('depth/src', glob.glob("depth/docs/*"))],
 	    zip_safe=False

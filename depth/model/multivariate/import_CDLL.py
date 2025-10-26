@@ -32,7 +32,6 @@ def import_CDLL():
         libACA=ct.CDLL(ACA_approx[0])
 
     if sys.platform=='win32':
-        os.add_dll_directory(r"C:\msys64\mingw64\bin")
         site_packages = [p for p in sys.path if ('site-packages' in p) or ("dist-packages" in p)] #Add search dist-packages 
         for i in site_packages:
             dll_path = os.path.join(i, 'depth', 'src')
@@ -42,9 +41,9 @@ def import_CDLL():
                 ddalpha_approx=glob.glob(os.path.join(dll_path, '*depth_wrapper*.dll'))
                 ACA_approx=glob.glob(os.path.join(dll_path, '*ACA_wrapper*.dll'))
                 if ddalpha_exact!=[] and ddalpha_approx!=[] and ACA_approx!=[]:
-                    libExact=ct.CDLL(r""+ddalpha_exact[0],winmode=0)
-                    libApprox=ct.CDLL(r""+ddalpha_approx[0],winmode=1)
-                    libACA=ct.CDLL(r""+ACA_approx[0],winmode=2)
+                    libExact=ct.CDLL(r""+ddalpha_exact[0])
+                    libApprox=ct.CDLL(r""+ddalpha_approx[0])
+                    libACA=ct.CDLL(r""+ACA_approx[0],)
     return libExact,libApprox,libACA
 
 libExact,libApprox,libACA=import_CDLL()
