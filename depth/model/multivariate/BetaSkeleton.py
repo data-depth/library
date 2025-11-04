@@ -73,15 +73,15 @@ Description
 	Calculates the beta-skeleton depth of points w.r.t. a multivariate data set.
 
 Arguments
-	x		
+    x		
 			Matrix of objects (numerical vector as one object) whose depth is to be calculated. 
 			Each row contains a d-variate point and should have the same dimension as data.
 
-	data 		
+    data 	
 			Matrix of data where each row contains a d-variate point, w.r.t. which the depth
 			is to be calculated.
 
-	beta
+    beta
 			The parameter defining the positionning of the balls’ centers, see Yang and Modarres (2017) for details.
 			By default (together with other arguments) equals
 			``2``, which corresponds to the lens depth, see Liu and Modarres (2011).

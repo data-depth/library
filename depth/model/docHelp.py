@@ -178,8 +178,8 @@ Arguments
         Matrix of objects (numerical vector as one object) whose depth is to be calculated. 
         Each row contains a d-variate point and should have the same dimension as data.
 
-	beta : int, default=2
-        The parameter defining the positionning of the balls’ centers, see `Yang and Modarres (2017)`_ for details.
+    beta : int, default=2
+        The parameter defining the positionning of the balls’ centers, see Yang and Modarres (2017) for details.
         By default (together with other arguments) equals
         ``2``, which corresponds to the lens depth, see Liu and Modarres (2011).
 
