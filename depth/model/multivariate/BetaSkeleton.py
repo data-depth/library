@@ -82,7 +82,7 @@ Arguments
 			is to be calculated.
 
 	beta
-			The parameter defining the positionning of the balls’ centers, see `Yang and Modarres (2017)`_ for details.
+			The parameter defining the positionning of the balls’ centers, see Yang and Modarres (2017) for details.
 			By default (together with other arguments) equals
 			``2``, which corresponds to the lens depth, see Liu and Modarres (2011).
 
