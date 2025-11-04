@@ -182,26 +182,26 @@ Arguments
         The parameter defining the positionning of the balls’ centers, see Yang and Modarres (2017) for details.
         By default (together with other arguments) equals
         ``2``, which corresponds to the lens depth, see Liu and Modarres (2011).
-
-	distance : str, default='Lp'
+        
+    distance : str, default='Lp'
         A character string defining the distance to be used for determining inclusion
         of a point into the lens (influence region), see Yang and Modarres (2017) for
         details. Possibilities are ``'Lp'`` for the Lp-metric (default) or ``'Mahalanobis'`` for
         the Mahalanobis distance adjustment.
 
-	Lp_p : int, default=2
-			A non-negative number defining the distance’s power equal ``2`` by default (Euclidean distance)
-			is used only when ``distance='Lp'``.
+    Lp_p : int, default=2
+        A non-negative number defining the distance’s power equal ``2`` by default (Euclidean distance) 
+        is used only when ``distance='Lp'``.
 
     mah_estimate : str, {"moment", "mcd"}, default="moment"
-			A character string specifying which estimates to use when calculating sample
-			covariance matrix; can be ``'none'``, ``'moment'`` or ``'MCD'``, determining whether
-			traditional moment or Minimum Covariance Determinant (MCD)
-			estimates for mean and covariance are used. By default ``'moment'`` is used. Is
-			used only when ``distance='Mahalanobis'``.
+        A character string specifying which estimates to use when calculating sample 
+        covariance matrix; can be ``'none'``, ``'moment'`` or ``'MCD'``, determining whether 
+        traditional moment or Minimum Covariance Determinant (MCD) 
+        estimates for mean and covariance are used. By default ``'moment'`` is used. Is 
+        used only when ``distance='Mahalanobis'``.
 
     mah_parMcd : float, default=0.75
-			The value of the argument alpha for Minimum Covariance Determinant (MCD); is used when ``distance='Mahalanobis'`` and ``mah.estimate='MCD'``.
+        The value of the argument alpha for Minimum Covariance Determinant (MCD); is used when ``distance='Mahalanobis'`` and ``mah.estimate='MCD'``.
     
     evaluate_dataset : bool, default=False
         Determines if dataset loaded will be evaluated. 
