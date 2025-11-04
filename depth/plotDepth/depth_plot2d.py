@@ -5,7 +5,7 @@ from ..model import multivariate as mtv
 from typing import List
 
 
-def depth_plot2d(model:DepthEucl, notion:str = "halfspace",freq:list = [100, 100], xlim:List[int]|List[float]=None, ylim:List[int]|List[float]=None, cmap:str = "YlOrRd", 
+def depth_plot2d(model:DepthEucl, notion:str = "halfspace",freq:list = [100, 100], xlim:List[float]=None, ylim:List[float]=None, cmap:str = "YlOrRd", 
                     ret_depth_mesh:bool= False,xs = None, ys = None,
                     val_mesh = None,mah_estimate = "moment",mah_parMCD = 0.75,beta = 2,distance = "Lp",Lp_p = 2,exact = True,method = "recursive",k = 0.05,
                     solver = "neldermead",NRandom = 1000,n_refinements = 10,sphcap_shrink = 0.5,alpha_Dirichlet = 1.25,cooling_factor = 0.95,

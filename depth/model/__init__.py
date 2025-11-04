@@ -1,3 +1,4 @@
 from .DepthEucl import DepthEucl
+from .DepthFunc import DepthFunc
 
-__all__ = ["DepthEucl",]
+__all__ = ["DepthEucl","DepthFunc"]

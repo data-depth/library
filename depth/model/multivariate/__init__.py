@@ -16,7 +16,8 @@ from .Spatial import spatial
 from .Zonoid import zonoid
 from .plot import depth_mesh, depth_plot2d
 from .MCD import MCD
-from .CUDA_approximation import cudaApprox
+try:from .CUDA_approximation import cudaApprox
+except:cudaApprox=None
 from .ACA_wrapper import ACA
 
 __all__ = ["depth_approximation", "betaSkeleton", "cexpchull", "cexpchullstar", "geometrical", "halfspace", "L2", "mahalanobis", "potential", "projection", "aprojection", "qhpeeling", "simplicial", "simplicialVolume", "spatial", "zonoid", "depth_mesh", "depth_plot2d", "calcDet",

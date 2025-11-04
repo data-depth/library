@@ -6,10 +6,10 @@ from typing import List
 
 
 #### Plot ####
-def depth_mesh(model:DepthEucl,notion:str = "halfspace",freq:List[int] = [100, 100],xlim:List[int]|None = None,ylim:List[int]|None = None,
+def depth_mesh(model:DepthEucl,notion:str = "halfspace",freq:List[int] = [100, 100],xlim:List[int] = None,ylim:List[int] = None,
                 mah_estimate:str = "moment",mah_parMCD:float = 0.75,beta:int = 2,distance:str = "Lp",Lp_p:int = 2,exact:bool = True,
                 method:str = "recursive",k:float = 0.05,solver:str = "neldermead",NRandom:int = 1000,n_refinements:int = 10,
-                sphcap_shrink:float = 0.5,alpha_Dirichlet:float = 1.25,cooling_factor:float = 0.95, cap_size:float|int = 1,
+                sphcap_shrink:float = 0.5,alpha_Dirichlet:float = 1.25,cooling_factor:float = 0.95, cap_size:float = 1,
                 start:str = "mean", space:str = "sphere", line_solver:str = "goldensection", bound_gc:bool = True
                 )->tuple[np.ndarray,np.ndarray,np.ndarray]:
     """

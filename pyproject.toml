@@ -1,6 +1,30 @@
 [build-system]
-requires = ["setuptools>=42",'numpy>=0.0','scipy>=0.0','scikit-learn>=0.0','matplotlib>=0.0','torch>=0.0','torchvision>=0.0']
+requires = ["setuptools>=42","wheel","cibuildwheel",]
 build-backend = "setuptools.build_meta"
+
+[project]
+name="data-depth"
+requires-python = ">=3.8"
+authors = [
+  {name = "Pavlo Mozharovskyi", email = "pavlo.mozharovskyi@telecom-paris.fr"},
+]
+maintainers = [
+  {name = "Pavlo Mozharovskyi", email = "pavlo.mozharovskyi@telecom-paris.fr"}
+]
+version="1.1.2.6"
+description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth"
+readme="README.md"
+dependencies=[
+            'numpy>0.0','scipy>0.0',
+            'scikit-learn>0.0','matplotlib>0.0',
+            'torch>0.0',
+            'torchvision>0.0']
+
+[project.urls]
+Homepage = "https://data-depth.github.io/"
+Documentation = "https://data-depth.github.io/"
+Repository = "https://github.com/data-depth/library"
+
 
 [tool.cibuildwheel]
 # Only build on CPython 3.9
