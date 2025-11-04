@@ -165,7 +165,7 @@ Examples
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
             >>> model = DepthEucl().load_dataset(data)
-            >>> model.aprojection(x, NRandom=1000)
+            >>> model.aprojection(x, NRandom=1000, output_option="lowest_depth")
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
 """
@@ -300,7 +300,7 @@ Examples
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
             >>> mode=DepthEucl().load_dataset(data)
-            >>> mode.cexpchull(x, data, NRandom=1000)
+            >>> mode.cexpchull(x, data, NRandom=1000, output_option="lowest_depth")
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
 """
@@ -375,7 +375,7 @@ Examples
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
             >>> model=DepthEucl().load_dataset(data)
-            >>> model.cexpchull(x, NRandom=1000)
+            >>> model.cexpchull(x, NRandom=1000, output_option="lowest_depth")
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
 """
@@ -450,7 +450,7 @@ Examples
             >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
             >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
             >>> model=DepthEucl().load_dataset(data)
-            >>> model.geometrical(x, NRandom=1000)
+            >>> model.geometrical(x, NRandom=1000, output_option="lowest_depth")
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
 """
@@ -544,7 +544,7 @@ Examples
         >>> x = np.random.multivariate_normal([1,1,1], mat2, 10)
         >>> data = np.random.multivariate_normal([0,0,0], mat1, 200)
         >>> model=DepthEucl().load_dataset(data)
-        >>> model.halfspace(x,)
+        >>> model.halfspace(x)
         [0.    0.005 0.005 0.    0.04  0.01  0.    0.    0.04  0.01 ]
         >>> model.halfspace(x, exact=True)
         [0.    0.005 0.005 0.    0.04  0.01  0.    0.    0.04  0.01 ]
@@ -721,7 +721,7 @@ Examples
         >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
         >>> model=DepthEucl().load_dataset(data)
         >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
-        >>> model.projection(x, NRandom=1000)
+        >>> model.projection(x, NRandom=1000, output_option="lowest_depth")
         [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
         0.20611053 0.17846703 0.19801984 0.23230606]             
 """
@@ -960,7 +960,7 @@ Examples
         >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
         >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 1000)
         >>> model=DepthEucl().load_dataset(data)
-        >>> model.zonoid(x,)
+        >>> model.zonoid(x, output_option="lowest_depth")
         [0.         0.00769552 0.03087017 0.         0.30945453 0.0142515
          0.         0.01970896 0.02169483 0.        ]
 

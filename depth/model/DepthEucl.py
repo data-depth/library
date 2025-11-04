@@ -193,10 +193,38 @@ class DepthEucl():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
-        
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"all_depth"`` : tuple of numpy arrays 
+                - ``"all_depth_directions"`` : tuple of numpy arrays 
+
         Returns
         ----------
-        Mahalanobis depth : {array-like}
+        array_like or tuple of array_like
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    Lowest Mahalanobis Detph
+        
+            If ``output_option=="final_depht_dir"`` returns:
+                Tuple of array_like
+                    Lowest Mahalanobis Detph
+                    Lowest depth respective sirection
+        
+            If ``output_option=="all_depth"`` returns:
+                array_like
+                    Lowest Mahalanobis Detph
+                    Lowest depth respective sirection
+                    All computed depths
+        
+            If ``output_option=="all_depth_directions"`` returns:
+                array_like
+                    Lowest Mahalanobis Detph
+                    Lowest depth respective sirection
+                    All computed depths
+                    All respective directions
+        
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -276,10 +304,38 @@ class DepthEucl():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
-        
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"all_depth"`` : tuple of numpy arrays 
+                - ``"all_depth_directions"`` : tuple of numpy arrays 
+
         Returns
         ----------
-        Asymmetrical projection depth : {array like}
+        array_like or tuple of array_like
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    Lowest Asymmetrical Projection Detph
+        
+            If ``output_option=="final_depht_dir"`` returns:
+                Tuple of array_like
+                    Lowest Asymmetrical Projection Detph
+                    Lowest depth respective sirection
+        
+            If ``output_option=="all_depth"`` returns:
+                array_like
+                    Lowest Asymmetrical Projection Detph
+                    Lowest depth respective sirection
+                    All computed depths
+        
+            If ``output_option=="all_depth_directions"`` returns:
+                array_like
+                    Lowest Asymmetrical Projection Detph
+                    Lowest depth respective sirection
+                    All computed depths
+                    All respective directions
+
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -350,7 +406,8 @@ class DepthEucl():
 
         Results
         ----------
-        Beta-skeleton depth : {array like}
+        Beta-skeleton depth : array_like
+
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -388,7 +445,8 @@ class DepthEucl():
 
         Results
         ----------
-        Continuous explected convex hull depth : {array like}
+        Continuous explected convex hull depth : array_like
+
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -461,10 +519,38 @@ class DepthEucl():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"all_depth"`` : tuple of numpy arrays 
+                - ``"all_depth_directions"`` : tuple of numpy arrays 
 
-        Results
+        Returns
         ----------
-        Continuous modified explected convex hull depth : {array like}
+        array_like or tuple of array_like
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    Lowest Continuous Modified Explected Convex Hull Detph
+        
+            If ``output_option=="final_depht_dir"`` returns:
+                Tuple of array_like
+                    Lowest Continuous Modified Explected Convex Hull Detph
+                    Lowest depth respective sirection
+        
+            If ``output_option=="all_depth"`` returns:
+                array_like
+                    Lowest Continuous Modified Explected Convex Hull Detph
+                    Lowest depth respective sirection
+                    All computed depths
+        
+            If ``output_option=="all_depth_directions"`` returns:
+                array_like
+                    Lowest Continuous Modified Explected Convex Hull Detph
+                    Lowest depth respective sirection
+                    All computed depths
+                    All respective directions
+
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -529,10 +615,38 @@ class DepthEucl():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"all_depth"`` : tuple of numpy arrays 
+                - ``"all_depth_directions"`` : tuple of numpy arrays 
 
-        Results
+        Returns
         ----------
-        Geometrical depth : {array like}
+        array_like or tuple of array_like
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    Lowest Geometrical Detph
+        
+            If ``output_option=="final_depht_dir"`` returns:
+                Tuple of array_like
+                    Lowest Geometrical Detph
+                    Lowest depth respective sirection
+        
+            If ``output_option=="all_depth"`` returns:
+                array_like
+                    Lowest Geometrical Detph
+                    Lowest depth respective sirection
+                    All computed depths
+        
+            If ``output_option=="all_depth_directions"`` returns:
+                array_like
+                    Lowest Geometrical Detph
+                    Lowest depth respective sirection
+                    All computed depths
+                    All respective directions
+        
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -599,10 +713,38 @@ class DepthEucl():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"all_depth"`` : tuple of numpy arrays 
+                - ``"all_depth_directions"`` : tuple of numpy arrays 
 
-        Results
+        Returns
         ----------
-        Halfspace (Tukey) depth : {array like}
+        array_like or tuple of array_like
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    Lowest Halfspace (Tukey) Detph
+        
+            If ``output_option=="final_depht_dir"`` returns:
+                Tuple of array_like
+                    Lowest Halfspace (Tukey) Detph
+                    Lowest depth respective sirection
+        
+            If ``output_option=="all_depth"`` returns:
+                array_like
+                    Lowest Halfspace (Tukey) Detph
+                    Lowest depth respective sirection
+                    All computed depths
+        
+            If ``output_option=="all_depth_directions"`` returns:
+                array_like
+                    Lowest Halfspace (Tukey) Detph
+                    Lowest depth respective sirection
+                    All computed depths
+                    All respective directions
+        
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -677,7 +819,7 @@ class DepthEucl():
 
         Results
         ----------
-        L2 depth : {array like}
+        L2 depth : array_like
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -722,7 +864,7 @@ class DepthEucl():
 
         Results
         ----------
-        Potential depth : {array like}
+        Potential depth : array_like
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -756,10 +898,37 @@ class DepthEucl():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"all_depth"`` : tuple of numpy arrays 
+                - ``"all_depth_directions"`` : tuple of numpy arrays 
 
-        Results
+        Returns
         ----------
-        Projection depth : {array like}
+        array_like or tuple of array_like
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    Lowest Projection Detph
+        
+            If ``output_option=="final_depht_dir"`` returns:
+                Tuple of array_like
+                    Lowest Projection Detph
+                    Lowest depth respective sirection
+        
+            If ``output_option=="all_depth"`` returns:
+                array_like
+                    Lowest Projection Detph
+                    Lowest depth respective sirection
+                    All computed depths
+        
+            If ``output_option=="all_depth_directions"`` returns:
+                array_like
+                    Lowest Projection Detph
+                    Lowest depth respective sirection
+                    All computed depths
+                    All respective directions
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -833,7 +1002,8 @@ class DepthEucl():
 
         Results
         ----------
-        Convex hull peeling depth : {array like}
+        Convex hull peeling depth : array_like
+        
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -868,7 +1038,8 @@ class DepthEucl():
 
         Results
         ----------
-        Simplicial depth : {array like}
+        Simplicial depth : array_like
+
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -908,7 +1079,8 @@ class DepthEucl():
 
         Results
         ----------
-        Simplicial volume depth : {array like}
+        Simplicial volume depth : array_like
+
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -939,7 +1111,8 @@ class DepthEucl():
 
         Results
         ----------
-        Spatial depth : {array like}
+        Spatial depth : array_like
+
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -972,10 +1145,38 @@ class DepthEucl():
         ----------
         x : {array-like} of shape (n_samples,d).
             Samples matrix to compute depth
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"all_depth"`` : tuple of numpy arrays 
+                - ``"all_depth_directions"`` : tuple of numpy arrays 
 
-        Results
+        Returns
         ----------
-        Zonoid depth : {array like}
+        array_like or tuple of array_like
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    Lowest Zonoid Detph
+        
+            If ``output_option=="final_depht_dir"`` returns:
+                Tuple of array_like
+                    Lowest Zonoid Detph
+                    Lowest depth respective sirection
+        
+            If ``output_option=="all_depth"`` returns:
+                array_like
+                    Lowest Zonoid Detph
+                    Lowest depth respective sirection
+                    All computed depths
+        
+            If ``output_option=="all_depth_directions"`` returns:
+                array_like
+                    Lowest Zonoid Detph
+                    Lowest depth respective sirection
+                    All computed depths
+                    All respective directions
+
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -1070,7 +1271,7 @@ class DepthEucl():
 
         Results
         --------
-            ACA directions for dimensional reduction
+            ACA directions for dimensional reduction : array_like
             
         """
         ACA_tab=mtv.ACA(X=self.data,dim=dim,
