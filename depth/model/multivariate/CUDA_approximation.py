@@ -57,7 +57,7 @@ def RS(data:torch.Tensor,z:torch.Tensor,notion:str,
     """Compute (refined) Random search
     """
     eps=torch.tensor([torch.pi/2],dtype=torch.float32,device=device) # initial cap size
-    pole=normalize(z).reshape(z.shape) # first pole 
+    pole=normalize(torch.normal(0,1,z.shape)).reshape(z.shape) # first pole 
     dMin=torch.ones((1,1),dtype=torch.float32,device=device)
     for ref in range(n_refinements):
         dirs=poleCuda(dirs,num_dir=dirRef, pole=pole,eps=eps,)
