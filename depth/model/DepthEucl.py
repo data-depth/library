@@ -69,7 +69,7 @@ class DepthEucl():
     bound_gc : bool, default = True
         For ``solver`` = ``neldermead``, it's ``True`` if the search is limited to the closed hemispher
     
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
     
     evaluate_dataset: bool, default=False,
@@ -106,7 +106,7 @@ class DepthEucl():
         Initialize depthModel instance for statistical depth computation.        
         """  
         self.data=None
-        self.approxOption=["lowest_depth","final_depht_dir","all_depth","all_depth_directions"]
+        self.approxOption=["lowest_depth","final_depth_dir","all_depth","all_depth_directions"]
         self.set_seed() # set initial seed  
         self._create_selfRef() # create self. referecnces for storing depth and directions
 
@@ -184,8 +184,8 @@ class DepthEucl():
                     alpha_Dirichlet= 1.25, cooling_factor=0.95, 
                     cap_size=1, start="mean", space= "sphere", 
                     line_solver="goldensection", bound_gc= True, 
-                    output_option:Literal["lowest_depth","final_depht_dir",
-                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False):
+                    output_option:Literal["lowest_depth","final_depth_dir",
+                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
         """
         Mahalanobis depth
 
@@ -196,7 +196,7 @@ class DepthEucl():
         output_option : str
             Determines the format of the output.
                 - ``"lowest_depth"`` : single numpy array
-                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
                 - ``"all_depth"`` : tuple of numpy arrays 
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
@@ -207,7 +207,7 @@ class DepthEucl():
                 array_like
                     Lowest Mahalanobis Depth
         
-            If ``output_option=="final_depht_dir"`` returns:
+            If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     Lowest Mahalanobis Depth
                     Lowest depth respective sirection
@@ -294,8 +294,8 @@ class DepthEucl():
                     n_refinements: int = 10, sphcap_shrink: float = 0.5, alpha_Dirichlet: float = 1.25, 
                     cooling_factor: float = 0.95,cap_size: int = 1, start: str = "mean", space: str = "sphere", 
                     line_solver: str = "goldensection", bound_gc: bool = True,
-                    output_option:Literal["lowest_depth","final_depht_dir",
-                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False,
+                    output_option:Literal["lowest_depth","final_depth_dir",
+                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False,
                                           CUDA:bool=False):
         """
         Compute asymmetric projection depth
@@ -307,7 +307,7 @@ class DepthEucl():
         output_option : str
             Determines the format of the output.
                 - ``"lowest_depth"`` : single numpy array
-                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
                 - ``"all_depth"`` : tuple of numpy arrays 
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
@@ -318,7 +318,7 @@ class DepthEucl():
                 array_like
                     Lowest Asymmetrical Projection Depth
         
-            If ``output_option=="final_depht_dir"`` returns:
+            If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     Lowest Asymmetrical Projection Depth
                     Lowest depth respective sirection
@@ -433,8 +433,8 @@ class DepthEucl():
                   alpha_Dirichlet:float = 1.25,cooling_factor:float = 0.95,
                   cap_size:float = 1,start:str = "mean",space:str = "sphere",
                   line_solver:str = "goldensection",bound_gc:bool = True,
-                  output_option:Literal["lowest_depth","final_depht_dir",
-                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False):
+                  output_option:Literal["lowest_depth","final_depth_dir",
+                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
         """
         Compute approximately the continuous explected convex hull depth of all samples w.r.t. the dataset.
 
@@ -510,8 +510,8 @@ class DepthEucl():
         option: int = 1, n_refinements: int = 10, sphcap_shrink: float = 0.5, 
         alpha_Dirichlet: float = 1.25, cooling_factor: float = 0.95, cap_size: int = 1,
         start: str = "mean", space: str = "sphere", line_solver: str = "goldensection", bound_gc: bool = True,
-        output_option:Literal["lowest_depth","final_depht_dir",
-                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False):
+        output_option:Literal["lowest_depth","final_depth_dir",
+                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
         """
         Calculates approximately the continuous modified explected convex hull depth
                 
@@ -522,7 +522,7 @@ class DepthEucl():
         output_option : str
             Determines the format of the output.
                 - ``"lowest_depth"`` : single numpy array
-                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
                 - ``"all_depth"`` : tuple of numpy arrays 
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
@@ -533,7 +533,7 @@ class DepthEucl():
                 array_like
                     Lowest Continuous Modified Explected Convex Hull Depth
         
-            If ``output_option=="final_depht_dir"`` returns:
+            If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     Lowest Continuous Modified Explected Convex Hull Depth
                     Lowest depth respective sirection
@@ -606,8 +606,8 @@ class DepthEucl():
     def geometrical(self,x:np.ndarray=None,solver: str = "neldermead", NRandom: int = 1000, n_refinements: int = 10, 
                     sphcap_shrink: float = 0.5, alpha_Dirichlet: float = 1.25, cooling_factor: float = 0.95, 
                     cap_size: int = 1, start: str = "mean", space: str = "sphere", line_solver: str = "goldensection", bound_gc: bool = True,
-                    output_option:Literal["lowest_depth","final_depht_dir",
-                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False):
+                    output_option:Literal["lowest_depth","final_depth_dir",
+                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
         """
         Compute geometrical depth
                 
@@ -618,7 +618,7 @@ class DepthEucl():
         output_option : str
             Determines the format of the output.
                 - ``"lowest_depth"`` : single numpy array
-                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
                 - ``"all_depth"`` : tuple of numpy arrays 
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
@@ -629,7 +629,7 @@ class DepthEucl():
                 array_like
                     Lowest Geometrical Depth
         
-            If ``output_option=="final_depht_dir"`` returns:
+            If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     Lowest Geometrical Depth
                     Lowest depth respective sirection
@@ -704,8 +704,8 @@ class DepthEucl():
     def halfspace(self, x:np.ndarray=None,exact: bool = True,method: str = "recursive",solver: str = "neldermead",
                   NRandom: int = 1000,n_refinements: int = 10,sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
                   cap_size: int = 1,start: str = "mean",space: str = "sphere",line_solver: str = "goldensection",bound_gc: bool = True,
-                  CUDA:bool=False,output_option:Literal["lowest_depth","final_depht_dir",
-                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False):
+                  CUDA:bool=False,output_option:Literal["lowest_depth","final_depth_dir",
+                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
         """
         Compute Halfspace depth
                 
@@ -716,7 +716,7 @@ class DepthEucl():
         output_option : str
             Determines the format of the output.
                 - ``"lowest_depth"`` : single numpy array
-                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
                 - ``"all_depth"`` : tuple of numpy arrays 
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
@@ -727,7 +727,7 @@ class DepthEucl():
                 array_like
                     Lowest Halfspace (Tukey) Depth
         
-            If ``output_option=="final_depht_dir"`` returns:
+            If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     Lowest Halfspace (Tukey) Depth
                     Lowest depth respective sirection
@@ -889,8 +889,8 @@ class DepthEucl():
     def projection(self,x:np.ndarray=None,solver: str = "neldermead",NRandom: int = 1000,n_refinements: int = 10,
                   sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
                   cap_size: int = 1,start: str = "mean",space: str = "sphere",line_solver: str = "goldensection",bound_gc: bool = True,
-                  CUDA:bool=False, output_option:Literal["lowest_depth","final_depht_dir",
-                                          "all_depth","all_depth_directions"]="final_depht_dir", evaluate_dataset:bool=False):
+                  CUDA:bool=False, output_option:Literal["lowest_depth","final_depth_dir",
+                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
         """
         Compute projection depth
                 
@@ -901,7 +901,7 @@ class DepthEucl():
         output_option : str
             Determines the format of the output.
                 - ``"lowest_depth"`` : single numpy array
-                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
                 - ``"all_depth"`` : tuple of numpy arrays 
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
@@ -912,7 +912,7 @@ class DepthEucl():
                 array_like
                     Lowest Projection Depth
         
-            If ``output_option=="final_depht_dir"`` returns:
+            If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     Lowest Projection Depth
                     Lowest depth respective sirection
@@ -1135,8 +1135,8 @@ class DepthEucl():
                solver="neldermead",NRandom=1000,n_refinements=10,
                sphcap_shrink=0.5,alpha_Dirichlet=1.25,cooling_factor=0.95,cap_size=1,
                start="mean",space="sphere",line_solver="goldensection",bound_gc=True,
-               output_option:Literal["lowest_depth","final_depht_dir",
-                                     "all_depth","all_depth_directions"]="final_depht_dir",
+               output_option:Literal["lowest_depth","final_depth_dir",
+                                     "all_depth","all_depth_directions"]="final_depth_dir",
                 evaluate_dataset:bool=False):
         """
         Compute zonoide depth
@@ -1148,7 +1148,7 @@ class DepthEucl():
         output_option : str
             Determines the format of the output.
                 - ``"lowest_depth"`` : single numpy array
-                - ``"final_depht_dir"`` : tuple of numpy arrays 
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
                 - ``"all_depth"`` : tuple of numpy arrays 
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
@@ -1159,7 +1159,7 @@ class DepthEucl():
                 array_like
                     Lowest Zonoid Depth
         
-            If ``output_option=="final_depht_dir"`` returns:
+            If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     Lowest Zonoid Depth
                     Lowest depth respective sirection
