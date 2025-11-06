@@ -205,22 +205,22 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Mahalanobis Detph
+                    Lowest Mahalanobis Depth
         
             If ``output_option=="final_depht_dir"`` returns:
                 Tuple of array_like
-                    Lowest Mahalanobis Detph
+                    Lowest Mahalanobis Depth
                     Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Mahalanobis Detph
+                    Lowest Mahalanobis Depth
                     Lowest depth respective sirection
                     All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Mahalanobis Detph
+                    Lowest Mahalanobis Depth
                     Lowest depth respective sirection
                     All computed depths
                     All respective directions
@@ -316,22 +316,22 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Asymmetrical Projection Detph
+                    Lowest Asymmetrical Projection Depth
         
             If ``output_option=="final_depht_dir"`` returns:
                 Tuple of array_like
-                    Lowest Asymmetrical Projection Detph
+                    Lowest Asymmetrical Projection Depth
                     Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Asymmetrical Projection Detph
+                    Lowest Asymmetrical Projection Depth
                     Lowest depth respective sirection
                     All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Asymmetrical Projection Detph
+                    Lowest Asymmetrical Projection Depth
                     Lowest depth respective sirection
                     All computed depths
                     All respective directions
@@ -531,22 +531,22 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Continuous Modified Explected Convex Hull Detph
+                    Lowest Continuous Modified Explected Convex Hull Depth
         
             If ``output_option=="final_depht_dir"`` returns:
                 Tuple of array_like
-                    Lowest Continuous Modified Explected Convex Hull Detph
+                    Lowest Continuous Modified Explected Convex Hull Depth
                     Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Continuous Modified Explected Convex Hull Detph
+                    Lowest Continuous Modified Explected Convex Hull Depth
                     Lowest depth respective sirection
                     All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Continuous Modified Explected Convex Hull Detph
+                    Lowest Continuous Modified Explected Convex Hull Depth
                     Lowest depth respective sirection
                     All computed depths
                     All respective directions
@@ -627,22 +627,22 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Geometrical Detph
+                    Lowest Geometrical Depth
         
             If ``output_option=="final_depht_dir"`` returns:
                 Tuple of array_like
-                    Lowest Geometrical Detph
+                    Lowest Geometrical Depth
                     Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Geometrical Detph
+                    Lowest Geometrical Depth
                     Lowest depth respective sirection
                     All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Geometrical Detph
+                    Lowest Geometrical Depth
                     Lowest depth respective sirection
                     All computed depths
                     All respective directions
@@ -725,22 +725,22 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Halfspace (Tukey) Detph
+                    Lowest Halfspace (Tukey) Depth
         
             If ``output_option=="final_depht_dir"`` returns:
                 Tuple of array_like
-                    Lowest Halfspace (Tukey) Detph
+                    Lowest Halfspace (Tukey) Depth
                     Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Halfspace (Tukey) Detph
+                    Lowest Halfspace (Tukey) Depth
                     Lowest depth respective sirection
                     All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Halfspace (Tukey) Detph
+                    Lowest Halfspace (Tukey) Depth
                     Lowest depth respective sirection
                     All computed depths
                     All respective directions
@@ -910,22 +910,22 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Projection Detph
+                    Lowest Projection Depth
         
             If ``output_option=="final_depht_dir"`` returns:
                 Tuple of array_like
-                    Lowest Projection Detph
+                    Lowest Projection Depth
                     Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Projection Detph
+                    Lowest Projection Depth
                     Lowest depth respective sirection
                     All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Projection Detph
+                    Lowest Projection Depth
                     Lowest depth respective sirection
                     All computed depths
                     All respective directions
@@ -1157,22 +1157,22 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Zonoid Detph
+                    Lowest Zonoid Depth
         
             If ``output_option=="final_depht_dir"`` returns:
                 Tuple of array_like
-                    Lowest Zonoid Detph
+                    Lowest Zonoid Depth
                     Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Zonoid Detph
+                    Lowest Zonoid Depth
                     Lowest depth respective sirection
                     All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Zonoid Detph
+                    Lowest Zonoid Depth
                     Lowest depth respective sirection
                     All computed depths
                     All respective directions
