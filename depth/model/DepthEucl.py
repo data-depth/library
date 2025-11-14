@@ -12,7 +12,7 @@ except:pass
 
 class DepthEucl():
     """
-    Statistical data depth.
+    Statistical Data-Depth.
 
     Return the depth of each sample w.r.t. a dataset, D(x,data), using a chosen depth notion.
     
@@ -130,7 +130,7 @@ class DepthEucl():
 
         Returns
         ---------
-        loaded dataset
+        DepthEucl model
         """
         if type(data)==None:
             raise Exception("You must load a dataset")
@@ -205,25 +205,25 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Mahalanobis Depth
+                    - Lowest Mahalanobis Detph
         
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
-                    Lowest Mahalanobis Depth
-                    Lowest depth respective sirection
+                    - Lowest Mahalanobis Detph
+                    - Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Mahalanobis Depth
-                    Lowest depth respective sirection
-                    All computed depths
+                    - Lowest Mahalanobis Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Mahalanobis Depth
-                    Lowest depth respective sirection
-                    All computed depths
-                    All respective directions
+                    - Lowest Mahalanobis Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
+                    - All respective directions
         
         """
         if evaluate_dataset==True: # Dataset evaluation
@@ -316,25 +316,25 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Asymmetrical Projection Depth
+                    - Lowest Asymmetrical Projection Detph
         
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
-                    Lowest Asymmetrical Projection Depth
-                    Lowest depth respective sirection
+                    - Lowest Asymmetrical Projection Detph
+                    - Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Asymmetrical Projection Depth
-                    Lowest depth respective sirection
-                    All computed depths
+                    - Lowest Asymmetrical Projection Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Asymmetrical Projection Depth
-                    Lowest depth respective sirection
-                    All computed depths
-                    All respective directions
+                    - Lowest Asymmetrical Projection Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
+                    - All respective directions
 
         """
         if evaluate_dataset==True: # Dataset evaluation
@@ -531,25 +531,25 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Continuous Modified Explected Convex Hull Depth
+                    - Lowest Continuous Modified Explected Convex Hull Detph
         
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
-                    Lowest Continuous Modified Explected Convex Hull Depth
-                    Lowest depth respective sirection
+                    - Lowest Continuous Modified Explected Convex Hull Detph
+                    - Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Continuous Modified Explected Convex Hull Depth
-                    Lowest depth respective sirection
-                    All computed depths
+                    - Lowest Continuous Modified Explected Convex Hull Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Continuous Modified Explected Convex Hull Depth
-                    Lowest depth respective sirection
-                    All computed depths
-                    All respective directions
+                    - Lowest Continuous Modified Explected Convex Hull Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
+                    - All respective directions
 
         """
         if evaluate_dataset==True: # Dataset evaluation
@@ -627,25 +627,25 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Geometrical Depth
+                    - Lowest Geometrical Detph
         
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
-                    Lowest Geometrical Depth
-                    Lowest depth respective sirection
+                    - Lowest Geometrical Detph
+                    - Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Geometrical Depth
-                    Lowest depth respective sirection
-                    All computed depths
+                    - Lowest Geometrical Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Geometrical Depth
-                    Lowest depth respective sirection
-                    All computed depths
-                    All respective directions
+                    - Lowest Geometrical Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
+                    - All respective directions
         
         """
         if evaluate_dataset==True: # Dataset evaluation
@@ -725,25 +725,25 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Halfspace (Tukey) Depth
+                    - Lowest Halfspace (Tukey) Detph
         
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
-                    Lowest Halfspace (Tukey) Depth
-                    Lowest depth respective sirection
+                    - Lowest Halfspace (Tukey) Detph
+                    - Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Halfspace (Tukey) Depth
-                    Lowest depth respective sirection
-                    All computed depths
+                    - Lowest Halfspace (Tukey) Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Halfspace (Tukey) Depth
-                    Lowest depth respective sirection
-                    All computed depths
-                    All respective directions
+                    - Lowest Halfspace (Tukey) Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
+                    - All respective directions
         
         """
         if evaluate_dataset==True: # Dataset evaluation
@@ -910,25 +910,25 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Projection Depth
+                    - Lowest Projection Detph
         
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
-                    Lowest Projection Depth
-                    Lowest depth respective sirection
+                    - Lowest Projection Detph
+                    - Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Projection Depth
-                    Lowest depth respective sirection
-                    All computed depths
+                    - Lowest Projection Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Projection Depth
-                    Lowest depth respective sirection
-                    All computed depths
-                    All respective directions
+                    - Lowest Projection Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
+                    - All respective directions
         """
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
@@ -1157,25 +1157,25 @@ class DepthEucl():
         array_like or tuple of array_like
             If ``output_option=="lowest_depth"`` returns:
                 array_like
-                    Lowest Zonoid Depth
+                    - Lowest Zonoid Detph
         
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
-                    Lowest Zonoid Depth
-                    Lowest depth respective sirection
+                    - Lowest Zonoid Detph
+                    - Lowest depth respective sirection
         
             If ``output_option=="all_depth"`` returns:
                 array_like
-                    Lowest Zonoid Depth
-                    Lowest depth respective sirection
-                    All computed depths
+                    - Lowest Zonoid Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
-                    Lowest Zonoid Depth
-                    Lowest depth respective sirection
-                    All computed depths
-                    All respective directions
+                    - Lowest Zonoid Detph
+                    - Lowest depth respective sirection
+                    - All computed depths
+                    - All respective directions
 
         """
         if evaluate_dataset==True: # Dataset evaluation

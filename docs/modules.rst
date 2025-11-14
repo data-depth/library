@@ -5,5 +5,6 @@ Data-depth
    :maxdepth: 4
 
    DepthEucl
+   DepthFunc
    DepthPlot
    
