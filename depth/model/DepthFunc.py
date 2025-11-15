@@ -1,5 +1,5 @@
 from . import multivariate as mvt
-from DepthEucl import DepthEucl
+# from DepthEucl import DepthEucl
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
@@ -18,8 +18,9 @@ class DepthFunc():
         self.data=None
     
     def load_dataset(self, data:np.ndarray=None, y:np.ndarray=None, 
-                     timestamp_col:str|int='timestamp',value_cols:str|list='value', 
-                     interpolation:bool=True,N_grid=10):
+                     timestamp_col:str|int='timestamp',value_cols:str|list='value', case_id:str|int="case_id", 
+                     interpolate_grid:bool=True,N_grid:int=10,
+                     interpolation_type:str="linear"):
         """
         Load the dataset X for reference calculations. Depth is computed with respect to this dataset.
 
@@ -40,7 +41,7 @@ class DepthFunc():
             If value_cols is a string, columns with such word in the name are used.
             If value_cols is a list, it is considered the list of columns to be used.
         
-        interpolation : bool, default = True   
+        interpolate_grid : bool, default = True   
 
         Returns
         ---------
@@ -54,11 +55,11 @@ class DepthFunc():
             - Compute the multivariate depth of the query vector relative to the data slice
             - Average the results over all L time points
         
-        """
+        """ 
         if type(data) == type(None):
             raise Exception("You must load a dataset")
         if type(timestamp_col)==str:
-            if timestamp_col in data.colunms:    
+            if timestamp_col in data.columns:    
                 self.timestamp_col=timestamp_col
             else:
                 raise NameError(f"timestamp_col is not a column in the data.")
@@ -66,30 +67,77 @@ class DepthFunc():
             if timestamp_col>=len(data.columns):
                 raise IndexError(f"timestamp_col is greater than the number of columns.")
             else:
-                self.timestamp_col=data.columns[timestamp_col]
+                self.timestamp_col = data.columns[timestamp_col]
         print(f"timestamp_col is set to {self.timestamp_col}")
         
         if type(value_cols) == str: 
             self.value_cols = data.filter(like = value_cols).columns
+            if self.value_cols==[]: raise ValueError("value_cols is an empty list, value_cols should be a suffix for different columns")
         if type(value_cols) == list:
             self.value_cols = value_cols
         print(f"value_cols is set to {self.value_cols}")
-         
         
-            
+        if type(case_id)==str:
+            if case_id in data.columns:
+                self.case_id=case_id
+            else:
+                raise ValueError("case_id is not a column of the data")
+        if type(case_id)==int:
+            if case_id>=len(data.columns):
+                raise IndexError(f"case_id is greater than the number of columns.")
+            else:
+                self.case_id = data.columns[case_id]
+        print(f"case_id is set to {self.case_id}")
+        
         # assert(type(data) == np.ndarray), "The dataset must be a numpy array"
         # self._nSamples=data.shape[0] # define dataset size - n
         # self._spaceDim=data.shape[2] # define space dimension - d
-        if interpolation:
-            t_min = min(data[self.timestamp_col].min())
-            t_max = max(data[self.timestamp_col].max())
+        if interpolate_grid==True:
+            self.N_grid = N_grid
+            self.t_min = data[self.timestamp_col].min()
+            self.t_max = data[self.timestamp_col].max()
             
             if np.issubdtype(data[self.timestamp_col].dtype, np.datetime64):
-                new_domain = np.linspace(0, (t_max - t_min).total_seconds(), N_grid)
+                new_domain = np.linspace(0, (self.t_max - self.t_min).total_seconds(), self.N_grid)
             else:
-                new_domain = np.linspace(0, t_max - t_min, N_grid)
+                new_domain = np.linspace(0, self.t_max - self.t_min, self.N_grid)
+            self.new_domain = new_domain
+        elif interpolate_grid==False:
+            self.t_min = data[self.timestamp_col].min()
+            if np.issubdtype(data[self.timestamp_col].dtype, np.datetime64):
+                self.new_domain=np.sort(np.unique((data[self.timestamp_col]-data[self.timestamp_col].min()).dt.total_seconds()))
+            else:
+                self.new_domain=np.sort(np.unique((data[self.timestamp_col]-data[self.timestamp_col].min())))
+        
+        self.data_array = self.syncronise_over_time(data, self.new_domain,True,interpolation_type)
         self.data = data
+        
         return self  
+    
+    def syncronise_over_time(self,df, new_domain, interpolation=True, interpolation_type="linear"):
+        M = []
+        if np.issubdtype(df[self.timestamp_col].dtype, np.datetime64):
+            for case, group in df.groupby(self.case_id):
+                group = group.loc[~group[self.timestamp_col].duplicated(keep='first')]
+
+                if interpolation:
+                    interp_values = self.interpolate(group[self.value_cols], 
+                                                        (group[self.timestamp_col]-self.t_min).dt.total_seconds().to_numpy(), new_domain,
+                                                        interpolation_type,axis = 0)
+                else:
+                    interp_values = np.asarray(group[self.value_cols])
+                M.append(interp_values)
+        else:
+            for case, group in df.groupby(self.case_id):
+                group = group.loc[~group[self.timestamp_col].duplicated(keep='first')]
+                
+                if interpolation:
+                    interp_values = self.interpolate(group[self.value_cols], (group[self.timestamp_col]-self.t_min).to_numpy(), new_domain, axis = 0)
+                else:
+                    interp_values = np.asarray(group[self.value_cols])
+                M.append(interp_values)
+        M = np.stack(M, axis = 0)
+        return M
     
     def interpolate(self,value_matrix, original_domain, new_domain, method='linear', axis=0):
         """
@@ -225,7 +273,7 @@ class DepthFunc():
 
         for i in range(l_points):
             # data_component_slice: N_data x D matrix (all functions at time i)
-            data_component_slice = self.data[:, i, :]
+            data_component_slice = self.data_array[:, i, :]
 
             # query_component: D-dimensional vector (query function at time i)
             query_component = query_point[i, :]
@@ -243,7 +291,7 @@ class DepthFunc():
 
         return functional_depth_val
     
-    def projection_based_func_depth(self, query, N_grid = 10, interpolation = True, 
+    def projection_based_func_depth(self, query, interpolation = True, 
                                     interpolation_type = "linear",
                                     type_of_depth='halfspace', solver='neldermead', NRandom=100,
                                     output_option:Literal["lowest_depth","final_depht_dir"]="lowest_depth"):
@@ -302,46 +350,26 @@ class DepthFunc():
 
 
         
-        if interpolation:
-            t_min = min(df['timestamp'].min(), query['timestamp'].min())
-            t_max = max(df['timestamp'].max(), query['timestamp'].max())
+        # if interpolation:
+        #     t_min = min(df['timestamp'].min(), query['timestamp'].min())
+        #     t_max = max(df['timestamp'].max(), query['timestamp'].max())
             
-            if np.issubdtype(df["timestamp"].dtype, np.datetime64):
-                new_domain = np.linspace(0, (t_max - t_min).total_seconds(), N_grid)
-            else:
-                new_domain = np.linspace(0, t_max - t_min, N_grid)
+        #     if np.issubdtype(df["timestamp"].dtype, np.datetime64):
+        #         new_domain = np.linspace(0, (t_max - t_min).total_seconds(), N_grid)
+        #     else:
+        #         new_domain = np.linspace(0, t_max - t_min, N_grid)
             
-        def syncronise_over_time(df, new_domain):
-            M = []
-            if np.issubdtype(df[self.timestamp_col].dtype, np.datetime64):
-                for case, group in df.groupby('case_id'):
-                    group = group.loc[~group[self.timestamp_col].duplicated(keep='first')]
+        
 
-                    if interpolation:
-                        interp_values = self.interpolate(group[self.value_cols], (group[self.timestamp_col]-t_min).dt.total_seconds().to_numpy(), new_domain, axis = 0)
-                    else:
-                        interp_values = np.asarray(group[self.value_cols])
-                    M.append(interp_values)
-            else:
-                for case, group in df.groupby('case_id'):
-                    group = group.loc[~group[self.timestamp_col].duplicated(keep='first')]
-                    
-                    if interpolation:
-                        interp_values = self.interpolate(group[self.value_cols], (group[self.timestamp_col]-t_min).to_numpy(), new_domain, axis = 0)
-                    else:
-                        interp_values = np.asarray(group[self.value_cols])
-                    M.append(interp_values)
-            M = np.stack(M, axis = 0)
-            return M
-
-        data_array = syncronise_over_time(df, new_domain)
-        query_array = syncronise_over_time(query, new_domain)
+        
+        query_array = self.syncronise_over_time(query, self.new_domain, interpolation_type=interpolation_type)
         
         depth_array = np.empty((query_array.shape[0],), dtype = float)
 
         for i in range(query_array.shape[0]):
             #depth_array.append(int_depth(data_array, query_array[i, :, :], type_of_depth='halfspace', solver='neldermead', NRandom=100))
-            depth_array[i] = self.int_depth(data_array, query_array[i, :, :], type_of_depth='halfspace', solver='neldermead', NRandom=100)[0]
+            depth_array[i] = self.int_depth(query_array[i, :, :], type_of_depth=type_of_depth, solver=solver, 
+                                            NRandom=NRandom)[0]
        
         return depth_array
 
