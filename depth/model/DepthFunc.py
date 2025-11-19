@@ -43,6 +43,18 @@ class DepthFunc():
         
         interpolate_grid : bool, default = True   
 
+        N_grid:
+
+
+        interpolation_type : str, default='linear'
+            Interpolation method to use. Supported options are those provided by
+            `scipy.interpolate.interp1d`, including:
+            - `'linear'` : linear interpolation (default)
+            - `'nearest'` : nearest-neighbor interpolation
+            - `'cubic'` : cubic spline interpolation
+            - `'quadratic'` : quadratic spline interpolation
+            - `'previous'`, `'next'` : stepwise interpolation
+
         Returns
         ---------
         DepthFunc model
@@ -63,17 +75,18 @@ class DepthFunc():
                 self.timestamp_col=timestamp_col
             else:
                 raise NameError(f"timestamp_col is not a column in the data.")
-        if type(timestamp_col)==int:
+        elif type(timestamp_col)==int:
             if timestamp_col>=len(data.columns):
                 raise IndexError(f"timestamp_col is greater than the number of columns.")
             else:
                 self.timestamp_col = data.columns[timestamp_col]
         print(f"timestamp_col is set to {self.timestamp_col}")
-        
+         
         if type(value_cols) == str: 
             self.value_cols = data.filter(like = value_cols).columns
-            if self.value_cols==[]: raise ValueError("value_cols is an empty list, value_cols should be a suffix for different columns")
-        if type(value_cols) == list:
+            print(self.value_cols)
+            if len(self.value_cols)==0: raise ValueError("value_cols is an empty list, value_cols should be a suffix for different columns")
+        elif type(value_cols) == list:
             self.value_cols = value_cols
         print(f"value_cols is set to {self.value_cols}")
         
@@ -82,7 +95,7 @@ class DepthFunc():
                 self.case_id=case_id
             else:
                 raise ValueError("case_id is not a column of the data")
-        if type(case_id)==int:
+        elif type(case_id)==int:
             if case_id>=len(data.columns):
                 raise IndexError(f"case_id is greater than the number of columns.")
             else:
@@ -92,6 +105,7 @@ class DepthFunc():
         # assert(type(data) == np.ndarray), "The dataset must be a numpy array"
         # self._nSamples=data.shape[0] # define dataset size - n
         # self._spaceDim=data.shape[2] # define space dimension - d
+
         if interpolate_grid==True:
             self.N_grid = N_grid
             self.t_min = data[self.timestamp_col].min()
@@ -108,22 +122,22 @@ class DepthFunc():
                 self.new_domain=np.sort(np.unique((data[self.timestamp_col]-data[self.timestamp_col].min()).dt.total_seconds()))
             else:
                 self.new_domain=np.sort(np.unique((data[self.timestamp_col]-data[self.timestamp_col].min())))
-        
-        self.data_array = self.syncronise_over_time(data, self.new_domain,True,interpolation_type)
+        self.interpolation_type=interpolation_type
+        self.data_array = self._syncronise_over_time(data,True)
         self.data = data
         
         return self  
     
-    def syncronise_over_time(self,df, new_domain, interpolation=True, interpolation_type="linear"):
+    def _syncronise_over_time(self,df, interpolation=True, ):
         M = []
         if np.issubdtype(df[self.timestamp_col].dtype, np.datetime64):
             for case, group in df.groupby(self.case_id):
                 group = group.loc[~group[self.timestamp_col].duplicated(keep='first')]
 
                 if interpolation:
-                    interp_values = self.interpolate(group[self.value_cols], 
-                                                        (group[self.timestamp_col]-self.t_min).dt.total_seconds().to_numpy(), new_domain,
-                                                        interpolation_type,axis = 0)
+                    interp_values = self._interpolate(group[self.value_cols], 
+                                                        (group[self.timestamp_col]-self.t_min).dt.total_seconds().to_numpy(), self.new_domain,
+                                                        self.interpolation_type,axis = 0)
                 else:
                     interp_values = np.asarray(group[self.value_cols])
                 M.append(interp_values)
@@ -132,14 +146,14 @@ class DepthFunc():
                 group = group.loc[~group[self.timestamp_col].duplicated(keep='first')]
                 
                 if interpolation:
-                    interp_values = self.interpolate(group[self.value_cols], (group[self.timestamp_col]-self.t_min).to_numpy(), new_domain, axis = 0)
+                    interp_values = self._interpolate(group[self.value_cols], (group[self.timestamp_col]-self.t_min).to_numpy(), self.new_domain, axis = 0)
                 else:
                     interp_values = np.asarray(group[self.value_cols])
                 M.append(interp_values)
         M = np.stack(M, axis = 0)
         return M
     
-    def interpolate(self,value_matrix, original_domain, new_domain, method='linear', axis=0):
+    def _interpolate(self,value_matrix, original_domain, new_domain, method='linear', axis=0):
         """
         Interpolate functional data (1D or ND) onto a new domain.
 
@@ -162,14 +176,6 @@ class DepthFunc():
         new_domain : array-like of shape (n_new_points,)
             The new domain points where the interpolation will be evaluated. 
 
-        method : str, default='linear'
-            Interpolation method to use. Supported options are those provided by
-            `scipy.interpolate.interp1d`, including:
-            - `'linear'` : linear interpolation (default)
-            - `'nearest'` : nearest-neighbor interpolation
-            - `'cubic'` : cubic spline interpolation
-            - `'quadratic'` : quadratic spline interpolation
-            - `'previous'`, `'next'` : stepwise interpolation
 
         axis : int, default=0
             Axis along which to perform the interpolation. By default, interpolation 
@@ -191,6 +197,7 @@ class DepthFunc():
         # 1D case
         if value_matrix.ndim == 1:
             non_nan_idx = ~np.isnan(value_matrix)
+            # TODO check if more thqn 2 values are not null
             f = interp1d(original_domain[non_nan_idx], value_matrix[non_nan_idx], kind=method, bounds_error=False, fill_value="extrapolate")
             return f(new_domain)
 
@@ -205,6 +212,7 @@ class DepthFunc():
         # Interpolate each flattened column
         for j in range(flat_value_matrix.shape[1]):
             non_nan_idx = ~np.isnan(flat_value_matrix[:, j])
+            # TODO check if more thqn 2 values are not null
             f = interp1d(original_domain[non_nan_idx], flat_value_matrix[:, j][non_nan_idx], kind=method, bounds_error=False, fill_value="extrapolate")
             interp_flat_value_matrix[:, j] = f(new_domain)
 
@@ -218,7 +226,7 @@ class DepthFunc():
         return interp_value_matrix
     
 
-    def int_depth(self, query_point, type_of_depth='halfspace', solver='neldermead', NRandom=100):
+    def _int_depth(self, query_point, notion='halfspace', solver='neldermead', NRandom=100, option=1, **kwargs):
         """
         Compute the integrated functional depth (IFD) of a query function with respect to a sample of functional data.
 
@@ -270,7 +278,9 @@ class DepthFunc():
         """
         total_depth_sum = 0
         l_points, d = query_point.shape
-
+        n_refinements,sphcap_shrink,alpha_Dirichlet,cooling_factor,\
+        cap_size,start,space,line_solver,bound_gc=self._check_hyperparDepth(**kwargs)
+        if option==2: directions=np.zeros(query_point.shape)
         for i in range(l_points):
             # data_component_slice: N_data x D matrix (all functions at time i)
             data_component_slice = self.data_array[:, i, :]
@@ -279,22 +289,38 @@ class DepthFunc():
             query_component = query_point[i, :]
 
             # Compute depth at time i
-            time_component_depth = mvt.depth_approximation(
-                query_component, data_component_slice,
-                type_of_depth, solver, NRandom, option=1
-            )
-
+            if option==1:
+                time_component_depth = mvt.depth_approximation(
+                    query_component, data_component_slice,
+                    notion, solver, NRandom, 
+                    option=option,
+                    n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                    alpha_Dirichlet=alpha_Dirichlet,
+                    cooling_factor=cooling_factor,cap_size=cap_size,
+                    start=start,space=space,line_solver=line_solver,bound_gc=bound_gc
+                )
+            if option==2:
+                time_component_depth,directions[i] = mvt.depth_approximation(
+                    query_component, data_component_slice,
+                    notion, solver, NRandom, 
+                    option=option,
+                    n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                    alpha_Dirichlet=alpha_Dirichlet,
+                    cooling_factor=cooling_factor,cap_size=cap_size,
+                    start=start,space=space,line_solver=line_solver,bound_gc=bound_gc
+                )
             total_depth_sum += time_component_depth
 
         # Average depth over all L time points
         functional_depth_val = total_depth_sum / l_points
 
-        return functional_depth_val
+        if option==1:return functional_depth_val 
+        else:return functional_depth_val,directions
+
     
-    def projection_based_func_depth(self, query, interpolation = True, 
-                                    interpolation_type = "linear",
-                                    type_of_depth='halfspace', solver='neldermead', NRandom=100,
-                                    output_option:Literal["lowest_depth","final_depht_dir"]="lowest_depth"):
+    def projection_based_func_depth(self, query,
+                                    notion='halfspace', solver='neldermead', NRandom=100,
+                                    output_option:Literal["lowest_depth","final_depth_dir"]="lowest_depth", **kwargs):
         """
         Compute projection-based functional depth for query functional data with respect to a reference dataset.
 
@@ -306,25 +332,16 @@ class DepthFunc():
 
         Parameters
         ----------
-        df : pandas.DataFrame
-            Reference dataset containing functional observations. Must include:
-            - 'case_id': identifier for each functional observation.
-            - 'timestamp': time or domain variable (can be numeric or datetime64).
-            - One or more value columns (e.g., 'value_1', 'value_2', ...).
-
         query : pandas.DataFrame
             Query dataset containing functional observations whose depth will be computed
             relative to `df`. Must have the same column structure as `df`.
 
-        N_grid : int, default=10
-            Number of equally spaced grid points for interpolation. Used only if
-            `interpolation=True`.
 
         interpolation : bool, default=True
             If True, each function is interpolated to a common grid across all cases 
             using the `interpolate()` function. If False, raw data are used as-is.
 
-        type_of_depth : {'halfspace', ...}, default='halfspace'
+        notion : {"mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"}, default='halfspace'
             Type of functional depth to compute. Currently supports 'halfspace', but 
             can be extended to other projection-based depths.
 
@@ -362,16 +379,69 @@ class DepthFunc():
         
 
         
-        query_array = self.syncronise_over_time(query, self.new_domain, interpolation_type=interpolation_type)
-        
+        self._check_depth(notion)
+        query_array = self._syncronise_over_time(query,)
         depth_array = np.empty((query_array.shape[0],), dtype = float)
+        if output_option=="lowest_depth":
+            option=1
+        elif output_option=="final_depth_dir":
+            option=2
+            direction_array = np.empty(query_array.shape, dtype = float)
+        else:
+            option=1
+            print(f"Invalid output_option, output_option set to 'lowest_depth'")
 
         for i in range(query_array.shape[0]):
-            #depth_array.append(int_depth(data_array, query_array[i, :, :], type_of_depth='halfspace', solver='neldermead', NRandom=100))
-            depth_array[i] = self.int_depth(query_array[i, :, :], type_of_depth=type_of_depth, solver=solver, 
-                                            NRandom=NRandom)[0]
+            if option==1:
+                depth_array[i] = self._int_depth(query_array[i, :, :], notion=notion, solver=solver,option=option,
+                                            NRandom=NRandom,**kwargs)[0]
+            
+            elif option==2:
+                depth_array[i], direction_array[i] =self._int_depth(query_array[i, :, :], notion=notion, solver=solver,option=option,
+                                            NRandom=NRandom,**kwargs)
+                
        
-        return depth_array
+        return depth_array if option==1 else depth_array,direction_array
 
-    
+
+    def _check_hyperparDepth(self,**kwargs):
+        n_refinements = 10
+        sphcap_shrink = 0.5
+        alpha_Dirichlet = 1.25
+        cooling_factor = 0.95
+        cap_size = 1
+        start = "mean"
+        space = "sphere"
+        line_solver = "goldensection"
+        bound_gc = True
+
+        for key, value in kwargs.items():
+            if key=="n_refinements":
+                n_refinements=value
+            elif key=="sphcap_shrink":
+                sphcap_shrink=value
+            elif key=="alpha_Dirichlet":
+                alpha_Dirichlet=value
+            elif key=="cooling_factor":
+                cooling_factor=value
+            elif key=="cap_size":
+                cap_size=value
+            elif key=="start":
+                start=value
+            elif key=="space":
+                space=value
+            elif key=="line_solver":
+                line_solver=value
+            elif key=="bound_gc":
+                bound_gc=value
+            else:
+                print(f"{key} is not a parameter for depth computation")
+            
+        return n_refinements,sphcap_shrink,alpha_Dirichlet,cooling_factor,cap_size,start,space,line_solver,bound_gc
+
+    def _check_depth(self, depth):
+        all_depths = ["mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"]
+        if (depth not in all_depths):
+            raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))    
+        
     
