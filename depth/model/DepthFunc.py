@@ -384,13 +384,13 @@ class DepthFunc():
         depth_array = np.empty((query_array.shape[0],), dtype = float)
         if output_option=="lowest_depth":
             option=1
+            direction_array=None
         elif output_option=="final_depth_dir":
             option=2
             direction_array = np.empty(query_array.shape, dtype = float)
         else:
             option=1
             print(f"Invalid output_option, output_option set to 'lowest_depth'")
-
         for i in range(query_array.shape[0]):
             if option==1:
                 depth_array[i] = self._int_depth(query_array[i, :, :], notion=notion, solver=solver,option=option,
@@ -401,7 +401,8 @@ class DepthFunc():
                                             NRandom=NRandom,**kwargs)
                 
        
-        return depth_array if option==1 else depth_array,direction_array
+        if option==1:return depth_array 
+        else:return  depth_array,direction_array
 
 
     def _check_hyperparDepth(self,**kwargs):
