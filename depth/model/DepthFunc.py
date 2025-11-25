@@ -281,13 +281,14 @@ class DepthFunc():
         n_refinements,sphcap_shrink,alpha_Dirichlet,cooling_factor,\
         cap_size,start,space,line_solver,bound_gc=self._check_hyperparDepth(**kwargs)
         if option==2: directions=np.zeros(query_point.shape)
+        # if d==1:option=1
         for i in range(l_points):
             # data_component_slice: N_data x D matrix (all functions at time i)
             data_component_slice = self.data_array[:, i, :]
 
             # query_component: D-dimensional vector (query function at time i)
             query_component = query_point[i, :]
-
+ 
             # Compute depth at time i
             if option==1:
                 time_component_depth = mvt.depth_approximation(
@@ -300,15 +301,15 @@ class DepthFunc():
                     start=start,space=space,line_solver=line_solver,bound_gc=bound_gc
                 )
             if option==2:
-                time_component_depth,directions[i] = mvt.depth_approximation(
-                    query_component, data_component_slice,
-                    notion, solver, NRandom, 
-                    option=option,
-                    n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                    alpha_Dirichlet=alpha_Dirichlet,
-                    cooling_factor=cooling_factor,cap_size=cap_size,
-                    start=start,space=space,line_solver=line_solver,bound_gc=bound_gc
-                )
+                time_component_depth, directions[i] = mvt.depth_approximation(
+                        query_component, data_component_slice,
+                        notion, solver, NRandom, 
+                        option=2,
+                        n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                        alpha_Dirichlet=alpha_Dirichlet,
+                        cooling_factor=cooling_factor,cap_size=cap_size,
+                        start=start,space=space,line_solver=line_solver,bound_gc=bound_gc
+                    )
             total_depth_sum += time_component_depth
 
         # Average depth over all L time points
@@ -382,6 +383,9 @@ class DepthFunc():
         self._check_depth(notion)
         query_array = self._syncronise_over_time(query,)
         depth_array = np.empty((query_array.shape[0],), dtype = float)
+        if len(self.value_cols)==1 and output_option=="final_depth_dir":
+            print("Space dimention is 1, output_option is set to 'lowest_depth'")
+            output_option="lowest_depth"
         if output_option=="lowest_depth":
             option=1
             direction_array=None
