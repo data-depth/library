@@ -17,7 +17,7 @@ class DepthFunc():
     def __init__(self):
         self.data=None
     
-    def load_dataset(self, data:np.ndarray=None, y:np.ndarray=None, 
+    def load_dataset(self, data:pd.DataFrame=None, y:np.ndarray=None, 
                      timestamp_col:str|int='timestamp',value_cols:str|list='value', case_id:str|int="case_id", 
                      interpolate_grid:bool=True,N_grid:int=10,
                      interpolation_type:str="linear"):

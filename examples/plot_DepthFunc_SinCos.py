@@ -41,7 +41,6 @@ for case in range(1, n_cases + 1):
     # ax3.plot(timestamps,value_3)
 df = pd.DataFrame(rows, columns=["case_id", "timestamp", "value_1", "value_2", "value_3"])
 
-# df[df.case_id==1].plot(x="timestamp", y="value_1")
 df.head(10)
 # %%
 
@@ -68,3 +67,4 @@ for case in range(1, n_cases + 1):
     ax3.plot(df[df.case_id==case].value_3.values,c=cm.plasma((Dpth[case-1]-Dpth.min())/(Dpth.max()-Dpth.min())))
 
 plt.show()
+# %%
