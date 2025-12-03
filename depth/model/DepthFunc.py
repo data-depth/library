@@ -18,8 +18,8 @@ class DepthFunc():
         self.data=None
     
     def load_dataset(self, data:pd.DataFrame=None, y:np.ndarray=None, 
-                     timestamp_col:str|int='timestamp',value_cols:str|list='value', case_id:str|int="case_id", 
-                     interpolate_grid:bool=True,N_grid:int=10,
+                     timestamp_col:str|int='timestamp',value_cols:str|list|int='value', case_id:str|int="case_id", 
+                     interpolate_grid:bool=True, N_grid:int=10,
                      interpolation_type:str="linear"):
         """
         Load the dataset X for reference calculations. Depth is computed with respect to this dataset.

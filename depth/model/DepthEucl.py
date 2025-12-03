@@ -185,7 +185,7 @@ class DepthEucl():
                     cap_size=1, start="mean", space= "sphere", 
                     line_solver="goldensection", bound_gc= True, 
                     output_option:Literal["lowest_depth","final_depth_dir",
-                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
+                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False):
         """
         Mahalanobis depth
 
@@ -295,7 +295,7 @@ class DepthEucl():
                     cooling_factor: float = 0.95,cap_size: int = 1, start: str = "mean", space: str = "sphere", 
                     line_solver: str = "goldensection", bound_gc: bool = True,
                     output_option:Literal["lowest_depth","final_depth_dir",
-                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False,
+                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False,
                                           CUDA:bool=False):
         """
         Compute asymmetric projection depth
@@ -434,7 +434,7 @@ class DepthEucl():
                   cap_size:float = 1,start:str = "mean",space:str = "sphere",
                   line_solver:str = "goldensection",bound_gc:bool = True,
                   output_option:Literal["lowest_depth","final_depth_dir",
-                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
+                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False):
         """
         Compute approximately the continuous explected convex hull depth of all samples w.r.t. the dataset.
 
@@ -511,7 +511,7 @@ class DepthEucl():
         alpha_Dirichlet: float = 1.25, cooling_factor: float = 0.95, cap_size: int = 1,
         start: str = "mean", space: str = "sphere", line_solver: str = "goldensection", bound_gc: bool = True,
         output_option:Literal["lowest_depth","final_depth_dir",
-                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
+                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False):
         """
         Calculates approximately the continuous modified explected convex hull depth
                 
@@ -607,7 +607,7 @@ class DepthEucl():
                     sphcap_shrink: float = 0.5, alpha_Dirichlet: float = 1.25, cooling_factor: float = 0.95, 
                     cap_size: int = 1, start: str = "mean", space: str = "sphere", line_solver: str = "goldensection", bound_gc: bool = True,
                     output_option:Literal["lowest_depth","final_depth_dir",
-                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
+                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False):
         """
         Compute geometrical depth
                 
@@ -705,7 +705,7 @@ class DepthEucl():
                   NRandom: int = 1000,n_refinements: int = 10,sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
                   cap_size: int = 1,start: str = "mean",space: str = "sphere",line_solver: str = "goldensection",bound_gc: bool = True,
                   CUDA:bool=False,output_option:Literal["lowest_depth","final_depth_dir",
-                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
+                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False):
         """
         Compute Halfspace depth
                 
@@ -838,7 +838,7 @@ class DepthEucl():
             else: self.L2Depth=self.L2Depth[0]
         return self.L2DepthDS if evaluate_dataset==True else self.L2Depth
 
-    def potential(self,x:np.ndarray=None,pretransform: str = "1Mom", kernel: str = "EDKernel", 
+    def potential(self,x:np.ndarray=None, pretransform: str = "1Mom", kernel: str = "EDKernel", 
                   mah_parMcd: float = 0.75, kernel_bandwidth: int = 0, evaluate_dataset:bool=False):
         """
         Compute potential depth
@@ -890,7 +890,7 @@ class DepthEucl():
                   sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
                   cap_size: int = 1,start: str = "mean",space: str = "sphere",line_solver: str = "goldensection",bound_gc: bool = True,
                   CUDA:bool=False, output_option:Literal["lowest_depth","final_depth_dir",
-                                          "all_depth","all_depth_directions"]="final_depth_dir", evaluate_dataset:bool=False):
+                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False):
         """
         Compute projection depth
                 
@@ -1136,7 +1136,7 @@ class DepthEucl():
                sphcap_shrink=0.5,alpha_Dirichlet=1.25,cooling_factor=0.95,cap_size=1,
                start="mean",space="sphere",line_solver="goldensection",bound_gc=True,
                output_option:Literal["lowest_depth","final_depth_dir",
-                                     "all_depth","all_depth_directions"]="final_depth_dir",
+                                     "all_depth","all_depth_directions"]="lowest_depth",
                 evaluate_dataset:bool=False):
         """
         Compute zonoide depth
