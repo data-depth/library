@@ -70,6 +70,16 @@ class DepthFunc():
         """ 
         if type(data) == type(None):
             raise Exception("You must load a dataset")
+        assert type(data)==np.ndarray or type(data)==pd.DataFrame, 'Data must be a 3D numpy array of a pandas DataFrame'
+        
+        if type(data)==np.ndarray:
+            self.TSnp=timestamp_col
+            self.CInp=case_id
+            data=self._3Dnp_tp_pd(data,self.TSnp, self.CInp)
+            timestamp_col="timestamp"
+            value_cols="value"
+            case_id="case_id"
+
         if type(timestamp_col)==str:
             if timestamp_col in data.columns:    
                 self.timestamp_col=timestamp_col
@@ -84,7 +94,6 @@ class DepthFunc():
          
         if type(value_cols) == str: 
             self.value_cols = data.filter(like = value_cols).columns
-            print(self.value_cols)
             if len(self.value_cols)==0: raise ValueError("value_cols is an empty list, value_cols should be a suffix for different columns")
         elif type(value_cols) == list:
             self.value_cols = value_cols
@@ -102,32 +111,148 @@ class DepthFunc():
                 self.case_id = data.columns[case_id]
         print(f"case_id is set to {self.case_id}")
         
-        # assert(type(data) == np.ndarray), "The dataset must be a numpy array"
-        # self._nSamples=data.shape[0] # define dataset size - n
-        # self._spaceDim=data.shape[2] # define space dimension - d
+        self.t_min = data[self.timestamp_col].min()
+        self.t_max = data[self.timestamp_col].max()
+        data=data.sort_values([self.case_id,self.timestamp_col])
+        data=self._MinMax(data)
+
+
 
         if interpolate_grid==True:
-            self.N_grid = N_grid
-            self.t_min = data[self.timestamp_col].min()
-            self.t_max = data[self.timestamp_col].max()
-            
+            self.N_grid = N_grid            
             if np.issubdtype(data[self.timestamp_col].dtype, np.datetime64):
                 new_domain = np.linspace(0, (self.t_max - self.t_min).total_seconds(), self.N_grid)
             else:
                 new_domain = np.linspace(0, self.t_max - self.t_min, self.N_grid)
             self.new_domain = new_domain
+        # for i in np.unique(data.case_id)
         elif interpolate_grid==False:
-            self.t_min = data[self.timestamp_col].min()
             if np.issubdtype(data[self.timestamp_col].dtype, np.datetime64):
                 self.new_domain=np.sort(np.unique((data[self.timestamp_col]-data[self.timestamp_col].min()).dt.total_seconds()))
             else:
                 self.new_domain=np.sort(np.unique((data[self.timestamp_col]-data[self.timestamp_col].min())))
+        
         self.interpolation_type=interpolation_type
         self.data_array = self._syncronise_over_time(data,True)
         self.data = data
         
         return self  
     
+    def _3Dnp_tp_pd(self,data,timestamp_col, case_id,):
+        assert len(data.shape)==3, "data must be a 3D numpy array or pandas dataframe"
+
+        if type(timestamp_col)==str and timestamp_col!="timestamp":
+            print(f"timestamp_col is set to {timestamp_col}, strings are only accepted with pandas dataframe.")
+            print("timestamp_col is set to a equaly spaced grid")
+            TS=np.arange(0,data.shape[-1])
+            timestamp_col=-1
+        elif type(timestamp_col)==int:
+            if timestamp_col>data.shape[-1]:
+                raise IndexError("timestamp_col is set to a value greater than the dataset")
+        else: 
+            print("timestamp_col must be an integer, it will not be considered for further computations")
+            timestamp_col=-1
+        if type(case_id)==str and case_id!="case_id":
+            print(f"case_id is set to {case_id}, strings are only accepted with pandas dataframe.")
+            print("case_id is set to the first dimension of the query.")
+            case_id=-1
+        elif type(case_id)==int:
+            if case_id>data.shape[-1]:
+                raise IndexError("case_id is set to a value greater than the dataset")
+        else: 
+            print("case_id must be an integer, it will not be considered for further computations")
+            case_id=-1
+        nCols=data.shape[-1]
+        if timestamp_col==-1:
+            timestamp_col=nCols
+            nCols+=1
+        if case_id==-1:
+            case_id=nCols
+            nCols+=1
+        valCols=[f"value_{i}" for i in range(nCols-2)]
+        df=pd.DataFrame(columns=["timestamp", "case_id", *valCols],dtype=np.float32)
+        for i in range(data.shape[0]):
+            # dfi=np.zeros((data.shape[1],nCols))
+            dfi=pd.DataFrame(data=np.zeros((data.shape[1],nCols)),columns=["timestamp", "case_id", *valCols],dtype=np.float32)
+            c=0
+            for j in range(nCols):
+                if j==timestamp_col:
+                    if j>=data.shape[-1]:
+                        dfi["timestamp"]=np.arange(data.shape[1],dtype=int)
+                    else: 
+                        dfi["timestamp"]=data[i,:,j]
+                elif j==case_id:
+                    if j>=data.shape[-1]:
+                        dfi["case_id"]=np.ones(data.shape[1],dtype=int)*i
+                    else: 
+                        dfi["case_id"]=data[i,:,j]
+                else:
+                    # print(f"value_{c}")
+                    dfi[f"value_{c}"]=data[i,:,j]
+                    c+=1
+            df=pd.concat([df,dfi],ignore_index=True).reset_index(drop=True)
+            # print(dfi,timestamp_col)
+        
+        return df
+
+
+
+    def _MinMax(self,data):
+        """
+        fix min max values for border times
+        """
+        for caso in np.unique(data[self.case_id]):
+            # df[df.case_id==i][minT]
+            # print(df[(df.case_id==i)&(df.timestamp==df[df.case_id==i]["timestamp"].min())][["case_id","timestamp",*val_cols]])
+            if data[(data[self.case_id]==caso)]["timestamp"].min()==self.t_min:
+                for col in self.value_cols:
+                    if data[(data[self.case_id]==caso)&(data[self.timestamp_col]==self.t_min)][col].isna().values[0]:
+                        data.loc[(data[self.case_id]==caso)&(data[self.timestamp_col]==self.t_min),col
+                                 ]=data[(data[self.case_id]==caso)].loc[data[(data[self.case_id]==caso)][col].first_valid_index()][col]
+                        
+            else:
+                firstCol=pd.DataFrame(columns=data.columns, )
+                for col in data.columns:
+                    if col==self.case_id:
+                        firstCol.loc[0,col]=caso
+                    elif col==self.timestamp_col:
+                        firstCol.loc[0,col]=self.t_min
+                    elif col in self.value_cols:
+                        firstCol.loc[0,col]=data[(data[self.case_id]==caso)].loc[data[(data[self.case_id]==caso)][[col]].first_valid_index()][col]
+                    else:
+                        firstCol.loc[0,col]=data[(data[self.case_id]==caso)].loc[data[(data[self.case_id]==caso)][[col]].first_valid_index()][col]
+                firstCol = firstCol.astype(data.dtypes.to_dict())
+                # print(firstCol.dtypes)
+                data=pd.concat([firstCol,data], ignore_index=False).reset_index(drop=True)
+                # print(data[data[self.case_id]==caso])
+
+                
+
+            if data[(data[self.case_id]==caso)]["timestamp"].max()==self.t_max:
+                for col in self.value_cols:
+                    if data[(data[self.case_id]==caso)&(data[self.timestamp_col]==self.t_max)][col].isna().values[0]:
+                        data.loc[(data[self.case_id]==caso)&(data[self.timestamp_col]==self.t_max),col
+                                 ]=data[(data[self.case_id]==caso)].loc[data[(data[self.case_id]==caso)][col].last_valid_index()][col]
+                        
+            else:
+                lastCol=pd.DataFrame(columns=data.columns, )
+                for col in data.columns:
+                    if col==self.case_id:
+                        lastCol.loc[0,col]=caso
+                    elif col==self.timestamp_col:
+                        lastCol.loc[0,col]=self.t_max
+                    elif col in self.value_cols:
+                        lastCol.loc[0,col]=data.loc[data[(data[self.case_id]==caso)][col].last_valid_index(),col]
+                    else :
+                        lastCol.loc[0,col]=data.loc[data[(data[self.case_id]==caso)][col].last_valid_index(),col]
+                lastCol = lastCol.astype(data.dtypes.to_dict())
+                # print(lastCol)
+            #     # print(firstCol.dtypes)
+                data=pd.concat([data,lastCol], ignore_index=False).reset_index(drop=True)
+        return data.sort_values([self.case_id,self.timestamp_col]).reset_index(drop=True)
+
+
+
     def _syncronise_over_time(self,df, interpolation=True, ):
         M = []
         if np.issubdtype(df[self.timestamp_col].dtype, np.datetime64):
@@ -381,7 +506,16 @@ class DepthFunc():
 
         
         self._check_depth(notion)
-        query_array = self._syncronise_over_time(query,)
+        if type(query)==np.ndarray:
+            query=self._3Dnp_tp_pd(query,self.TSnp, self.CInp)
+        if query[self.timestamp_col].max()>self.t_max:
+            print(f"Values with {self.timestamp_col} greater the base set domain are excluded")
+            query.drop(query[query[self.timestamp_col]>self.t_max].index, inplace=True)
+        if query[self.timestamp_col].min()>self.t_min:
+            print(f"Values with {self.timestamp_col} smaller the base set domain are excluded")
+            query.drop(query[query[self.timestamp_col]<self.t_min].index, inplace=True)
+        queryMM=self._MinMax(query)
+        query_array = self._syncronise_over_time(queryMM,)
         depth_array = np.empty((query_array.shape[0],), dtype = float)
         if len(self.value_cols)==1 and output_option=="final_depth_dir":
             print("Space dimention is 1, output_option is set to 'lowest_depth'")
