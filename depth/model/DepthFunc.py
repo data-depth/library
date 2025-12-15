@@ -26,7 +26,7 @@ class DepthFunc():
 
         Parameters
         ----------
-        data : array_like.
+        data : dataframe or array_like.
             Dataset that will be used as base for depth computation
             
         y : Ignored, default=None
@@ -35,15 +35,24 @@ class DepthFunc():
         timestamp_col : str|int, default = timestamp
             Column used for discretization of the dataset.
             timestamp_col can be a string indicating the name of the column or an integer for the position of the column.
-        
-        value_cols: str|list, default='value'
+            If the dataset is an array, timestamp_col must be an integer or it will not be considered and a new timestamp_col is created. 
+
+        case_id : str | int, default= "case_id"
+            Column used to separate different functions.
+            For pandas dataframe, it must be either the column name or its position.
+            For numpy array, it must be eather an integer for the position or it wil be considered as the dimension separation.
+
+        value_cols: str|list, default = 'value'
             Columns used for the multivariate depth computation.
             If value_cols is a string, columns with such word in the name are used.
             If value_cols is a list, it is considered the list of columns to be used.
+            If data is an array, value_cols must be an integer or a list of integers, if not all columns that are not timestamp or case_id will be considered.
         
         interpolate_grid : bool, default = True   
+            Interpolates the timestamp grid using an equaly spaced array from the minimum to the maximum timestamp value.  
 
-        N_grid:
+        N_grid : int, default = 10
+            Determines the number of grid points in the interpolation process.
 
 
         interpolation_type : str, default='linear'
@@ -453,36 +462,79 @@ class DepthFunc():
         This function computes depth values of functional observations (in `query`) relative to a 
         reference dataset (`df`) using projection-based methods such as halfspace depth.
         Each function (trajectory) is represented by a sequence of multivariate values over time.
-        If `interpolation=True`, the function first synchronizes all cases over a common 
-        time grid via interpolation before computing depths.
-
+        
         Parameters
         ----------
         query : pandas.DataFrame
             Query dataset containing functional observations whose depth will be computed
             relative to `df`. Must have the same column structure as `df`.
 
-
-        interpolation : bool, default=True
-            If True, each function is interpolated to a common grid across all cases 
-            using the `interpolate()` function. If False, raw data are used as-is.
-
         notion : {"mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"}, default='halfspace'
             Type of functional depth to compute. Currently supports 'halfspace', but 
             can be extended to other projection-based depths.
 
         solver : str, default='neldermead'
-            Optimization solver used within the internal depth computation (`int_depth` function).
+            {'simplegrid', 'refinedgrid', 'simplerandom', 'refinedrandom', 'coordinatedescent', 'randomsimplices', 'neldermead', 'simulatedannealing'},
+            The type of solver used to approximate the depth.
+            Optimization solver used within the internal depth computation.
 
         NRandom : int, default=100
             Number of random projections or optimization restarts used in computing 
             projection-based depth.
 
+        notion 
+            {"mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"},
+            Which depth will be computed.
+                            
+        n_refinements  
+            For ``solver`` = ``refinedrandom`` or ``refinedgrid``, set the maximum of iteration for 
+            computing the depth of one point. 
+            
+        sphcap_shrink  
+            For ``solver`` = ``refinedrandom`` or `refinedgrid`, it's the shrinking of the spherical cap. 
+            
+        alpha_Dirichlet  
+            For ``solver`` = ``randomsimplices``. it's the parameter of the Dirichlet distribution. 
+            
+        cooling_factor  
+            For ``solver`` = ``randomsimplices``, it's the cooling factor. 
+            
+        cap_size 
+            For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the size of the spherical cap. 
+            
+        start 
+            {'mean', 'random'}, 
+            For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the method used to compute the first depth.
+            
+        space  
+            {'sphere', 'euclidean'}, 
+            For ``solver`` = ``coordinatedescent`` or ``neldermead``, it's the type of spacecin which
+            the solver is running.
+            
+        line_solver 
+            {'uniform', 'goldensection'}, 
+            For ``solver`` = ``coordinatedescent``, it's the line searh strategy used by this solver.
+            
+        bound_gc 
+            For ``solver`` = ``neldermead``, it's ``True`` if the search is limited to the closed hemisphere.
+
+
         Returns
         -------
         depth_array : np.ndarray of shape (n_query,)
-            Array of depth values, where `n_query` is the number of functional observations 
-            (unique `case_id`s) in the `query` dataset.
+        Array of depth values, where `n_query` is the number of functional observations 
+        (unique `case_id`s) in the `query` dataset.
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    - Lowest Asymmetrical Projection Detph
+        
+            If ``output_option=="final_depth_dir"`` returns:
+                Tuple of array_like
+                    - Lowest Asymmetrical Projection Detph
+                    - Lowest depth respective sirection
 
         Notes
         -----
@@ -490,18 +542,7 @@ class DepthFunc():
         relative to the global minimum timestamp (`t_min`).
         - Duplicate timestamps within each `case_id` group are automatically dropped.
         - Interpolation uses linear extrapolation outside the observed time range."""
-
-
-        
-        # if interpolation:
-        #     t_min = min(df['timestamp'].min(), query['timestamp'].min())
-        #     t_max = max(df['timestamp'].max(), query['timestamp'].max())
-            
-        #     if np.issubdtype(df["timestamp"].dtype, np.datetime64):
-        #         new_domain = np.linspace(0, (t_max - t_min).total_seconds(), N_grid)
-        #     else:
-        #         new_domain = np.linspace(0, t_max - t_min, N_grid)
-            
+  
         
 
         
@@ -583,4 +624,3 @@ class DepthFunc():
         if (depth not in all_depths):
             raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))    
         
-    

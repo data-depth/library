@@ -130,7 +130,8 @@ class DepthEucl():
 
         Returns
         ---------
-        DepthEucl model
+        self : DepthEucl model object.
+            Returns the instance itself.
         """
         if type(data)==None:
             raise Exception("You must load a dataset")
@@ -203,6 +204,10 @@ class DepthEucl():
         Returns
         ----------
         array_like or tuple of array_like
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+        The third return is all the computed depth values with respect to all approximative directions.
+        The fourth return is all corresponding directions. 
             If ``output_option=="lowest_depth"`` returns:
                 array_like
                     - Lowest Mahalanobis Detph
@@ -314,6 +319,10 @@ class DepthEucl():
         Returns
         ----------
         array_like or tuple of array_like
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+        The third return is all the computed depth values with respect to all approximative directions.
+        The fourth return is all corresponding directions. 
             If ``output_option=="lowest_depth"`` returns:
                 array_like
                     - Lowest Asymmetrical Projection Detph
@@ -529,6 +538,10 @@ class DepthEucl():
         Returns
         ----------
         array_like or tuple of array_like
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+        The third return is all the computed depth values with respect to all approximative directions.
+        The fourth return is all corresponding directions. 
             If ``output_option=="lowest_depth"`` returns:
                 array_like
                     - Lowest Continuous Modified Explected Convex Hull Detph
@@ -625,6 +638,10 @@ class DepthEucl():
         Returns
         ----------
         array_like or tuple of array_like
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+        The third return is all the computed depth values with respect to all approximative directions.
+        The fourth return is all corresponding directions. 
             If ``output_option=="lowest_depth"`` returns:
                 array_like
                     - Lowest Geometrical Detph
@@ -723,6 +740,10 @@ class DepthEucl():
         Returns
         ----------
         array_like or tuple of array_like
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+        The third return is all the computed depth values with respect to all approximative directions.
+        The fourth return is all corresponding directions. 
             If ``output_option=="lowest_depth"`` returns:
                 array_like
                     - Lowest Halfspace (Tukey) Detph
@@ -908,6 +929,10 @@ class DepthEucl():
         Returns
         ----------
         array_like or tuple of array_like
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+        The third return is all the computed depth values with respect to all approximative directions.
+        The fourth return is all corresponding directions. 
             If ``output_option=="lowest_depth"`` returns:
                 array_like
                     - Lowest Projection Detph
@@ -1155,6 +1180,10 @@ class DepthEucl():
         Returns
         ----------
         array_like or tuple of array_like
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+        The third return is all the computed depth values with respect to all approximative directions.
+        The fourth return is all corresponding directions. 
             If ``output_option=="lowest_depth"`` returns:
                 array_like
                     - Lowest Zonoid Detph
@@ -1272,6 +1301,7 @@ class DepthEucl():
         Results
         --------
             ACA directions for dimensional reduction : array_like
+            The return respresents directions that best represents anomalies in the dataset.
             
         """
         ACA_tab=mtv.ACA(X=self.data,dim=dim,
