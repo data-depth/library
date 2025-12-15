@@ -15,7 +15,7 @@ version="1.1.2.6"
 description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth"
 readme="README.md"
 dependencies=[
-            'numpy>0.0','scipy>0.0',
+            'numpy>0.0','scipy>0.0','pandas>0.0',
             'scikit-learn>0.0','matplotlib>0.0',
             'torch>0.0',
             'torchvision>0.0']

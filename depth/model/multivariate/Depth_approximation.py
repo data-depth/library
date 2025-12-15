@@ -111,8 +111,8 @@ def depth_approximation(z,
         for i in range(n_z):
             if(np.sum(z[i]*best_directions[i]) < np.sum(z[i]*(-best_directions[i]))):
                     best_directions[i] = -best_directions[i]
-
-
+    # print(option)
+    depths=np.nan_to_num(depths, nan=0)
     if(option == 1):
         return depths
     elif(option == 2):

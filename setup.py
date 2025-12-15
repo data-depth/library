@@ -12,28 +12,6 @@ class custom_build_ext(build_ext):
         # distutils.sysconfig.get_var("CFLAGS").
         # self.compiler.set_executable("compiler_so", "g++ -fpic")
         self.compiler.set_executable("compiler_cxx", "g++")
-        # if sys.platform=='win32':
-        #     subprocess.check_call([
-		# 		"g++",
-		# 		"-O2", "-std=c++17",
-		# 		"-shared", "-static-libgcc", "-static-libstdc++",
-		# 		"depth/src/ddalpha.cpp",
-		# 		"-o", "depth/src/ddalpha.dll",
-		# 	])
-        #     subprocess.check_call([
-		# 		"g++",
-		# 		"-O2", "-std=c++17",
-		# 		"-shared", "-static-libgcc", "-static-libstdc++",
-		# 		"depth/src/depth_wrapper.cpp",
-		# 		"-o", "depth/src/depth_wrapper.dll",
-		# 	])
-        #     subprocess.check_call([
-		# 		"g++",
-		# 		"-O2", "-std=c++17",
-		# 		"-shared", "-static-libgcc", "-static-libstdc++",
-		# 		"depth/src/ACA_wrapper.cpp",
-		# 		"-o", "depth/src/ACA_wrapper.dll",
-		# 	])
         if sys.platform=='darwin':
             self.compiler.set_executable("linker_so", "g++ -Wl, -shared -lstdc++")
         if sys.platform=='linux':
