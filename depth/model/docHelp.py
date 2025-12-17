@@ -58,10 +58,10 @@ Arguments
     bound_gc : bool, default = True
         For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
     
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
         |        If ``output_option=lowest_depth``, only approximated depths are returned.
-        |        If ``output_option=final_depht_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
         |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
         |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
@@ -139,10 +139,10 @@ Arguments
     bound_gc : bool, default = True
         For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
     
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
         |        If ``output_option=lowest_depth``, only approximated depths are returned.
-        |        If ``output_option=final_depht_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
         |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
         |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
@@ -178,30 +178,30 @@ Arguments
         Matrix of objects (numerical vector as one object) whose depth is to be calculated. 
         Each row contains a d-variate point and should have the same dimension as data.
 
-	beta : int, default=2
-        The parameter defining the positionning of the balls’ centers, see `Yang and Modarres (2017)`_ for details.
+    beta : int, default=2
+        The parameter defining the positionning of the balls’ centers, see Yang and Modarres (2017) for details.
         By default (together with other arguments) equals
         ``2``, which corresponds to the lens depth, see Liu and Modarres (2011).
-
-	distance : str, default='Lp'
+        
+    distance : str, default='Lp'
         A character string defining the distance to be used for determining inclusion
         of a point into the lens (influence region), see Yang and Modarres (2017) for
         details. Possibilities are ``'Lp'`` for the Lp-metric (default) or ``'Mahalanobis'`` for
         the Mahalanobis distance adjustment.
 
-	Lp_p : int, default=2
-			A non-negative number defining the distance’s power equal ``2`` by default (Euclidean distance)
-			is used only when ``distance='Lp'``.
+    Lp_p : int, default=2
+        A non-negative number defining the distance’s power equal ``2`` by default (Euclidean distance) 
+        is used only when ``distance='Lp'``.
 
     mah_estimate : str, {"moment", "mcd"}, default="moment"
-			A character string specifying which estimates to use when calculating sample
-			covariance matrix; can be ``'none'``, ``'moment'`` or ``'MCD'``, determining whether
-			traditional moment or Minimum Covariance Determinant (MCD)
-			estimates for mean and covariance are used. By default ``'moment'`` is used. Is
-			used only when ``distance='Mahalanobis'``.
+        A character string specifying which estimates to use when calculating sample 
+        covariance matrix; can be ``'none'``, ``'moment'`` or ``'MCD'``, determining whether 
+        traditional moment or Minimum Covariance Determinant (MCD) 
+        estimates for mean and covariance are used. By default ``'moment'`` is used. Is 
+        used only when ``distance='Mahalanobis'``.
 
     mah_parMcd : float, default=0.75
-			The value of the argument alpha for Minimum Covariance Determinant (MCD); is used when ``distance='Mahalanobis'`` and ``mah.estimate='MCD'``.
+        The value of the argument alpha for Minimum Covariance Determinant (MCD); is used when ``distance='Mahalanobis'`` and ``mah.estimate='MCD'``.
     
     evaluate_dataset : bool, default=False
         Determines if dataset loaded will be evaluated. 
@@ -275,10 +275,10 @@ Arguments
     bound_gc : bool, default = True
         For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
     
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
         |        If ``output_option=lowest_depth``, only approximated depths are returned.
-        |        If ``output_option=final_depht_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
         |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
         |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
@@ -350,10 +350,10 @@ Arguments
     bound_gc : bool, default = True
         For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
     
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
         |        If ``output_option=lowest_depth``, only approximated depths are returned.
-        |        If ``output_option=final_depht_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
         |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
         |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
@@ -425,10 +425,10 @@ Arguments
     bound_gc : bool, default = True
         For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
     
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
         |        If ``output_option=lowest_depth``, only approximated depths are returned.
-        |        If ``output_option=final_depht_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
         |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
         |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
@@ -516,10 +516,10 @@ Arguments
         Determines if approximate computation will be performed in GPU.
         avaiable only for simplerandom or refinedrandom
 
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
         |        If ``output_option=lowest_depth``, only approximated depths are returned.
-        |        If ``output_option=final_depht_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
         |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
         |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
@@ -696,10 +696,10 @@ Arguments
         Determines if approximate computation will be performed in GPU.
         avaiable only for simplerandom or refinedrandom
 
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
         |        If ``output_option=lowest_depth``, only approximated depths are returned.
-        |        If ``output_option=final_depht_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
         |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
         |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
 
@@ -934,10 +934,10 @@ Arguments
     bound_gc : bool, default = True
         For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
     
-    output_option : str {"lowest_depth","final_depht_dir","all_depth","all_depth_directions}, default = final_depht_dir
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
         Determines what will be computated alongside with the final depth
         |        If ``output_option=lowest_depth``, only approximated depths are returned.
-        |        If ``output_option=final_depht_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
         |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
         |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
 

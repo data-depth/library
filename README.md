@@ -21,7 +21,17 @@ data-depth can be directly installed using **pip**:
 
 Running GPU based depth requires CUDA availability, it can be installed using pytorch:
     
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    pip install torch --index-url https://download.pytorch.org/whl/cu118
+    pip install data-depth
+
+When using **conda**, run before:
+
+    conda install conda-forge::pytorch
+    pip install data-depth
+    
+Or for GPU usage:
+
+    conda install conda-forge::pytorch-gpu 
     pip install data-depth
 
 For more information about CUDA version, see https://pytorch.org/get-started/locally/
