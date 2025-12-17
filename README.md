@@ -12,7 +12,7 @@ Following the seminal idea of Tukey (1975), data depth is a function that measur
 - **Contributing:** https://data-depth.github.io/multivariate/credits.html#contributors
 
 ___
-Instalation:
+Installation:
 ---
 
 data-depth can be directly installed using **pip**:
