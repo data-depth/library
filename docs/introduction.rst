@@ -89,10 +89,11 @@ References
 
 * Lange, T., Mosler, K., and Mozharovskyi, P. (2014). DDα-classification of asymmetric and fattailed data. In: Spiliopoulou, M., Schmidt Thieme, L., Janning, R. (eds), *Data Analysis, Machine Learning and Knowledge Discovery*, Springer (Berlin), 71–78.
 
-* Mozharovskyi, P. (2022). Anomaly detection using data depth: multivariate case. [arXiv:2210.02851]
+* Mozharovskyi, P., Valla, R. (2022). Anomaly detection using data depth: multivariate case. [arXiv:2210.02851]
 
 * Mozharovskyi, P., Josse, J., and Husson, F. (2020). Nonparametric imputation by data depth. *Journal of the American Statistical Association*, 115(529), 241-253.
 
+* Leone, L., Mozharovskyi, P., Bounie, D. (2025). Massive parallelization of projection-based depths. [arXiv:2506.08262]
 
 .. toctree::
    :maxdepth: 1
