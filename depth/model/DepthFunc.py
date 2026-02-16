@@ -1,4 +1,4 @@
-import multivariate as mvt
+from . import multivariate as mvt
 # from DepthEucl import DepthEucl
 import numpy as np
 import pandas as pd
