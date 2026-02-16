@@ -1,4 +1,4 @@
-from . import multivariate as mvt
+import multivariate as mvt
 # from DepthEucl import DepthEucl
 import numpy as np
 import pandas as pd
@@ -9,9 +9,160 @@ from typing import Literal
 
 class DepthFunc():
     """
-    Functional Data-Depth
-    
-    Computes the depth of functional data
+    DepthFunc
+    =========
+    Functional Data Depth computation via time-integrated multivariate depth.
+
+    This class computes the Integrated Functional Depth (IFD) of functional
+    observations with respect to a reference sample of functions.
+
+    The functional depth is defined as the average of multivariate depth
+    values computed at each discretization time point:
+
+        IFD(x) = (1/L) * sum_{i=1}^L D(x(t_i) | X(t_i))
+
+    where:
+        - X(t_i) is the sample of multivariate observations at time t_i
+        - D(·) is a multivariate depth (e.g., halfspace depth)
+        - L is the number of time grid points
+
+
+    ----------------------------------------------------------------------
+    Expected Data Format
+    ----------------------------------------------------------------------
+
+    1) Pandas DataFrame (recommended)
+
+       Required columns:
+           - timestamp : time variable
+           - case_id   : function identifier
+           - value_*   : one or more value columns
+
+       Example:
+
+           timestamp | case_id | value_1 | value_2
+           ----------------------------------------
+           0         | 1       | 2.1     | 5.3
+           1         | 1       | 2.5     | 5.8
+           0         | 2       | 1.9     | 4.8
+           1         | 2       | 2.2     | 5.1
+
+       Each unique case_id corresponds to one functional observation.
+
+
+    2) 3D NumPy array
+
+       Shape:
+           (N_functions, L_time_points, D_dimension)
+
+       Example:
+           data.shape == (50, 100, 2)
+
+       It will automatically be converted internally to DataFrame format.
+
+
+    ----------------------------------------------------------------------
+    Typical Workflow
+    ----------------------------------------------------------------------
+
+    Step 1 — Create object
+
+        dfunc = DepthFunc()
+
+
+    Step 2 — Load reference dataset
+
+        dfunc.load_dataset(
+            data=df,
+            timestamp_col="timestamp",
+            case_id="case_id",
+            value_cols="value",
+            interpolate_grid=True,
+            N_grid=50
+        )
+
+        This:
+            - synchronizes all functions
+            - interpolates onto a common time grid
+
+    Step 3 — Compute depth of query functions
+
+        depths = dfunc.projection_based_func_depth(query_df)
+
+        Returns:
+            np.ndarray of depth values (one per function)
+
+
+    ----------------------------------------------------------------------
+    Supported Depth Notions
+    ----------------------------------------------------------------------
+
+        - "mahalanobis"
+        - "halfspace"
+        - "zonoid"
+        - "projection"
+        - "aprojection"
+        - "cexpchullstar"
+        - "cexpchull"
+        - "geometrical"
+
+
+    Example:
+
+        depths = dfunc.projection_based_func_depth(
+            query_df,
+            notion="halfspace",
+            solver="neldermead",
+            NRandom=200
+        )
+
+
+    ----------------------------------------------------------------------
+    Advanced Output Option
+    ----------------------------------------------------------------------
+
+        output_option="lowest_depth"
+            Returns only the depth value.
+
+        output_option="final_depth_dir"
+            Returns:
+                (depth_value, optimal_direction)
+
+            The direction corresponds to the projection achieving
+            the minimal depth.
+
+
+    ----------------------------------------------------------------------
+    Automatic Handling
+    ----------------------------------------------------------------------
+
+        - Sorting by time
+        - Removal of duplicate timestamps
+        - Boundary time completion
+        - Interpolation to common grid
+        - Handling datetime timestamps
+        - NaN-safe interpolation
+
+
+    ----------------------------------------------------------------------
+    Internal Representation
+    ----------------------------------------------------------------------
+
+        After loading the dataset:
+
+            self.data_array.shape =
+                (N_functions, L_grid_points, D_dimension)
+
+        All depth computations are performed using this array.
+
+
+    Notes
+    ----------------------------------------------------------------------
+
+        - Query dataset must have the same structure as the reference dataset.
+        - Query timestamps outside the reference domain are excluded.
+        - Depth values are numerically approximated.
+        - Interpolation is linear by default.
 
     """
     def __init__(self):
@@ -42,6 +193,8 @@ class DepthFunc():
             If value_cols is a list, it is considered the list of columns to be used.
         
         interpolate_grid : bool, default = True   
+            Interpolates the timestamp grid using an equaly spaced array from the minimum to the maximum timestamp value.  
+            If False, the time stamps for all functions must be the same and the grid is set to the unique timestamp values in the dataset.
 
         N_grid:
 
@@ -356,8 +509,19 @@ class DepthFunc():
         Returns
         -------
         depth_array : np.ndarray of shape (n_query,)
-            Array of depth values, where `n_query` is the number of functional observations 
-            (unique `case_id`s) in the `query` dataset.
+        Array of depth values, where `n_query` is the number of functional observations 
+        (unique `case_id`s) in the `query` dataset.
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    - Lowest Asymmetrical Projection Detph
+        
+            If ``output_option=="final_depth_dir"`` returns:
+                Tuple of array_like
+                    - Lowest Asymmetrical Projection Detph
+                    - Lowest depth respective direction
 
         Notes
         -----
