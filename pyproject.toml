@@ -11,7 +11,7 @@ authors = [
 maintainers = [
   {name = "Pavlo Mozharovskyi", email = "pavlo.mozharovskyi@telecom-paris.fr"}
 ]
-version="1.1.2.6"
+version="1.1.3.0"
 description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth"
 readme="README.md"
 dependencies=[

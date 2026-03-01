@@ -156,6 +156,8 @@ References
     
     * Dyckerhoff, R., Mozharovskyi, P., and Nagy, S. (2021). Approximate computation of projection depths. *Computational Statistics and Data Analysis*, 157, 107166.
 
+    * Leone, L., Mozharovskyi, P., Bounie, D. (2025). Massive parallelization of projection-based depths. [arXiv:2506.08262]
+
 Examples
             >>> import numpy as np
             >>> from depth.model import DepthEucl
@@ -536,6 +538,8 @@ References
 
     * Dyckerhoff, R., Mozharovskyi, P., and Nagy, S. (2021). Approximate computation of projection depths. *Computational Statistics and Data Analysis*, 157, 107166.
 
+    * Leone, L., Mozharovskyi, P., Bounie, D. (2025). Massive parallelization of projection-based depths. [arXiv:2506.08262]
+
 Examples
         >>> import numpy as np
         >>> from depth.model import DepthEucl
@@ -711,6 +715,8 @@ References
     * Zuo, Y. and Serfling, R. (2000). General notions of statistical depth function. *The Annals of Statistics*, 28, 461–482.
 
     * Dyckerhoff, R., Mozharovskyi, P., and Nagy, S. (2021). Approximate computation of projection depths. *Computational Statistics and Data Analysis*, 157, 107166.
+
+    * Leone, L., Mozharovskyi, P., Bounie, D. (2025). Massive parallelization of projection-based depths. [arXiv:2506.08262]
 
 Examples
         >>> import numpy as np

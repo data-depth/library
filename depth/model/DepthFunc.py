@@ -213,7 +213,7 @@ class DepthFunc():
         for caso in np.unique(data[self.case_id]):
             # df[df.case_id==i][minT]
             # print(df[(df.case_id==i)&(df.timestamp==df[df.case_id==i]["timestamp"].min())][["case_id","timestamp",*val_cols]])
-            if data[(data[self.case_id]==caso)]["timestamp"].min()==self.t_min:
+            if data[(data[self.case_id]==caso)][self.timestamp_col].min()==self.t_min:
                 for col in self.value_cols:
                     if data[(data[self.case_id]==caso)&(data[self.timestamp_col]==self.t_min)][col].isna().values[0]:
                         data.loc[(data[self.case_id]==caso)&(data[self.timestamp_col]==self.t_min),col
@@ -237,7 +237,7 @@ class DepthFunc():
 
                 
 
-            if data[(data[self.case_id]==caso)]["timestamp"].max()==self.t_max:
+            if data[(data[self.case_id]==caso)][self.timestamp_col].max()==self.t_max:
                 for col in self.value_cols:
                     if data[(data[self.case_id]==caso)&(data[self.timestamp_col]==self.t_max)][col].isna().values[0]:
                         data.loc[(data[self.case_id]==caso)&(data[self.timestamp_col]==self.t_max),col

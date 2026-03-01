@@ -166,17 +166,13 @@ class DepthEucl():
                     device = torch.device("cuda")
                 else:
                     device = torch.device("cpu")
-                self.dataCuda=torch.tensor(data.T,device=device,dtype=torch.float32) 
                 self.data=data
                 # Tensor is transposed to facilitate projection and depth  computation
             else:
+                device = torch.device("cpu")
                 self.data=data
-                self.CUDA=False
-                print("CUDA is set to True, but cuda is not available, CUDA is automatically set to False")
-        else:
-            self.data=data
-            self.CUDA=False
-            print("CUDA is set to True, but troch is not installed, CUDA is automatically set to False")
+                print("CUDA is set to True, but cuda is not available")
+            self.dataCuda=torch.tensor(data.T,device=device,dtype=torch.float32) 
         return self
 
     def mahalanobis(self, x: np.ndarray = None, exact: bool = True, mah_estimate: Literal["none", "moment", "mcd"] = "moment",
@@ -791,7 +787,7 @@ class DepthEucl():
                 self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
 
         for ind,d in enumerate(self.distRef):
-            if CUDA and self.CUDA:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
+            if CUDA==True and self.CUDA==True:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
                 space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,

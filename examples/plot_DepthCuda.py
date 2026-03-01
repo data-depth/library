@@ -54,3 +54,5 @@ plt.xlabel("Projection depth")
 plt.ylabel("Asymmetric projection depth")
 plt.suptitle("Depth results using CUDA application")
 plt.show()
+
+# %%
