@@ -1,15 +1,10 @@
-# Authors: Leonardo Leone
-
 import numpy as np
 import ctypes
 import gc
 import math
 
-try:
-    import torch
-    from torch.nn.functional import normalize
-except:
-    raise ImportError('Torch is not installed')
+import torch
+from torch.nn.functional import normalize
 if torch.backends.mps.is_available():
     device = torch.device("mps")
 elif torch.cuda.is_available():
