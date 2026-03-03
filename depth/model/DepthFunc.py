@@ -444,7 +444,7 @@ class DepthFunc():
                         cooling_factor=cooling_factor,cap_size=cap_size,
                         start=start,space=space,line_solver=line_solver,bound_gc=bound_gc
                     )
-            total_depth_sum += time_component_depth
+            total_depth_sum += np.nan_to_num(time_component_depth,nan=0)
 
         # Average depth over all L time points
         functional_depth_val = total_depth_sum / l_points
