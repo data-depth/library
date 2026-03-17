@@ -5,7 +5,6 @@ import pandas as pd
 from scipy.interpolate import interp1d
 from typing import Literal
 
-# from depth.multivariate import *
 
 class DepthFunc():
     """
@@ -17,6 +16,8 @@ class DepthFunc():
     
     Notes
     -----
+    Possible depth notions are : `mahalanobis`, `halfspace`, `zonoid`, `projection`, `aprojection`, `cexpchullstar`, `cexpchull`, `geometrical`.
+    
     For each discretization point i = 1, ..., L:
         - Extract the data slice `data[:, i, :]` (shape: N_data x D)
         - Extract the query vector `x[i, :]` (shape: D)
