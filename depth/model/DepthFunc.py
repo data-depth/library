@@ -5,14 +5,25 @@ import pandas as pd
 from scipy.interpolate import interp1d
 from typing import Literal
 
-# from depth.multivariate import *
 
 class DepthFunc():
     """
     Functional Data-Depth
     
-    Computes the depth of functional data
+    Return the depth of each sample w.r.t. a dataset, D(x,data) in a functional space, using a chosen depth notion.
 
+    Data depth computes the centrality (similarity, belongness) of a sample 'x' given a dataset 'data'.
+    
+    Notes
+    -----
+    Possible depth notions are : `mahalanobis`, `halfspace`, `zonoid`, `projection`, `aprojection`, `cexpchullstar`, `cexpchull`, `geometrical`.
+    
+    For each discretization point i = 1, ..., L:
+        - Extract the data slice `data[:, i, :]` (shape: N_data x D)
+        - Extract the query vector `x[i, :]` (shape: D)
+        - Compute the multivariate depth of the query vector relative to the data slice
+        - Average the results over all L time points
+    
     """
     def __init__(self):
         self.data=None
