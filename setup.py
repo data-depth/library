@@ -35,18 +35,15 @@ if sys.platform=='darwin' or sys.platform=='linux':
 		    "ddalpha", 
 		    sources=["depth/src/ddalpha.cpp"],
 		    extra_compile_args=["-I.",'-std=c++14','-fPIC','-O2'],
-      		# extra_compile_args=['-std=c++14','-fPIC','-O2'],
-		    extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
+      	    extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
 		),Extension(
 		    "depth_wrapper", 
 		    sources=["depth/src/depth_wrapper.cpp"],
-		    # extra_compile_args=["-I.",'-std=c++14','-fPIC','-O2'],
-      		extra_compile_args=['-std=c++14','-fPIC','-O2'],
+			extra_compile_args=['-std=c++14','-fPIC','-O2'],
 		    extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
 		),Extension(
             "ACA_wrapper",
             sources=["depth/src/ACA_wrapper.cpp"],
-            # extra_compile_args=['-std=c++14','-fPIC','-O2'],
             extra_compile_args=["-I.",'-std=c++14','-fPIC','-O2'],
             extra_link_args=["-rdynamic",'-std=c++14','-fPIC']
         )
