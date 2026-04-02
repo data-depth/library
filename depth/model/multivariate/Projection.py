@@ -18,13 +18,14 @@ def projection(x, data,
         space = "sphere",
         line_solver = "goldensection",
         bound_gc = True,
-        CUDA=False):
+        CUDA=False,
+        device=None):
     if CUDA==False: #check cuda
         return depth_approximation(x, data, "projection", solver, NRandom, option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
     else: 
         return cudaApprox(data,x, "projection", solver, option,NRandom, n_refinements,
-        sphcap_shrink,) # return for depth cuda
+        sphcap_shrink,device=device,) # return for depth cuda
 
 projection.__doc__="""
 

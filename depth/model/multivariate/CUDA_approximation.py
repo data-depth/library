@@ -5,15 +5,15 @@ import math
 
 import torch
 from torch.nn.functional import normalize
-if torch.backends.mps.is_available():
-    device = torch.device("mps")
-elif torch.cuda.is_available():
-    device = torch.device("cuda")
-else:
-    device = torch.device("cpu")
+# if torch.backends.mps.is_available():
+#     device = torch.device("mps")
+# elif torch.cuda.is_available():
+#     device = torch.device("cuda")
+# else:
+#     device = torch.device("cpu")
 def cudaApprox(data:torch.Tensor,x:torch.Tensor,notion:str,
             solver:str,option:int,NRandom:int,n_refinements:int,sphcap_shrink:float,
-            step:int=10000)->torch.Tensor:
+            step:int=10000,device=None)->torch.Tensor:
     """Main function to compute approximated depth based on chosen notion 
     """
     torch.manual_seed(2801)
@@ -28,7 +28,7 @@ def cudaApprox(data:torch.Tensor,x:torch.Tensor,notion:str,
     if option==2:finalDirections=np.empty((x.shape)) # direction matrix
     for ind,z in enumerate(x):
         zCuda=torch.tensor(z.reshape(1,-1),dtype=torch.float32,device=device)
-        D=RS(data,zCuda,notion,option,dirRef,n_refinements,sphcap_shrink,step,Pdata,dirs)
+        D=RS(data,zCuda,notion,option,dirRef,n_refinements,sphcap_shrink,step,Pdata,dirs,device)
         if option==1:
             finalDepth[ind]=D
         elif option==2:
@@ -48,17 +48,17 @@ def cudaApprox(data:torch.Tensor,x:torch.Tensor,notion:str,
 
 def RS(data:torch.Tensor,z:torch.Tensor,notion:str,
         option:int,dirRef:int,n_refinements:int,sphcap_shrink:float,
-        step:int,Pdata,dirs):
+        step:int,Pdata,dirs,device):
     """Compute (refined) Random search
     """
     eps=torch.tensor([torch.pi/2],dtype=torch.float32,device=device) # initial cap size
     pole=normalize(torch.normal(0,1,z.shape)).reshape(z.shape) # first pole 
     dMin=torch.ones((1,1),dtype=torch.float32,device=device)
     for ref in range(n_refinements):
-        dirs=poleCuda(dirs,num_dir=dirRef, pole=pole,eps=eps,)
+        dirs=poleCuda(dirs,num_dir=dirRef, pole=pole,eps=eps,device=device)
         torch.matmul(dirs,data,out=Pdata)
         Pz=torch.matmul(dirs,z.T).reshape(1,-1)
-        Pz=depthCompNotion(z,data,Pz,Pdata,notion,step)
+        Pz=depthCompNotion(z,data,Pz,Pdata,notion,step,device)
         eps*=sphcap_shrink
         index_min=torch.argmin(Pz, 1,)
         torch.index_select(Pz, 1,index_min,out=dMin)
@@ -68,7 +68,7 @@ def RS(data:torch.Tensor,z:torch.Tensor,notion:str,
     else:return dMin[0].cpu()
 
 
-def poleCuda(dirs:torch.Tensor,num_dir:int,pole:torch.Tensor, eps : float)->torch.Tensor:
+def poleCuda(dirs:torch.Tensor,num_dir:int,pole:torch.Tensor, eps : float,device)->torch.Tensor:
     """
     creating multiple directions based on the north pole values in the p tensor
     
@@ -91,7 +91,7 @@ def poleCuda(dirs:torch.Tensor,num_dir:int,pole:torch.Tensor, eps : float)->torc
         dirs: tensor
             created directions inside region
     """
-    def randVectorSphCuda(dirs,num_dir:int,p:torch.Tensor,eps)->torch.Tensor:
+    def randVectorSphCuda(dirs,num_dir:int,p:torch.Tensor,eps,device)->torch.Tensor:
         """
         function to generate a random number from a spherical cap of size 'eps' around 'p'
         the new p is the minimium direction
@@ -125,12 +125,12 @@ def poleCuda(dirs:torch.Tensor,num_dir:int,pole:torch.Tensor, eps : float)->torc
         del lamb, temp
         return dirs
  
-    dirs=randVectorSphCuda(dirs,num_dir, pole[0], eps) # call function
+    dirs=randVectorSphCuda(dirs,num_dir, pole[0], eps,device) # call function
     for i in range(pole.shape[0]):
         dirs[i] = pole[i] # put pole back in the 
     return dirs
 
-def depthCompNotion(z,data,Pz,Pdata,notion,step)->torch.Tensor:
+def depthCompNotion(z,data,Pz,Pdata,notion,step,device)->torch.Tensor:
     """Computes the appproximate depth based on the chosen projection-based notion
     """
     if notion=="projection":

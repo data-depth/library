@@ -157,22 +157,22 @@ class DepthEucl():
         if self.CUDA==False:
             self.data=data
             if type(torch)!=type(None):
-                device = torch.device("cpu")
+                self.device = torch.device("cpu")
         elif self.CUDA==True and type(torch)!=type(None): 
             if torch.cuda.is_available() or torch.backends.mps.is_available():
                 if torch.backends.mps.is_available():
-                    device = torch.device("mps")
+                    self.device = torch.device("mps")
                 elif torch.cuda.is_available():
-                    device = torch.device("cuda")
+                    self.device = torch.device("cuda")
                 else:
-                    device = torch.device("cpu")
+                    self.device = torch.device("cpu")
                 self.data=data
                 # Tensor is transposed to facilitate projection and depth  computation
             else:
-                device = torch.device("cpu")
+                self.device = torch.device("cpu")
                 self.data=data
                 print("CUDA is set to True, but cuda is not available")
-            self.dataCuda=torch.tensor(data.T,device=device,dtype=torch.float32) 
+            self.dataCuda=torch.tensor(data.T,device=self.device,dtype=torch.float32) 
         return self
 
     def mahalanobis(self, x: np.ndarray = None, exact: bool = True, mah_estimate: Literal["none", "moment", "mcd"] = "moment",
@@ -366,10 +366,10 @@ class DepthEucl():
         for ind,d in enumerate(self.distRef):
             if CUDA and self.CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value        
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device) #compute depth value        
             else:DAP=mtv.aprojection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA) #compute depth value
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device) #compute depth value
             if evaluate_dataset==False:
                 if option==1:self.aprojectionDepth[ind]=DAP # assign val option 1
                 elif option==2:self.aprojectionDepth[ind],self.aprojectionDir[ind]=DAP # assign value option 2
@@ -790,7 +790,7 @@ class DepthEucl():
             if CUDA==True and self.CUDA==True:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA, device=self.device,
             )
             elif CUDA==False:DH=mtv.halfspace(x=x,data=self.data[self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
@@ -978,7 +978,7 @@ class DepthEucl():
             if CUDA and self.CUDA:DP=mtv.projection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device,
             )
             else:DP=mtv.projection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
