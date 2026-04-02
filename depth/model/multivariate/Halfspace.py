@@ -19,7 +19,8 @@ def halfspace(x, data, exact=True, method="recursive",
                 space = "sphere",
                 line_solver = "goldensection",
                 bound_gc = True,
-                CUDA=False):
+                CUDA=False,
+                device=None):
     if exact:
         if (method =="recursive" or method==1):
             method=1
@@ -58,7 +59,7 @@ def halfspace(x, data, exact=True, method="recursive",
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
         if CUDA==True:
             return cudaApprox(data,x, "halfspace", solver, option,NRandom, n_refinements,
-        sphcap_shrink,)
+        sphcap_shrink,device)
 
 halfspace.__doc__="""
 
