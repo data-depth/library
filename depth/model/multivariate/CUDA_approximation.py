@@ -13,7 +13,7 @@ from torch.nn.functional import normalize
 #     device = torch.device("cpu")
 def cudaApprox(data:torch.Tensor,x:torch.Tensor,notion:str,
             solver:str,option:int,NRandom:int,n_refinements:int,sphcap_shrink:float,
-            step:int=10000,device=None)->torch.Tensor:
+            step:int=10000,device="cpu")->torch.Tensor:
     """Main function to compute approximated depth based on chosen notion 
     """
     torch.manual_seed(2801)
@@ -52,7 +52,7 @@ def RS(data:torch.Tensor,z:torch.Tensor,notion:str,
     """Compute (refined) Random search
     """
     eps=torch.tensor([torch.pi/2],dtype=torch.float32,device=device) # initial cap size
-    pole=normalize(torch.normal(0,1,z.shape)).reshape(z.shape) # first pole 
+    pole=normalize(torch.normal(0,1,z.shape,device=device)).reshape(z.shape) # first pole 
     dMin=torch.ones((1,1),dtype=torch.float32,device=device)
     for ref in range(n_refinements):
         dirs=poleCuda(dirs,num_dir=dirRef, pole=pole,eps=eps,device=device)
