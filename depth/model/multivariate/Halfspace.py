@@ -58,8 +58,8 @@ def halfspace(x, data, exact=True, method="recursive",
         if CUDA==False:return depth_approximation(x, data, "halfspace", solver, NRandom ,option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
         if CUDA==True:
-            return cudaApprox(data,x, "halfspace", solver, option,NRandom, n_refinements,
-        sphcap_shrink,device)
+            return cudaApprox(data,x, "halfspace", solver=solver, option=option,NRandom=NRandom, n_refinements=n_refinements,
+        sphcap_shrink=sphcap_shrink,device=device)
 
 halfspace.__doc__="""
 
