@@ -15,6 +15,7 @@ Contributors
 * Oleksii Pokotylo, <alexey.pokotylo at gmail.com>
 * Romain Valla, <romain.valla at telecom-paris.fr>
 * Leonardo Leone, <leonardo.leone at telecom-paris.fr>
+* Sibsankar Singha, <sibsankar.singha@telecom-paris.fr>
 * Arturo Castellanos Salinas, <arturo.castellanos at telecom-paris.fr>
 * Pierre-Antoine Amiand Leroy, <pierre-antoine.amiand-leroy at ip-paris.fr> (on behalf of Hi! Paris)
 * Amine Yamoul, <amine.yamoul at capgemini.com> (on behalf of Hi! Paris)
