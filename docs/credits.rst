@@ -23,3 +23,4 @@ Contributors
 * Contribution of the Starting Grant (JCJC) of the French National Research Agency (ANR <https://anr.fr>) in the category Artificial Intelligence (CE23) is greatly acknowledged (grant number ANR-21-CE23-0029-01).
 * The support of the National Association for Research in Technology (ANRT) (CIFRE grant number 2021/1739) is gratefully acknowledged.
 * Contribution of the Research Chair "Digital Finance" under the aegis of the Risk Foundation is greatly acknowledged.
+* Contribution of the Research and Teaching Chair of Telecom Paris "Artificial Intelligence For Industry" (AI4I)  is greatly acknowledged.
