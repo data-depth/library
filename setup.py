@@ -21,7 +21,7 @@ class custom_build_ext(build_ext):
 if sys.platform=='darwin' or sys.platform=='linux':
 	setup(
 	    # name="data_depth",
-	    # version="1.1.3.0",
+	    # version="1.2.1.1",
 	    # author="Pavlo Mozharovskyi",
 	    # author_email="pavlo.mozharovskyi@telecom-paris.fr",
 	    # description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",

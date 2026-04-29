@@ -18,11 +18,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'package "data-depth"'
-copyright = '2024, Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Leonardo Leone, Arturo Castellanos Salinas'
-author = 'Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Leonardo Leone, Arturo Castellanos Salinas'
+copyright = '2024, Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Leonardo Leone, Sibsankar Singha, Arturo Castellanos Salinas'
+author = 'Pavlo Mozharovskyi, Rainer Dyckerhoff, Oleksii Pokotylo, Romain Valla, Leonardo Leone, Sibsankar Singha, Arturo Castellanos Salinas'
 
 # The full version, including alpha/beta/rc tags
-release = '1.1.3.0'
+release = '1.2.1.1'
 
 
 # -- General configuration ---------------------------------------------------

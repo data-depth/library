@@ -15,6 +15,7 @@ Contributors
 * Oleksii Pokotylo, <alexey.pokotylo at gmail.com>
 * Romain Valla, <romain.valla at telecom-paris.fr>
 * Leonardo Leone, <leonardo.leone at telecom-paris.fr>
+* Sibsankar Singha, <sibsankar.singha@telecom-paris.fr>
 * Arturo Castellanos Salinas, <arturo.castellanos at telecom-paris.fr>
 * Pierre-Antoine Amiand Leroy, <pierre-antoine.amiand-leroy at ip-paris.fr> (on behalf of Hi! Paris)
 * Amine Yamoul, <amine.yamoul at capgemini.com> (on behalf of Hi! Paris)
@@ -22,3 +23,4 @@ Contributors
 * Contribution of the Starting Grant (JCJC) of the French National Research Agency (ANR <https://anr.fr>) in the category Artificial Intelligence (CE23) is greatly acknowledged (grant number ANR-21-CE23-0029-01).
 * The support of the National Association for Research in Technology (ANRT) (CIFRE grant number 2021/1739) is gratefully acknowledged.
 * Contribution of the Research Chair "Digital Finance" under the aegis of the Risk Foundation is greatly acknowledged.
+* Contribution of the Research and Teaching Chair of Telecom Paris "Artificial Intelligence For Industry" (AI4I)  is greatly acknowledged.
