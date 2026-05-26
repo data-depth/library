@@ -3,7 +3,7 @@ from ctypes import *
 from math import ceil
 import sys, os, glob
 import platform
-from .import_CDLL import libApprox
+from .import_CDLL import libApprox, libExact
     
 def depth_approximation(z,
                         X,

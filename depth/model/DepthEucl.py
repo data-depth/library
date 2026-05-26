@@ -1316,6 +1316,26 @@ class DepthEucl():
                         line_solver=line_solver,
                         bound_gc=bound_gc)
         return ACA_tab
+    
+    def IsInConvexes(self,z):
+        """
+        Checks the belonging to at least one of class convex hulls of the training dataset
+            
+        Parameters
+        ----------
+        z: array_like,
+            points to check the belongingness
+        
+
+        Results
+        --------
+            belongingness  : array_like
+            The return respresents directions that best represents anomalies in the dataset.
+            
+        """
+        return mtv.IsInConvexes(self.data,z,self.distribution,self.seed)
+        
+
 
     ## Det and MCD 
     def _calcDet(self,mat:np.ndarray):

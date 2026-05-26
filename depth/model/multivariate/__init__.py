@@ -19,6 +19,8 @@ from .MCD import MCD
 try:from .CUDA_approximation import cudaApprox
 except:cudaApprox=None
 from .ACA_wrapper import ACA
+from .import_CDLL import libExact,libApprox
+from .isInConvexes import IsInConvexes
 
 __all__ = ["depth_approximation", "betaSkeleton", "cexpchull", "cexpchullstar", "geometrical", "halfspace", "L2", "mahalanobis", "potential", "projection", "aprojection", "qhpeeling", "simplicial", "simplicialVolume", "spatial", "zonoid", "depth_mesh", "depth_plot2d", "calcDet",
-    "MCD", "cudaApprox","ACA"]
+    "MCD", "cudaApprox","ACA", "IsInConvexes"]
