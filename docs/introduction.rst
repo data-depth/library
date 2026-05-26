@@ -43,7 +43,7 @@ Examples can be found in - :ref:`depth-examples <Examples>`. The mentioned below
 Installation
 ------------
 
-data-depth can be directly installed using **pip**:
+The `\texttt{data-depth}` library can be directly installed using **pip**:
 
 .. code:: bash
 
