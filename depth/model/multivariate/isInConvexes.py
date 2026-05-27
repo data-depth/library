@@ -12,44 +12,68 @@ def IsInConvexes(X,z,distributions,seed):
     try:
         n, d = X.shape
     except ValueError:
-        n = X.shape[0]
-        d = 1
+        n, d = X.shape[0], 1
     n_z = z.shape[0]
-    points_list=X.flatten()
-    points=(c_double*len(points_list))(*points_list)
-    objects_list=z.flatten()
-    objects=(c_double*len(objects_list))(*objects_list)
-    distrSeq_list=distributions.flatten()
-    distrSeq=(c_int*len(distrSeq_list))(*distrSeq_list)
-    points=pointer(points)
-    objects=pointer(objects)
-    distrSeq=pointer(distrSeq)
+    
+    
+    distr_uniques, counts= np.unique(distributions, return_counts=True)
+    numClasses=int(counts.shape[0])
 
-    distr=np.unique(distributions,return_counts=True)[1]
-    distribution_list=distr.flatten()
-    distribution=(c_int*len(distribution_list))(*distribution_list)
-    distribution=pointer(distribution)
+    cumsum_arr= np.zeros(numClasses, dtype=np.int32)
+    cumsum_arr[1:]=counts.cumsum()[:-1]
+    
+    c_points=(c_double*X.size)(*X.flatten().astype(np.float64))
+    c_objects=(c_double*z.size)(*z.flatten().astype(np.float64))
+    c_distrSeq=(c_int*len(distributions))(*distributions.flatten().astype(np.int32))
+    c_cardin=(c_int*numClasses)(*counts.astype(np.int32))
+    c_cumsum=(c_int*numClasses)(*cumsum_arr)
 
-    CSum=np.zeros(distr.shape,dtype=int)
-    CSum[1:]=distr.cumsum(dtype=int)[:-1]
-    cumSum_list=CSum.flatten()
-    cumSum=(c_int*len(cumSum_list))(*cumSum_list)
-    cumSum=pointer(cumSum)
-    numPoints=pointer(c_int(n))
-    numObjects=pointer(c_int(n_z))
-    dimension=pointer(c_int(d))
-    seed=pointer((c_int(seed)))
-    numClasses=pointer(c_int(distr.shape[0]))
-    belongs=pointer((c_int*len(z))(*np.zeros(distr.shape[0],dtype=int)))
-    libExact.IsInConvexes(points,dimension,distribution,numClasses,
-                      objects,numObjects,seed,belongs,cumSum, distrSeq,)
-    res=np.zeros((distr.shape[0],len(z)))
-    for i in range(distr.shape[0]):
-        for j in range(len(z)):
-            res[i][j]=belongs[i][j]
+    output_size= numClasses*n_z
+    c_belongs= (c_int*output_size)(*([0]*output_size))
+
+    c_dim=c_int(d)
+    c_numClasses=c_int(numClasses)
+    c_numObjects=c_int(n_z)
+    c_seed=c_int(int(seed))
+    
+    libExact.IsInConvexes.restype=None
+    libExact.IsInConvexes.argtypes=[
+        POINTER(c_double), # points
+        POINTER(c_int), # dimension
+        POINTER(c_int), # cardinalities 
+        POINTER(c_int), # number distributions 
+        POINTER(c_double), # objects 
+        POINTER(c_int), # number objects
+        POINTER(c_int), # seed 
+        POINTER(c_int), # output 
+        POINTER(c_int), # cumulative sum 
+        POINTER(c_int), # distribution seq
+    ]
+
+    libExact.IsInConvexes(
+        c_points,
+        byref(c_dim),
+        c_cardin,
+        byref(c_numClasses),
+        c_objects,
+        byref(c_numObjects),
+        byref(c_seed),
+        c_belongs,
+        c_cumsum,
+        c_distrSeq,
+    )
+
+
+    res=np.zeros((n_z,numClasses), dtype=np.int32)
+
+    for i in range(n_z):
+        for j in range(numClasses):
+            res[i,j]=c_belongs[numClasses*i+j]
+
 
 
     return res
+
 
 
     
