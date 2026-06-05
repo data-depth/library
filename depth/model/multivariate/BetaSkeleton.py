@@ -2,17 +2,18 @@ import numpy as np
 from ctypes import *
 from multiprocessing import *
 import math
-import sklearn.covariance as sk
+# import sklearn.covariance as sk
 import sys, os, glob
 import platform
 from .import_CDLL import libExact
 
-def MCD_fun(data,alpha,NeedLoc=False):
-    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
-    if NeedLoc:return([cov.covariance_,cov.location_])
-    else:return(cov.covariance_)
+# def MCD_fun(data,alpha,NeedLoc=False):
+#     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
+#     if NeedLoc:return([cov.covariance_,cov.location_])
+#     else:return(cov.covariance_)
 
-def betaSkeleton(x, data, beta = 2, distance = "Lp", Lp_p = 2, mah_estimate = "moment", mah_parMcd = 0.75):
+def betaSkeleton(x, data, beta = 2, distance = "Lp", Lp_p = 2, mah_estimate = "moment", mah_parMcd = 0.75,
+				 covMCD=None):
 	points_list=data.flatten()
 	objects_list=x.flatten()
 	if (distance == "Mahalanobis"):
@@ -22,8 +23,8 @@ def betaSkeleton(x, data, beta = 2, distance = "Lp", Lp_p = 2, mah_estimate = "m
 		else:
 			if(mah_estimate == "moment"):
 				tmpCov = np.cov(np.transpose(data))
-			elif (mah_estimate == "MCD"):
-				tmpCov = MCD_fun(data, mah_parMcd)
+			elif (mah_estimate.lower() == "mcd"):
+				tmpCov = covMCD
 			else:
 				print("Wrong argument \"mah_estimate\", should be one of \"moment\", \"MCD\", \"none\"")
 			

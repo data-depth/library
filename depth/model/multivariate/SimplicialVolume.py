@@ -1,7 +1,7 @@
 import numpy as np
 from ctypes import *
 from multiprocessing import *
-import sklearn.covariance as sk
+# import sklearn.covariance as sk
 import scipy.special as scspecial
 import sys, os, glob
 import platform
@@ -13,10 +13,10 @@ def longtoint(k):
   k2 = int(k - k1*limit)
   return np.array([k1,k2])
 
-def MCD_fun(data,alpha,NeedLoc=False):
-    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
-    if NeedLoc:return([cov.covariance_,cov.location_])
-    else:return(cov.covariance_)
+# def MCD_fun(data,alpha,NeedLoc=False):
+#     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
+#     if NeedLoc:return([cov.covariance_,cov.location_])
+#     else:return(cov.covariance_)
     
 def calcDet(A):
     dim_pointer = pointer(c_int(A.shape[0]))
@@ -27,7 +27,8 @@ def calcDet(A):
     return res_pointer[0]
 
 def simplicialVolume(x, data, exact = True, k = 0.05,
-        mah_estimate = "moment", mah_parMCD = 0.75, seed = 0):
+        mah_estimate = "moment", mah_parMCD = 0.75, seed = 0,
+        covMCD=None):
     points_list=data.flatten()
     objects_list=x.flatten()
     if (mah_estimate == "none"):
@@ -38,7 +39,7 @@ def simplicialVolume(x, data, exact = True, k = 0.05,
         covEst=np.cov(np.transpose(data))
     elif (mah_estimate == "MCD") :
         useCov = 2
-        covEst = MCD_fun(data, mah_parMCD)
+        covEst = covMCD
     else:
         print("Wrong argument \"mah.estimate\", should be one of \"moment\", \"MCD\", \"none\"")
         print("moment is use")

@@ -9,22 +9,18 @@ import multiprocessing as mp
 import sys, os, glob
 from .import_CDLL import libACA
 
-def ACA(X, dim = 1, sample_size = None, sample = None, notion = "projection", # Can't use halfspace with NelderMead
+def ACA(X, dim = 1, sample_size = None,  notion = "projection", # Can't use halfspace with NelderMead
         solver = "neldermead", NRandom = 100, n_refinements = 10, sphcap_shrink = 0.5,
         alpha_Dirichlet = 1.25, cooling_factor = 0.95, cap_size = 1, start = "mean",
         space = "sphere", line_solver = "goldensection", bound_gc = True):
     
     z=X.copy()
 
-    if(sample_size != None and sample == None): # Run method on a (specified) sample
+    if(sample_size != None): # Run method on a (specified) sample
         ind = np.random.default_rng().choice(X.shape[0], size=sample_size, replace=False)
         X = X[ind]
-    elif(sample_size == None and sample is not None):
-        ind = sample
-        X = X[sample]
-    elif(sample_size != None and sample is not None):
-        print("Can't give size of uniform sampling and your own index for sampling")
-        return(None)
+    else:
+        pass
 
     # Check arguments
     depth_indice = check_depth(notion)
@@ -37,8 +33,7 @@ def ACA(X, dim = 1, sample_size = None, sample = None, notion = "projection", # 
     try:
         n, d = X.shape
     except ValueError:
-        n = X.shape[0]
-        d = 1
+        n,d = X.shape[0],1
     basis = np.eye(d, dtype=np.double)
     d_aca = d
     iter_aca = dim

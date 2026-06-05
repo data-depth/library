@@ -9,21 +9,18 @@ vector<int> split(int n){//split n into (at most 5) bins and return the vector v
 		val = 300;
 	}
 	else{
-		k = (int) n/300;
-		if (n % 300 == 0) k = k-1;
+		k = std::max(1, (int)(n / 300));
+		if (n % 300 == 0 && k > 1) k = k-1;
 		val = (int) n/k;
 	}
 	
 	vector<int> v(k,val);//will contain number of elements in each bin
 
 	// Adding extra numbers to add up exactly to n
+	remainder = n - k*val;
 	if (n<1500){
-		remainder = n - k*val;
-		for (int i=0; i < v.size(); i++){
-			if (remainder>0){
-				v[i] += 1; 
-				remainder -= 1;
-			}
+		for (int i=0; i < (int)v.size() && remainder > 0; i++, remainder--){
+				v[i] ++;
 		}
 	}
 	return v;
@@ -73,6 +70,7 @@ double det(TDMatrix M, int d){
             }
             if (amax < eps_pivot) {
                 delete[] colp;
+				deleteM(A);
                 return 0;
             }
             // Column swap
@@ -313,14 +311,16 @@ void ExactUnivariateMcd(TDMatrix X, int n, int h, double* T, TDMatrix M){
 	for(int i=1; i<n-h+1; i++){
 		means[i] = (float_h*means[i-1]-Y[i-1]+Y[i+h-1])/float_h;
 		SQ[i] = SQ[i-1] - Y[i-1]*Y[i-1] + Y[i+h-1]*Y[i+h-1] - float_h*means[i]*means[i] + float_h*means[i-1]*means[i-1];
-		cout <<  SQ[i] <<  " ";
+		// cout <<  SQ[i] <<  " ";
 		if (SQ[i]<SQ[bestIndex]) bestIndex = i;
 	}
+	
 	T[0] = means[bestIndex];// should actually be 1x1
 	M[0][0] = SQ[bestIndex]/float_h;
 }
 
-void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp,int *seed, bool seeded){
+void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, 
+	double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp,int *seed){
 	TDMatrix M = asMatrix(mat_MCD,d,d); //address of the matrix to be computed
 	TDMatrix Xh = newM(h, d);
 	double* T = new double[d];
@@ -328,10 +328,8 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 	vector<int> index(n, 0);
 	std::random_device rd;
 	std::mt19937 g(rd());
-	if (seeded){
-		g.seed(*seed);
-	}
-    int bestIndex;
+	g.seed(*seed);
+    int bestIndex=0;
     double finalDet = DBL_MAX;
     double tempDet;
 	if (h==n){
@@ -391,9 +389,9 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 				best_indices[i] = best(10, all_det[i] , rep);
 			}
 
-			// Merging
+	// 		// Merging
 
-			// First count the occurences
+	// 		// First count the occurences
 			int counters[1500] = {0};
 			for (int i = 0;i<k;i++){ 
 				for (int m = 0;m<10;m++){
@@ -402,18 +400,18 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 					}
 				}
 			}
-			// Count how many distinct elements (nMerged) in Xmerged
+	// 		// Count how many distinct elements (nMerged) in Xmerged
 			int nMerged = 0;
-			// int sum = 0;
+	// 		// int sum = 0;
 			for (int i=0;i<1500;i++){
 				if ( counters[i] > 0 ) nMerged +=1;
 			}
-
-			// Now build Xmerged
+		
+	// 		// Now build Xmerged
 			TDMatrix Xmerged = newM(nMerged, d);
-			// Reinitialise counters, to then check first occurence or not
+	// 		// Reinitialise counters, to then check first occurence or not
 			for (int i=0;i<1500;i++) counters[i] = 0;
-			// Fill in Xmerged
+	// 		// Fill in Xmerged
 			int movingInd = 0;// index for Xmerged filling step by step
 			int tempoInd;// current index when checking through the best solutions to avoid recomputation of the index at each call
 			for (int i = 0;i<k;i++){ 
@@ -431,7 +429,8 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 					}
 				}
 			}
-			// Compute on nSelect (10 best (T,S) of each subsets)
+		
+	// 		// Compute on nSelect (10 best (T,S) of each subsets)
 			int nSelect = k*10;
 			int hMerged =  (int)ceil((double) (h*nMerged/n));
 			double* mergedDistTab = new double[nMerged];
@@ -451,9 +450,9 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 			}
 
 			vector<int> mergedBest = best(mfull, merged_all_det , nSelect);
-			// Full dataset computation
+	// 		// Full dataset computation
 
-			// for simplicity recopy the previous best results (T,S) in a fresh compilation
+	// 		// for simplicity recopy the previous best results (T,S) in a fresh compilation
 			vector<TDMatrix> full_all_cov(mfull);
 			vector<double*> full_all_T(mfull);
 			int convertedM, convertedI; // i<k, m <10 vs ind<nSelect
@@ -478,17 +477,17 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 					bestIndex = i;
 				}
 			}
-			// copy result in T and M
+	// 		// copy result in T and M
 			for(int i=0 ; i<d ; i++){
 				T[i] = full_all_T[bestIndex][i];
 				for (int j=0; j<d ; j++){
 					M[i][j] = full_all_cov[bestIndex][i][j];
 				}
 			}
-			// Deleting
-			// Nested
+	// 		// Deleting
+	// 		// Nested
 			deleteM(Xnest);
-			// !!! don't forget to delete the double* inside all_T,all_cov, all_distTab (maybe further there)
+	// 		// !!! don't forget to delete the double* inside all_T,all_cov, all_distTab (maybe further there)
 			for (int i = 0;i<k;i++){
 				for (int j = 0;j<rep;j++){
 					delete[] all_distTab[i][j];
@@ -496,23 +495,29 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 					deleteM(all_cov[i][j]);// ou delete[], à voir à bouger plus loin
 				}
 			}
-			//Merged
+	// 		//Merged
 			deleteM(Xmerged);
 			delete[] mergedDistTab;
 			deleteM(XhMerged);
-			//Full
+	// 		//Full
 			for (int i = 0 ; i<mfull ; i++){
 				deleteM(full_all_cov[i]);
 			}
+	// 		// for (int i = 0; i < 500; i++) {
+	// 		// 	deleteM(all_cov[i]);
+	// 		// }
+	// 		// delete[] all_cov;
+	// 		// delete[] all_index;
+	// 		// delete[] all_det;
 
 
 		}
 		else{// h<n,d>=2,n<=600
-			// initialise index vector
+	// 		// initialise index vector
 		    for (int i = 0 ; i != index.size() ; i++) { // assume index.size() is n !
 				index[i] = i;
 			}
-			// big loop 500
+	// 		// big loop 500
 			TDMatrix* all_cov = new TDMatrix[500];
 			vector<int>* all_index = new vector<int>[500];
 			double* all_det = new double[500];
@@ -529,8 +534,9 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
                 // update Cov & T according to most recent update of index
 				MeanCovUp(all_index[i], T, all_cov[i], X, Xh, n, d, h);
 				all_det[i] = det(all_cov[i],d);
-			}			
-			// take the 10 best results
+			}	
+		
+	// 		// take the 10 best results
 			vector<int> index500(500, 0); //index to help find 10 best
 			iota(index500.begin(), index500.end(), 0);
 			std::nth_element(index500.begin(),index500.begin()+9,index500.end(),
@@ -539,6 +545,7 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 				}
 			); //ten first elements now are index of ten smallest det
             int ind;
+		
 			// run until convergence for each of the 10 best
 			for(int i=0;i<10;i++){
 				ind = index500[i];
@@ -556,43 +563,43 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, doub
 	}
 
 
-    cout << " M cov " << endl;
-    for (int k=0; k < d; k++){
-    	for (int p=0; p < d; p++){
-    		std::cout << M[k][p] << " " ;
-    	}
-    	std::cout << std::endl ;
-    }
+    // cout << " M cov " << endl;
+    // for (int k=0; k < d; k++){
+    // 	for (int p=0; p < d; p++){
+    // 		std::cout << M[k][p] << " " ;
+    // 	}
+    // 	std::cout << std::endl ;
+    // }
 
-	// Ultimate reweighting
-	// std::cout << "det M before reweighting " << det(M,d) << std::endl;
+	// // Ultimate reweighting
+	// // std::cout << "det M before reweighting " << det(M,d) << std::endl;
 	DistanceUp(X, n, d, distTab, T, M);
 	double medi = DataDepth::med(distTab,n);
 	double medi2 = medi*medi;
-	// if (medi2==0){
-	// 	for(int i=0;i<n;i++) distTab[i] = 0;
-	// }
-	// else{
-	// 	for(int i=0;i<n;i++) distTab[i] *= sqrt(1.39/medi2);//sqrt(chisqr(d,0.5)/medi2);
-	// }
-	// // write new array checking which elements are kept
-	// bool* indices = new bool[n];
-	// int ncount = 0;
-	// double chival = 2.72;//sqrt(chisqr(d,0.975));
-	// for(int i=0;i<n;i++){
-	// 	if (distTab[i] <= chival){
-	// 		indices[i] = true;
-	// 		ncount += 1;
-	// 	}
-	// 	else{
-	// 	indices[i] = false;
-	// 	std::cout << " out ";
-	// 	for(int j=0;j<d;j++) std::cout << X[i][j];
-	// 	std::cout << std::endl;
-	// 	}
-	// }
+	// // if (medi2==0){
+	// // 	for(int i=0;i<n;i++) distTab[i] = 0;
+	// // }
+	// // else{
+	// // 	for(int i=0;i<n;i++) distTab[i] *= sqrt(1.39/medi2);//sqrt(chisqr(d,0.5)/medi2);
+	// // }
+	// // // write new array checking which elements are kept
+	// // bool* indices = new bool[n];
+	// // int ncount = 0;
+	// // double chival = 2.72;//sqrt(chisqr(d,0.975));
+	// // for(int i=0;i<n;i++){
+	// // 	if (distTab[i] <= chival){
+	// // 		indices[i] = true;
+	// // 		ncount += 1;
+	// // 	}
+	// // 	else{
+	// // 	indices[i] = false;
+	// // 	std::cout << " out ";
+	// // 	for(int j=0;j<d;j++) std::cout << X[i][j];
+	// // 	std::cout << std::endl;
+	// // 	}
+	// // }
 
-	// Alter. version of reweighting
+	// // Alter. version of reweighting
 	for(int i=0;i<d;i++){
 		for(int j=0;j<d;j++){
 					M[i][j] = medi2 * M[i][j]/chisqr05;

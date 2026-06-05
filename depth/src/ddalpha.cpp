@@ -2,7 +2,7 @@
   File:             ddalpha.cpp
   Created by:       Pavlo Mozharovskyi, Oleksii Pokotylo, Arturo Castellanos
   First published:  28.02.2013
-  Last revised:     24.10.2024
+  Last revised:     28.05.2026
 
   Defines the exported functions for the former 'ddalpha'-package, now 'data-depth'-library.
 
@@ -70,6 +70,7 @@ void IsInConvexes(double *points, int *dimension, int *cardinalities,
 	}
 	TIntMatrix answers(o.size());
 	int error = 0;
+	// int InConvexes(TMatrix &points, TVariables &cardinalities, TMatrix &objects, int &Error, TIntMatrix *areInConvexes)
 	InConvexes(x, cars, o, error, &answers);
 	for (int i = 0; i < numObjects[0]; i++)
     for (int j = 0; j < numClasses[0]; j++){
@@ -77,40 +78,6 @@ void IsInConvexes(double *points, int *dimension, int *cardinalities,
   	}
 }
 
-// void IsInConvexes(double *points, int *dimension, int *cardinalities, 
-// 	int *numClasses, double *objects, int *numObjects, int *seed, int *isInConvexes,
-// 	int *cumSum, int *distrSeq){
-// 	setSeed(*seed);
-// 	for(int i = 0; i < 2; i++){
-// 		cumSum[i];
-// 	}
-// 	int numPoints = 0;for (int i = 0; i < numClasses[0]; i++){numPoints += cardinalities[i];}
-// 	TMatrix x(numPoints);
-// 	for (int i = 0; i < numPoints; i++){x[i] = TPoint(dimension[0]);}
-// 	for (int i = 0; i < numPoints; i++){
-// 		for (int j = 0; j < dimension[0]; j++){
-// 			x[i][j] = points[i * dimension[0] + j];
-// 		}
-// 	}
-// 	TMatrix o(numObjects[0]);
-// 	for (int i = 0; i < numObjects[0]; i++){o[i] = TPoint(dimension[0]);}
-// 	for (int i = 0; i < numObjects[0]; i++){
-// 		for (int j = 0; j < dimension[0]; j++){
-// 			o[i][j] = objects[i * dimension[0] + j];
-// 		}
-// 	}
-// 	TVariables cars(numClasses[0]);
-// 	for (int i = 0; i < numClasses[0]; i++){
-// 		cars[i] = cardinalities[i];
-// 	}
-// 	TIntMatrix answers(o.size());
-// 	int error = 0;
-// 	InConvexes(x, cars, o, error, &answers);
-// 	for (int i = 0; i < numObjects[0]; i++)
-//     for (int j = 0; j < numClasses[0]; j++){
-//   		isInConvexes[numClasses[0]*i+j] = answers[i][j];
-//   	}
-// }
 
 
 void ZDepth(double *points, double *objects, int *numPoints, int *numObjects, int *dimension, int *seed, double *depths){
@@ -306,11 +273,16 @@ void BetaSkeletonDepth(double *points, double *objects, int *numPoints, int *num
   delete[] s;
 }
 
-void MinimumCovarianceDeterminantEstim(double *points, int *numPoints, int *dimension, int *hParam, int *seed, double *mat_MCD, double chisqr05, double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp, bool seeded){
+void MinimumCovarianceDeterminantEstim(double *points, int *numPoints, 
+	int *dimension, int *hParam, int *seed, double *mat_MCD, 
+	double chisqr05, double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp){
     TDMatrix X = asMatrix(points, *numPoints, *dimension);
-    Mcd(X, *numPoints,*dimension, *hParam, mat_MCD, chisqr05, chisqr0975, mfull, nstep, hiRegimeCompleteLastComp, seed, seeded);
-    delete[] X;
+	
+    Mcd(X, *numPoints,*dimension, *hParam, mat_MCD, chisqr05, chisqr0975, mfull, nstep,
+		 hiRegimeCompleteLastComp, seed);
+    // delete[] X;
 }
+
 
 int main() {
     std::cout << "Hello Ddalpha!";
