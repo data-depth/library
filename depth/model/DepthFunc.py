@@ -493,10 +493,6 @@ class DepthFunc():
             Number of random projections or optimization restarts used in computing 
             projection-based depth.
 
-        notion 
-            {"mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"},
-            Which depth will be computed.
-                            
         n_refinements  
             For ``solver`` = ``refinedrandom`` or ``refinedgrid``, set the maximum of iteration for 
             computing the depth of one point. 
@@ -592,8 +588,54 @@ class DepthFunc():
                 
        
         if option==1:return depth_array 
-        else:return  depth_array,direction_array
+        else:return depth_array,direction_array
 
+    def general_func_depth(self,query,notion='halfspace', **kwargs):
+        """
+        Compute non projection-based functional depth for query functional data with respect to a reference dataset.
+
+        This function computes depth values of functional observations (in `query`) relative to a 
+        reference dataset (`df`) using projection-based methods such as halfspace depth.
+        Each function (trajectory) is represented by a sequence of multivariate values over time.
+        
+        Parameters
+        ----------
+        query : pandas.DataFrame
+            Query dataset containing functional observations whose depth will be computed
+            relative to `df`. Must have the same column structure as `df`.
+
+        notion 
+            {"mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"},
+            Which depth will be computed.
+
+
+        Returns
+        -------
+        depth_array : np.ndarray of shape (n_query,)
+        Array of depth values, where `n_query` is the number of functional observations 
+        (unique `case_id`s) in the `query` dataset.
+        The return is the lowest comuted depth regarding all explored directions in space.
+
+        Notes
+        -----
+        - If `timestamp` is of type `datetime64`, it is converted internally to seconds
+        relative to the global minimum timestamp (`t_min`).
+        - Duplicate timestamps within each `case_id` group are automatically dropped.
+        - Interpolation uses linear extrapolation outside the observed time range.
+        """
+        self._check_depth(notion)
+        if type(query)==np.ndarray:
+            query=self._3Dnp_tp_pd(query,self.TSnp, self.CInp)
+        if query[self.timestamp_col].max()>self.t_max:
+            print(f"Values with {self.timestamp_col} greater the base set domain are excluded")
+            query.drop(query[query[self.timestamp_col]>self.t_max].index, inplace=True)
+        if query[self.timestamp_col].min()>self.t_min:
+            print(f"Values with {self.timestamp_col} smaller the base set domain are excluded")
+            query.drop(query[query[self.timestamp_col]<self.t_min].index, inplace=True)
+        queryMM=self._MinMax(query)
+        query_array = self._syncronise_over_time(queryMM,)
+        depth_array = np.empty((query_array.shape[0],), dtype = float)
+        pass
 
     def _check_hyperparDepth(self,**kwargs):
         n_refinements = 10
