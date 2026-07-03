@@ -61,10 +61,9 @@ if sys.platform=='win32':
 	    # description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    # long_description="The package provides many procedures for calculating the depth of points in an empirical distribution for many notions of data depth",
 	    # long_description_content_type="text/markdown",
-	    packages=find_packages(),
-	    # install_requires=['numpy','scipy','scikit-learn','matplotlib',
-		# 			   "torch",
-		# 			   "torchvision",],
+	    #packages=find_packages(),
+        package_dir = {"": "depth"},
+        packages=find_namespace_packages(where='depth'),
 	    include_package_data=True,
 		data_files=[('depth/src', glob.glob("depth/docs/*"))],
 	    zip_safe=False

@@ -4,7 +4,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+*.dll
 
 auto_examples
 
