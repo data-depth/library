@@ -541,7 +541,7 @@ class DepthFunc():
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     - Lowest Asymmetrical Projection Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
 
         Notes
         -----
