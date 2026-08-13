@@ -148,7 +148,7 @@ private:
 	std::function<double(const double*, const dyMatrixClass::cMatrix, int, int)> MultiDepth;
 public:
 	// constructor
-	cProjection(const dyMatrixClass::cMatrix& x, int n = 0, int d = 0, int NRandom = 1000);
+	cProjection(const dyMatrixClass::cMatrix& x, int n = 0, int d = 0, int NRandom = 1000, unsigned int seed = 2801);
 	// destructor
 	~cProjection();
 	// setter methods for most of the private members declared above

@@ -19,6 +19,16 @@
 extern "C" {
 #endif
 
+void setSeed(int random_seed){
+	if (random_seed != 0) {
+		std::seed_seq seq{random_seed};
+	}
+	else {
+		std::seed_seq seq{time(NULL)};
+	}
+}
+
+
 int SetDepthPars(cProjection& depthObj, int n_refinements,
 				double sphcap_shrink, double alpha_Dirichlet,
 				double cooling_factor, double cap_size,
@@ -66,16 +76,17 @@ int depth_approximation(double *z, double *x, int notion, int solver,
 						int line_solver, int bound_gc, int n, int d,
 						int n_z, double *depths, double *depths_iter,
 						double *directions, int *directions_card,
-						double *best_directions){
+						double *best_directions,int *seed){
 	
+	setSeed(*seed);
 	dyMatrixClass::cMatrix X(n ,d); // Fill data matrice with numpy array
 	for(int i=0; i<n; i++){
 		for(int j=0; j<d; j++){
 			X[i][j] = x[j + i*d];
 		}
 	}
-
-	cProjection Proj(X, n, d, NRandom);
+	unsigned int seed_un = static_cast<unsigned int>(*seed);
+	cProjection Proj(X, n, d, NRandom, seed_un);
 	Proj.SetDepthNotion((eDepth)notion);
 	Proj.SetMethod((eProjMeth)solver);
 	Proj.SetD_ACA(d);

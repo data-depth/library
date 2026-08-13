@@ -269,7 +269,7 @@ class DepthEucl():
                 alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
                 cap_size=cap_size, start=start, space=space, 
                 line_solver=line_solver, bound_gc=bound_gc,option=option, 
-                covMCD=covMCD
+                covMCD=covMCD, seed=self.seed
                             ) #compute depth value
             if evaluate_dataset==False:
                 if exact or option==1:self.mahalanobisDepth[ind]=DM # assign value - exact or option 1
@@ -376,10 +376,10 @@ class DepthEucl():
         for ind,d in enumerate(self.distRef):
             if CUDA and self.CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device) #compute depth value        
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device, seed=self.seed) #compute depth value        
             else:DAP=mtv.aprojection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device) #compute depth value
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device, seed=self.seed) #compute depth value
             if evaluate_dataset==False:
                 if option==1:self.aprojectionDepth[ind]=DAP # assign val option 1
                 elif option==2:self.aprojectionDepth[ind],self.aprojectionDir[ind]=DAP # assign value option 2
@@ -497,7 +497,7 @@ class DepthEucl():
                 x=x, data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,
                 sphcap_shrink=sphcap_shrink,alpha_Dirichlet =alpha_Dirichlet,cooling_factor=cooling_factor,
                 cap_size =cap_size,start =start,space =space,line_solver =line_solver,bound_gc =bound_gc,
-                ) # compute depth 
+                seed=self.seed) # compute depth 
             if evaluate_dataset==False: 
                 if option==1:self.cexpchullDepth[ind]=DC # assign value
                 elif option==2:self.cexpchullDepth[ind],self.cexpchullDir[ind]=DC # assign value
@@ -600,7 +600,8 @@ class DepthEucl():
         for ind,d in enumerate(self.distRef):
             DC=mtv.cexpchullstar(x=x,data=self.data[self.distribution==d], solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
                             sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc)
+                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc,
+                            seed=self.seed)
             if evaluate_dataset==False:
                 if option==1:self.cexpchullstarDepth[ind]=DC # assign value
                 elif option==2:self.cexpchullstarDepth[ind],self.cexpchullstarDir[ind]=DC # assign value
@@ -701,7 +702,8 @@ class DepthEucl():
         for ind,d in enumerate(self.distRef):
             DG=mtv.geometrical(x=x,data=self.data[self.distribution==d], solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
                             sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc)
+                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc,
+                            seed=self.seed)
             if evaluate_dataset==False:
                 if option==1:self.geometricalDepth[ind]=DG # assign value
                 elif option==2:self.geometricalDepth[ind],self.geometricalDir[ind]=DG # assign value
@@ -806,12 +808,12 @@ class DepthEucl():
             if CUDA==True and self.CUDA==True:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA, device=self.device,
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA, device=self.device,seed=self.seed
             )
             elif CUDA==False:DH=mtv.halfspace(x=x,data=self.data[self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,seed=self.seed
             )
             if evaluate_dataset==False:
                 if option==1 or exact==True:self.halfspaceDepth[ind]=DH # assign value
@@ -1001,12 +1003,12 @@ class DepthEucl():
             if CUDA and self.CUDA:DP=mtv.projection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device,
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device,seed=self.seed
             )
             else:DP=mtv.projection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,seed=self.seed
             )
             if evaluate_dataset==False:
                 if option==1:self.projectionDepth[ind]=DP # assign value

@@ -20,7 +20,8 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                 space = "sphere",
                 line_solver = "goldensection",
                 bound_gc = True,
-                covMCD=None):
+                covMCD=None,
+                seed=2801):
                         
     if exact:
         points_list=data.flatten()
@@ -50,7 +51,7 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
         return res
     else:
         return depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
-        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,seed)
 
 mahalanobis.__doc__= """
 

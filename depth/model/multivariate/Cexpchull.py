@@ -16,10 +16,11 @@ def cexpchull(x, data,
         start = "mean",
         space = "sphere",
         line_solver = "goldensection",
-        bound_gc = True):
+        bound_gc = True,
+        seed=2801):
 
     return depth_approximation(x, data, "cexpchull", solver, NRandom, option, n_refinements,
-    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,seed)
 
 cexpchull.__doc__="""
 
