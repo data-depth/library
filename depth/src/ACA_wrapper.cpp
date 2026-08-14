@@ -58,11 +58,22 @@ int SetDepthPars(cProjection& depthObj, int n_refinements,
     
 }
 
+void setSeed(int random_seed){
+	if (random_seed != 0) {
+		std::seed_seq seq{random_seed};
+	}
+	else {
+		std::seed_seq seq{time(NULL)};
+	}
+}
+
 void ACA(double *z, double *x, int notion, int solver, int NRandom, int n_refinements,
          double sphcap_shrink, double alpha_Dirichlet, double cooling_factor,
          double cap_size, int start, int line_solver, int bound_gc, int n, int d,
-         int n_z, double *depths, double *best_directions, double *basis_py, int d_aca, int option){
+         int n_z, double *depths, double *best_directions, double *basis_py, int d_aca, int option,int *seed){
     
+    setSeed(*seed);
+    unsigned int seed_un = static_cast<unsigned int>(*seed);
     dyMatrixClass::cMatrix X(n ,d); // Fill data matrice with numpy array
     for(int i=0; i<n; i++){
         for(int j=0; j<d; j++){
@@ -77,7 +88,7 @@ void ACA(double *z, double *x, int notion, int solver, int NRandom, int n_refine
         }
     }
     
-    cProjection Proj(X, n, d, NRandom);
+    cProjection Proj(X, n, d, NRandom, seed_un);
     Proj.SetDepthNotion((eDepth)notion);
     Proj.SetMethod((eProjMeth)solver);
     Proj.SetOption(option);

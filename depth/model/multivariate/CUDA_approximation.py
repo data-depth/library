@@ -13,10 +13,10 @@ from torch.nn.functional import normalize
 #     device = torch.device("cpu")
 def cudaApprox(data:torch.Tensor,x:torch.Tensor,notion:str,
             solver:str,option:int,NRandom:int,n_refinements:int,sphcap_shrink:float,
-            step:int=10000,device="cpu")->torch.Tensor:
+            step:int=10000,device="cpu", seed=2801)->torch.Tensor:
     """Main function to compute approximated depth based on chosen notion 
     """
-    torch.manual_seed(2801)
+    torch.manual_seed(seed)
     # IMPORTANT TO REMEMBER: data is a transposed matrix, spaceDim x nSamples 
     if len(x.shape)==1:x=x.reshape(1,-1)
     # xCUDA=torch.tensor(x,dtype=torch.float32,device=device) # transfert x to cuda

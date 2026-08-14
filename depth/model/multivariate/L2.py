@@ -1,16 +1,16 @@
 import numpy as np
 from ctypes import *
 from multiprocessing import *
-import sklearn.covariance as sk
+# import sklearn.covariance as sk
 import sys, os, glob
 import platform
 
-def MCD_fun(data,alpha,NeedLoc=False):
-    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
-    if NeedLoc:return([cov.covariance_,cov.location_])
-    else:return(cov.covariance_)
+# def MCD_fun(data,alpha,NeedLoc=False):
+#     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
+#     if NeedLoc:return([cov.covariance_,cov.location_])
+#     else:return(cov.covariance_)
 
-def L2(x, data,mah_estimate='moment',mah_parMcd=0.75):
+def L2(x, data,mah_estimate='moment',mah_parMcd=0.75,covMCD=None):
 	points_list=data.flatten()
 	objects_list=x.flatten()
 	
@@ -19,8 +19,8 @@ def L2(x, data,mah_estimate='moment',mah_parMcd=0.75):
 	else:
 		if mah_estimate=='moment':
 			cov=np.cov(np.transpose(data))
-		elif mah_estimate=='MCD':
-			cov=MCD_fun(data, mah_parMcd)
+		elif mah_estimate.lower()=='mcd':
+			cov=covMCD
 		else :
 			print("Wrong argument \"mah.estimate\", should be one of \"moment\", \"MCD\", \"none\"")
 			print("moment is used")

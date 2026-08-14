@@ -5,12 +5,12 @@ import sys, os, glob
 import platform
 import sklearn.covariance as sk
     
-def MCD_fun(data,alpha,NeedLoc=False):
-    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
-    if NeedLoc:return([cov.covariance_,cov.location_])
-    else:return(cov.covariance_)
+# def MCD_fun(data,alpha,NeedLoc=False):
+#     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
+#     if NeedLoc:return([cov.covariance_,cov.location_])
+#     else:return(cov.covariance_)
 
-def spatial(x, data,mah_estimate='moment',mah_parMcd=0.75):
+def spatial(x, data,mah_estimate='moment',mah_parMcd=0.75,covMCD=None):
     depths_tab=[]
 
     if mah_estimate=='none':
@@ -19,8 +19,8 @@ def spatial(x, data,mah_estimate='moment',mah_parMcd=0.75):
         cov[:]=np.nan
     elif mah_estimate=='moment':
         cov=np.cov(np.transpose(data))
-    elif mah_estimate=='MCD':
-        cov=MCD_fun(data,mah_parMcd)
+    elif mah_estimate.lower()=='mcd':
+        cov=covMCD
     if np.sum(np.isnan(cov))==0:
         w,v=np.linalg.eig(cov)
         lambda1=np.linalg.inv(np.matmul(v,np.diag(np.sqrt(w))))

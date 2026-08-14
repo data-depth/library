@@ -1,15 +1,11 @@
 import numpy as np
 from ctypes import *
-import sklearn.covariance as sk
+# import sklearn.covariance as sk
 from .Depth_approximation import depth_approximation
 import sys, os, glob
 import platform
 from .import_CDLL import libExact,libApprox
 
-def MCD_fun(data,alpha,NeedLoc=False):
-    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
-    if NeedLoc:return([cov.covariance_,cov.location_])
-    else:return(cov.covariance_)
 
 def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                 solver = "neldermead",
@@ -23,7 +19,9 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                 start = "mean",
                 space = "sphere",
                 line_solver = "goldensection",
-                bound_gc = True):
+                bound_gc = True,
+                covMCD=None,
+                seed=2801):
                         
     if exact:
         points_list=data.flatten()
@@ -39,8 +37,8 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
         dimension=pointer(c_int(len(data[0])))
         if mah_estimate=='moment': # compute cov based on user choice
             PY_MatMCD=np.cov(np.transpose(data))
-        else: # compute cov based on user choice
-            PY_MatMCD=MCD_fun(data,mah_parMcd)
+        elif mah_estimate=="mcd": # compute cov based on user choice
+            PY_MatMCD=covMCD
         PY_MatMCD=PY_MatMCD.flatten(order='C')
         mat_MCD=pointer((c_double*len(PY_MatMCD))(*PY_MatMCD))
 
@@ -53,7 +51,7 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
         return res
     else:
         return depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
-        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,seed)
 
 mahalanobis.__doc__= """
 

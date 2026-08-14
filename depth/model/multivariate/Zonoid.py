@@ -16,7 +16,7 @@ def zonoid(x, data, seed=0, exact=True, solver="neldermead",
                         start="mean",
                         space="sphere",
                         line_solver="goldensection",
-                        bound_gc=True):
+                        bound_gc=True,):
     if exact:
         points_list=data.flatten()
         objects_list=x.flatten()
@@ -39,7 +39,7 @@ def zonoid(x, data, seed=0, exact=True, solver="neldermead",
         return res
     else:
         return depth_approximation(x, data, "zonoid", solver, NRandom, option, n_refinements,
-        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc)
+        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,seed)
 
 zonoid.__doc__= """
 

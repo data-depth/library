@@ -129,23 +129,24 @@ class DepthEucl():
             Not used, present for API consistency by convention.
 
         Returns
-        ---------
+        -------
         self : DepthEucl model object.
             Returns the instance itself.
         """
         if type(data)==None:
             raise Exception("You must load a dataset")
         assert(type(data)==np.ndarray), "The dataset must be a numpy array"
-        self._nSamples=data.shape[0] # define dataset size - n
-        self._spaceDim=data.shape[1] # define space dimension - d
+         # define dataset size - n
         if type(distribution)!=type(None):
             if distribution.shape[0]!=data.shape[0]:
                 raise Exception(f"distribution and dataset must have same length, {distribution.shape[0]}!={data.shape[0]}")
             self.distribution=distribution # define distributions 
-            self.distRef=np.unique(distribution) # define unique dist
         else:
             self.distribution=np.repeat(0,data.shape[0])
-            self.distRef=np.array([0]) # define unique dist
+
+        self.distRef,self._nSamples=np.unique(self.distribution,return_counts=True) # define unique dist
+        self._spaceDim=data.shape[1] # define space dimension - d
+        
 
         if type(y)!=type(None):
             if y.shape[0]!=data.shape[0]:
@@ -182,7 +183,7 @@ class DepthEucl():
                     cap_size=1, start="mean", space= "sphere", 
                     line_solver="goldensection", bound_gc= True, 
                     output_option:Literal["lowest_depth","final_depth_dir",
-                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False):
+                                          "all_depth","all_depth_directions"]="lowest_depth", evaluate_dataset:bool=False,):
         """
         Mahalanobis depth
 
@@ -198,7 +199,7 @@ class DepthEucl():
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
         Returns
-        ----------
+        -------
         array_like or tuple of array_like
         The first return is the lowest comuted depth regarding all explored directions in space.
         The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
@@ -211,18 +212,18 @@ class DepthEucl():
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     - Lowest Mahalanobis Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
         
             If ``output_option=="all_depth"`` returns:
                 array_like
                     - Lowest Mahalanobis Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
                     - Lowest Mahalanobis Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
                     - All respective directions
         
@@ -243,6 +244,12 @@ class DepthEucl():
             alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
             cap_size=cap_size, output_option=output_option, ) # check if parameters are valid
 
+        if mah_estimate.lower()=="mcd":
+            if type(self.MCD)==type(None):
+                self.computeMCD(h=mah_parMcd)
+
+
+
         option=self._determine_option(x,NRandom,output_option,exact=exact) # determine option number 
         if option>=2:
             if evaluate_dataset:self.mahalanobisDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
@@ -253,6 +260,8 @@ class DepthEucl():
                 self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
 
         for ind, d in enumerate(self.distRef):
+            try:covMCD=self.MCD[ind]
+            except:covMCD=None
             DM=mtv.mahalanobis(
                 x,self.data[self.distribution==d],exact,mah_estimate.lower(),mah_parMcd,
                 solver=solver, NRandom=NRandom, 
@@ -260,6 +269,7 @@ class DepthEucl():
                 alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
                 cap_size=cap_size, start=start, space=space, 
                 line_solver=line_solver, bound_gc=bound_gc,option=option, 
+                covMCD=covMCD, seed=self.seed
                             ) #compute depth value
             if evaluate_dataset==False:
                 if exact or option==1:self.mahalanobisDepth[ind]=DM # assign value - exact or option 1
@@ -313,7 +323,7 @@ class DepthEucl():
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
         Returns
-        ----------
+        -------
         array_like or tuple of array_like
         The first return is the lowest comuted depth regarding all explored directions in space.
         The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
@@ -326,18 +336,18 @@ class DepthEucl():
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     - Lowest Asymmetrical Projection Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
         
             If ``output_option=="all_depth"`` returns:
                 array_like
                     - Lowest Asymmetrical Projection Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
                     - Lowest Asymmetrical Projection Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
                     - All respective directions
 
@@ -366,10 +376,10 @@ class DepthEucl():
         for ind,d in enumerate(self.distRef):
             if CUDA and self.CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device) #compute depth value        
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device, seed=self.seed) #compute depth value        
             else:DAP=mtv.aprojection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device) #compute depth value
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device, seed=self.seed) #compute depth value
             if evaluate_dataset==False:
                 if option==1:self.aprojectionDepth[ind]=DAP # assign val option 1
                 elif option==2:self.aprojectionDepth[ind],self.aprojectionDir[ind]=DAP # assign value option 2
@@ -410,7 +420,7 @@ class DepthEucl():
             Samples matrix to compute depth
 
         Results
-        ----------
+        -------
         Beta-skeleton depth : array_like
 
         """
@@ -421,10 +431,16 @@ class DepthEucl():
         else:
             self.betaSkeletonDepth=np.empty((self.distRef.shape[0],x.shape[0]))
         self._check_variables(x=x,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd) #check validity
-
+        
+        if mah_estimate.lower()=="mcd":
+            if type(self.MCD)==type(None):
+                self.computeMCD(h=mah_parMcd)
         for ind,d in enumerate(self.distRef):
+            try:covMCD=self.MCD[ind]
+            except:covMCD=None
             DB=mtv.betaSkeleton(x=x,data=self.data[self.distribution==d],beta=beta,distance=distance, Lp_p=Lp_p,
-                                                        mah_estimate=mah_estimate,mah_parMcd=mah_parMcd) # compute depth
+                                                        mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                covMCD=covMCD) # compute depth
             if evaluate_dataset==False: self.betaSkeletonDepth[ind]=DB
             if evaluate_dataset==True: self.betaSkeletonDepthDS[ind]=DB
         if self.distRef.shape[0]==1: 
@@ -449,7 +465,7 @@ class DepthEucl():
             Samples matrix to compute depth
 
         Results
-        ----------
+        -------
         Continuous explected convex hull depth : array_like
 
         """
@@ -481,7 +497,7 @@ class DepthEucl():
                 x=x, data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,
                 sphcap_shrink=sphcap_shrink,alpha_Dirichlet =alpha_Dirichlet,cooling_factor=cooling_factor,
                 cap_size =cap_size,start =start,space =space,line_solver =line_solver,bound_gc =bound_gc,
-                ) # compute depth 
+                seed=self.seed) # compute depth 
             if evaluate_dataset==False: 
                 if option==1:self.cexpchullDepth[ind]=DC # assign value
                 elif option==2:self.cexpchullDepth[ind],self.cexpchullDir[ind]=DC # assign value
@@ -532,7 +548,7 @@ class DepthEucl():
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
         Returns
-        ----------
+        -------
         array_like or tuple of array_like
         The first return is the lowest comuted depth regarding all explored directions in space.
         The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
@@ -545,18 +561,18 @@ class DepthEucl():
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     - Lowest Continuous Modified Explected Convex Hull Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
         
             If ``output_option=="all_depth"`` returns:
                 array_like
                     - Lowest Continuous Modified Explected Convex Hull Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
                     - Lowest Continuous Modified Explected Convex Hull Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
                     - All respective directions
 
@@ -584,7 +600,8 @@ class DepthEucl():
         for ind,d in enumerate(self.distRef):
             DC=mtv.cexpchullstar(x=x,data=self.data[self.distribution==d], solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
                             sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc)
+                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc,
+                            seed=self.seed)
             if evaluate_dataset==False:
                 if option==1:self.cexpchullstarDepth[ind]=DC # assign value
                 elif option==2:self.cexpchullstarDepth[ind],self.cexpchullstarDir[ind]=DC # assign value
@@ -632,7 +649,7 @@ class DepthEucl():
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
         Returns
-        ----------
+        -------
         array_like or tuple of array_like
         The first return is the lowest comuted depth regarding all explored directions in space.
         The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
@@ -645,18 +662,18 @@ class DepthEucl():
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     - Lowest Geometrical Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
         
             If ``output_option=="all_depth"`` returns:
                 array_like
                     - Lowest Geometrical Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
                     - Lowest Geometrical Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
                     - All respective directions
         
@@ -685,7 +702,8 @@ class DepthEucl():
         for ind,d in enumerate(self.distRef):
             DG=mtv.geometrical(x=x,data=self.data[self.distribution==d], solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
                             sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc)
+                            cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc,
+                            seed=self.seed)
             if evaluate_dataset==False:
                 if option==1:self.geometricalDepth[ind]=DG # assign value
                 elif option==2:self.geometricalDepth[ind],self.geometricalDir[ind]=DG # assign value
@@ -734,7 +752,7 @@ class DepthEucl():
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
         Returns
-        ----------
+        -------
         array_like or tuple of array_like
         The first return is the lowest comuted depth regarding all explored directions in space.
         The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
@@ -747,18 +765,18 @@ class DepthEucl():
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     - Lowest Halfspace (Tukey) Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
         
             If ``output_option=="all_depth"`` returns:
                 array_like
                     - Lowest Halfspace (Tukey) Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
                     - Lowest Halfspace (Tukey) Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
                     - All respective directions
         
@@ -790,12 +808,12 @@ class DepthEucl():
             if CUDA==True and self.CUDA==True:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA, device=self.device,
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA, device=self.device,seed=self.seed
             )
             elif CUDA==False:DH=mtv.halfspace(x=x,data=self.data[self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,seed=self.seed
             )
             if evaluate_dataset==False:
                 if option==1 or exact==True:self.halfspaceDepth[ind]=DH # assign value
@@ -835,7 +853,7 @@ class DepthEucl():
             Samples matrix to compute depth
 
         Results
-        ----------
+        -------
         L2 depth : array_like
         """
         if evaluate_dataset==True: # Dataset evaluation
@@ -845,9 +863,16 @@ class DepthEucl():
         else: # create self 
             self.L2Depth=np.zeros((self.distRef.shape[0], x.shape[0])) 
         self._check_variables(x=x,mah_estimate=mah_estimate, mah_parMcd=mah_parMcd) # check if parameters are valid
+        
+        if mah_estimate.lower()=="mcd":
+            if type(self.MCD)==type(None):
+                self.computeMCD(h=mah_parMcd)
         for ind,d in enumerate(self.distRef): # run distributions
+            try:covMCD=self.MCD[ind]
+            except:covMCD=None
             DL2=mtv.L2(x=x,data=self.data[self.distribution==d],
-                    mah_estimate=mah_estimate, mah_parMcd=mah_parMcd)
+                    mah_estimate=mah_estimate, mah_parMcd=mah_parMcd,
+                    covMCD=covMCD)
             if evaluate_dataset:self.L2DepthDS[ind]=DL2
             else:self.L2Depth[ind]=DL2
         if self.distRef.shape[0]==1: # Fix size
@@ -880,7 +905,7 @@ class DepthEucl():
 			the single bandwidth parameter of the kernel. If ``0`` - the Scott`s rule of thumb is used.
 
         Results
-        ----------
+        -------
         Potential depth : array_like
         """
         if evaluate_dataset==True: # Dataset evaluation
@@ -923,7 +948,7 @@ class DepthEucl():
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
         Returns
-        ----------
+        -------
         array_like or tuple of array_like
         The first return is the lowest comuted depth regarding all explored directions in space.
         The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
@@ -936,18 +961,18 @@ class DepthEucl():
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     - Lowest Projection Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
         
             If ``output_option=="all_depth"`` returns:
                 array_like
                     - Lowest Projection Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
                     - Lowest Projection Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
                     - All respective directions
         """
@@ -978,12 +1003,12 @@ class DepthEucl():
             if CUDA and self.CUDA:DP=mtv.projection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device,
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device,seed=self.seed
             )
             else:DP=mtv.projection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,seed=self.seed
             )
             if evaluate_dataset==False:
                 if option==1:self.projectionDepth[ind]=DP # assign value
@@ -1022,7 +1047,7 @@ class DepthEucl():
             Samples matrix to compute depth
 
         Results
-        ----------
+        -------
         Convex hull peeling depth : array_like
         
         """
@@ -1058,7 +1083,7 @@ class DepthEucl():
                 but the calculation precision stays approximately the same.
 
         Results
-        ----------
+        -------
         Simplicial depth : array_like
 
         """
@@ -1099,7 +1124,7 @@ class DepthEucl():
                 but the calculation precision stays approximately the same.
 
         Results
-        ----------
+        -------
         Simplicial volume depth : array_like
 
         """
@@ -1110,9 +1135,15 @@ class DepthEucl():
         else: # create self 
             self.simplicialVolumeDepth=np.zeros((self.distRef.shape[0], x.shape[0])) 
         self._check_variables(x=x)# check if parameters are valid
+        if mah_estimate.lower()=="mcd":
+            if type(self.MCD)==type(None):
+                self.computeMCD(h=mah_parMCD)
         for ind,d in enumerate(self.distRef):
+            try:covMCD=self.MCD[ind]
+            except:covMCD=None
             DS=mtv.simplicialVolume(x=x,data=self.data[self.distribution==d],
-                                    exact=exact,k=k,mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,seed=self.seed)
+                                    exact=exact,k=k,mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,seed=self.seed,
+                                    covMCD=covMCD)
             if evaluate_dataset==True:self.simplicialVolumeDepthDS[ind]=DS
             elif evaluate_dataset==False:self.simplicialVolumeDepth[ind]=DS
         if self.distRef.shape[0]==1: # Fix size
@@ -1131,7 +1162,7 @@ class DepthEucl():
             Samples matrix to compute depth
 
         Results
-        ----------
+        -------
         Spatial depth : array_like
 
         """
@@ -1142,8 +1173,14 @@ class DepthEucl():
         else: # create self 
             self.spatialDepth=np.zeros((self.distRef.shape[0], x.shape[0]))
         self._check_variables(x=x,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd) # check if parameters are valid
+        if mah_estimate.lower()=="mcd":
+            if type(self.MCD)==type(None):
+                self.computeMCD(h=mah_parMcd)
         for ind,d in enumerate(self.distRef):
-            DS=mtv.spatial(x,self.data[self.distribution==d],mah_estimate=mah_estimate,mah_parMcd=mah_parMcd)
+            try:covMCD=self.MCD[ind]
+            except:covMCD=None
+            DS=mtv.spatial(x,self.data[self.distribution==d],mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                           covMCD=covMCD)
             if evaluate_dataset==False:self.spatialDepth[ind]=DS
             if evaluate_dataset==True:self.spatialDepthDS[ind]=DS
         if self.distRef.shape[0]==1: # Fix size
@@ -1174,7 +1211,7 @@ class DepthEucl():
                 - ``"all_depth_directions"`` : tuple of numpy arrays 
 
         Returns
-        ----------
+        -------
         array_like or tuple of array_like
         The first return is the lowest comuted depth regarding all explored directions in space.
         The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
@@ -1187,18 +1224,18 @@ class DepthEucl():
             If ``output_option=="final_depth_dir"`` returns:
                 Tuple of array_like
                     - Lowest Zonoid Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
         
             If ``output_option=="all_depth"`` returns:
                 array_like
                     - Lowest Zonoid Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
         
             If ``output_option=="all_depth_directions"`` returns:
                 array_like
                     - Lowest Zonoid Detph
-                    - Lowest depth respective sirection
+                    - Lowest depth respective direction
                     - All computed depths
                     - All respective directions
 
@@ -1264,7 +1301,6 @@ class DepthEucl():
 
     def ACA(self,dim:int=2,
             sample_size: None = None,
-            sample: None = None,
             notion: str = "projection",
             solver: str = "neldermead",
             NRandom: int = 100,
@@ -1295,27 +1331,50 @@ class DepthEucl():
             Chosen notion for depth computation
 
         Results
-        --------
+        -------
             ACA directions for dimensional reduction : array_like
             The return respresents directions that best represents anomalies in the dataset.
             
         """
-        ACA_tab=mtv.ACA(X=self.data,dim=dim,
-                        sample_size=sample_size,
-                        sample=sample,
-                        notion=notion,
-                        solver=solver,
-                        NRandom=NRandom,
-                        n_refinements=n_refinements,
-                        sphcap_shrink=sphcap_shrink,
-                        alpha_Dirichlet=alpha_Dirichlet,
-                        cooling_factor=cooling_factor,
-                        cap_size=cap_size,
-                        start=start,
-                        space=space,
-                        line_solver=line_solver,
-                        bound_gc=bound_gc)
+        
+        ACA_tab=np.zeros((self.distRef.shape[0],self._spaceDim,dim))
+        for ind, i in enumerate(self.distRef):
+            ACA_tab[ind]=mtv.ACA(X=self.data[self.distribution==i],dim=dim,
+                            sample_size=sample_size,
+                            notion=notion,
+                            solver=solver,
+                            NRandom=NRandom,
+                            n_refinements=n_refinements,
+                            sphcap_shrink=sphcap_shrink,
+                            alpha_Dirichlet=alpha_Dirichlet,
+                            cooling_factor=cooling_factor,
+                            cap_size=cap_size,
+                            start=start,
+                            space=space,
+                            line_solver=line_solver,
+                            bound_gc=bound_gc)
+        ACA_tab = ACA_tab[0] if  self.distRef.shape[0]==1 else ACA_tab
         return ACA_tab
+    
+    def IsInConvexes(self,z):
+        """
+        Checks the belonging to at least one of class convex hulls of the training dataset
+            
+        Parameters
+        ----------
+        z: array_like,
+            points to check the belongingness
+        
+
+        Results
+        -------
+            belongingness  : array_like
+            The return respresents directions that best represents anomalies in the dataset.
+            
+        """
+        return mtv.IsInConvexes(self.data,z,self.distribution,self.seed)
+        
+
 
     ## Det and MCD 
     def _calcDet(self,mat:np.ndarray):
@@ -1323,32 +1382,31 @@ class DepthEucl():
         Computes the determinant of a matrix 
 
         Parametres 
-        -----------
+        ----------
         mat: {array-like}
             Matrix to compute the determinant
 
         Results
-        -----------
+        -------
         Det: float
             determinant of the matrix
         """
         # self._check_variables
         return mtv.calcDet(mat)
         
-    def computeMCD(self,mat:np.ndarray=None, h:float=1, mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
+    def computeMCD(self, h:float=1., mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
+
         """
         Compute Minimum Covariance Determinant (MCD)
 
         Parametres 
-        -----------
+        ----------
         mat: {array-like} or None, default=None
             Matrix to compute MCD. If set to None, compute the MCD of the loaded dataset
 
-        h: int or float, default=1
+        h: int or float, default=1.
             Represents the amount of data of the dataset used to compute the MCD. 
-            If the value is in the interval [0,1], it is treated as the percentage of dataset,
-            if the value is in the interval [n/2,n], it is treated as the amount of sample points.
-            It in the interval ]1,n/2[, the amount is rounded to n/2.
+            The value is in the interval [0,1], and it is treated as the percentage of dataset
         
         mfull: int, default=10
 
@@ -1358,17 +1416,19 @@ class DepthEucl():
         hiRegimeCompleteLastComp: bool, default=True
             
         Results 
-        -----------
+        -------
         Minimum Covariance Determinant (MCD): {array-like}
         """
-        self._check_variables(h) # check if h is in the acceptable range
-        if h>0 and h<=1: # transform h in the good value for MCD function
-            h=int(h*self._nSamples)
-        elif h<self._nSamples/2:
-            h=int(self._nSamples/2)
-        else:h=int(h)
-        self.MCD=mtv.MCD(self.data,h=h,seed=self.seed,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
-        return self.MCD
+
+        self._check_variables(h=h) # check if h is in the acceptable range
+        self.MCD=np.zeros((self._nSamples.shape[0], self._spaceDim,self._spaceDim))
+        for ind,i in enumerate(self.distRef):
+            h_dist=int(h*self._nSamples[ind])
+            self.MCD[ind]=mtv.MCD(self.data[self.distribution==i],h=h_dist,seed=self.seed,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
+        
+        self.MCD=self.MCD[0] if self.distRef.shape[0]==1 else self.MCD
+        return  self.MCD
+
     
     def change_dataset(self,newDataset:np.ndarray,newY:np.ndarray=None, newDistribution:np.ndarray=None,keepOld:bool=False,)->None:
         """
@@ -1403,7 +1463,7 @@ class DepthEucl():
             except:pass
             try:
                 self.distribution=np.concatenate((self.distribution,newDistribution)) # try for distribution
-                self.distRef=np.unique(self.distribution)
+                # self.distRef=np.unique(self.distribution)
             except:
                 self.distribution=np.concatenate((self.distribution,np.repeat(0,newDataset.shape[0]))) # try for distribution
         else:
@@ -1412,10 +1472,11 @@ class DepthEucl():
             except:pass
             try:
                 self.distribution=newDistribution # try for distribution
-                self.distRef=np.unique(self.distribution)
+                # self.distRef=np.unique(self.distribution)
             except:
                 self.distribution=np.repeat(0,newDataset.shape[0])
-                self.distRef=np.unique(self.distribution)
+                # self.distRef=np.unique(self.distribution)
+        self.distRef,self._nSamples=np.unique(self.distribution,return_counts=True)
         return self
     #### auxiliar functions #### 
     def set_seed(self,seed:int=2801)->None:
@@ -1496,9 +1557,9 @@ class DepthEucl():
                 if value not in self.approxOption: 
                     raise ValueError(f"Only output_option possibilities are {self.approxOption}, got {value}.")
             if key=="h":
-                assert type(value)==int or type(value)==float, f"h must be a float or int, got {type(value)}"
-                if value<=0 or value>self._nSamples: 
-                    raise ValueError(f"h must be in the range from 0 to {self._nSamples}, got {value}.")
+                assert type(value)==float, f"h must be a float, got {type(value)}"
+                # if value<=0 or value>np.min(self._nSamples): 
+                #     raise ValueError(f"h must be in the range from 0 to {self._nSamples}, got {value}.")
 
     def _check_CUDA(self,CUDA,solver):
         if solver not in ["simplerandom", "refinedrandom"] and CUDA==True:

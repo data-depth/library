@@ -43,7 +43,7 @@ using namespace dyMatrixClass;
 const int debug = 1;
 
 // seed for the RNG
-#define _seed 1234
+// #define _seed 1234
 
 // error indicator used when computing the zonoid depth
 int error;
@@ -80,8 +80,8 @@ function<double(double, const double*, int)> uniDepths[]
 
 // constructor
 
-cProjection::cProjection(const cMatrix& x, int n, int d, int NRandom)
-	: x{ x }, n{ n }, d{ d }, _nProjections{ 0 }, _nRandom{ NRandom }, gen{ _seed }, rnd{ 0.0, 1.0 },
+cProjection::cProjection(const cMatrix& x, int n, int d, int NRandom, unsigned int seed)
+	: x{ x }, n{ n }, d{ d }, _nProjections{ 0 }, _nRandom{ NRandom }, gen{ seed }, rnd{ 0.0, 1.0 },
 xp{ new double[n] {} }
 {
 	// initialization of array 'Method' that contains the different approximations methods

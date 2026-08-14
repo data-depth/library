@@ -3,7 +3,7 @@ from ctypes import *
 from math import ceil
 import sys, os, glob
 import platform
-from .import_CDLL import libApprox
+from .import_CDLL import libApprox, libExact
     
 def depth_approximation(z,
                         X,
@@ -19,7 +19,8 @@ def depth_approximation(z,
                         start = "mean",
                         space = "sphere",
                         line_solver = "goldensection",
-                        bound_gc = True):
+                        bound_gc = True,
+                        seed = 2801):
 
     depth_indice = check_depth(notion)
     check_space(space)
@@ -27,6 +28,7 @@ def depth_approximation(z,
     start_indice = check_start(start)
     line_solver_indice = check_line_solver(line_solver)
     check_bound(bound_gc)
+    
 
     try:
         n, d = X.shape
@@ -80,7 +82,7 @@ def depth_approximation(z,
     objects=(c_double*len(objects_list))(*objects_list)
     points=pointer(points)
     objects=pointer(objects)
-
+    seed = pointer((c_int(seed)))
 
     libApprox.depth_approximation(
         objects,
@@ -104,14 +106,15 @@ def depth_approximation(z,
         c_void_p(depths_iter.ctypes.data),
         c_void_p(directions.ctypes.data),
         c_void_p(directions_card.ctypes.data),
-        c_void_p(best_directions.ctypes.data)
+        c_void_p(best_directions.ctypes.data),
+        seed
         )
     
     if(option == 2 or option == 3 or option == 4):
         for i in range(n_z):
             if(np.sum(z[i]*best_directions[i]) < np.sum(z[i]*(-best_directions[i]))):
                     best_directions[i] = -best_directions[i]
-    # print(option)
+
     depths=np.nan_to_num(depths, nan=0)
     if(option == 1):
         return depths
