@@ -21,8 +21,10 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                 line_solver = "goldensection",
                 bound_gc = True,
                 covMCD=None,
-                seed=2801):
-                        
+                state=None):
+
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state=state
     if exact:
         points_list=data.flatten()
         objects_list=x.flatten()
@@ -48,10 +50,11 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
         res=np.zeros(len(x))
         for i in range(len(x)):
             res[i]=depths[0][i]
-        return res
+        return res,RNG.bit_generator.state
     else:
-        return depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
-        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,seed)
+        res=depth_approximation(x, data, "mahalanobis", solver, NRandom, option, n_refinements,
+        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,RNG.bit_generator.state)
+        return res
 
 mahalanobis.__doc__= """
 

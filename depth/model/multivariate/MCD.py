@@ -3,13 +3,14 @@ from ctypes import *
 from scipy.stats import chi2
 from .import_CDLL import libExact
 
-def MCD(data, h, seed=1, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True):
+def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True):
 
     try:
         n, d = data.shape
     except ValueError:
         n, d = data.shape[0], 1
-
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state=state
     hParam = pointer(c_int(h))
     numPoints = pointer(c_int(n))
     dimension = pointer(c_int(d))
@@ -19,7 +20,7 @@ def MCD(data, h, seed=1, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True)
     c_points=cast(points, POINTER(c_double))
     # points=pointer(points)
 
-    c_seed=(c_int(seed))
+    c_seed=(c_int(int(RNG.integers(0,10000000,1)[0])))
 
     cov_size = d*d
     # print("cov_size",cov_size)
@@ -70,7 +71,7 @@ def MCD(data, h, seed=1, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True)
         for j in range(d):
             res[i,j]=c_mat_MCD[i*d+j]    
 
-    return res
+    return res, RNG.bit_generator.state
 
 # def MCD(data, h, seed=2801, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True):
 

@@ -269,8 +269,10 @@ class DepthEucl():
                 alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
                 cap_size=cap_size, start=start, space=space, 
                 line_solver=line_solver, bound_gc=bound_gc,option=option, 
-                covMCD=covMCD, seed=self.seed
+                covMCD=covMCD, state=self.RNG.bit_generator.state
                             ) #compute depth value
+            self.RNG.bit_generator.state=DM[-1]
+            DM=DM[:-1]
             if evaluate_dataset==False:
                 if exact or option==1:self.mahalanobisDepth[ind]=DM # assign value - exact or option 1
                 elif option==2:self.mahalanobisDepth[ind],self.mahalanobisDir[ind]=DM # assign value option 2
@@ -374,12 +376,20 @@ class DepthEucl():
                 self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
 
         for ind,d in enumerate(self.distRef):
-            if CUDA and self.CUDA:DAP=mtv.aprojection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+            if CUDA and self.CUDA:
+                DAP=mtv.aprojection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device, seed=self.seed) #compute depth value        
-            else:DAP=mtv.aprojection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device, 
+                                state=self.RNG.bit_generator.state) #compute depth value   
+                self.RNG.bit_generator.state=DAP[-1]
+                DAP=DAP[:-1]
+            else:
+                DAP=mtv.aprojection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                                 n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
-                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device, seed=self.seed) #compute depth value
+                                cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device, 
+                                state=self.RNG.bit_generator.state) #compute depth value
+                self.RNG.bit_generator.state=DAP[-1]
+                DAP=DAP[:-1]
             if evaluate_dataset==False:
                 if option==1:self.aprojectionDepth[ind]=DAP # assign val option 1
                 elif option==2:self.aprojectionDepth[ind],self.aprojectionDir[ind]=DAP # assign value option 2
@@ -496,8 +506,10 @@ class DepthEucl():
             DC=mtv.cexpchull(
                 x=x, data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,
                 sphcap_shrink=sphcap_shrink,alpha_Dirichlet =alpha_Dirichlet,cooling_factor=cooling_factor,
-                cap_size =cap_size,start =start,space =space,line_solver =line_solver,bound_gc =bound_gc,
-                seed=self.seed) # compute depth 
+                cap_size =cap_size,start =start,space =space,line_solver =line_solver,bound_gc =bound_gc,state=self.RNG.bit_generator.state
+                ) # compute depth 
+            self.RNG.bit_generator.state=DC[-1]
+            DC=DC[:-1]
             if evaluate_dataset==False: 
                 if option==1:self.cexpchullDepth[ind]=DC # assign value
                 elif option==2:self.cexpchullDepth[ind],self.cexpchullDir[ind]=DC # assign value
@@ -601,7 +613,9 @@ class DepthEucl():
             DC=mtv.cexpchullstar(x=x,data=self.data[self.distribution==d], solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
                             sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
                             cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc,
-                            seed=self.seed)
+                            state=self.RNG.bit_generator.state)
+            self.RNG.bit_generator.state=DC[-1]
+            DC=DC[:-1]
             if evaluate_dataset==False:
                 if option==1:self.cexpchullstarDepth[ind]=DC # assign value
                 elif option==2:self.cexpchullstarDepth[ind],self.cexpchullstarDir[ind]=DC # assign value
@@ -703,7 +717,10 @@ class DepthEucl():
             DG=mtv.geometrical(x=x,data=self.data[self.distribution==d], solver=solver, NRandom=NRandom, option=option, n_refinements=n_refinements, 
                             sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
                             cap_size=cap_size,start=start, space=space, line_solver=line_solver, bound_gc=bound_gc,
-                            seed=self.seed)
+                            state=self.RNG.bit_generator.state)
+            self.RNG.bit_generator.state=DG[-1]
+            DG=DG[:-1]
+            
             if evaluate_dataset==False:
                 if option==1:self.geometricalDepth[ind]=DG # assign value
                 elif option==2:self.geometricalDepth[ind],self.geometricalDir[ind]=DG # assign value
@@ -781,6 +798,7 @@ class DepthEucl():
                     - All respective directions
         
         """
+        
         if evaluate_dataset==True: # Dataset evaluation
             print("x value is set to the loaded dataset")
             x=self.data
@@ -808,13 +826,15 @@ class DepthEucl():
             if CUDA==True and self.CUDA==True:DH=mtv.halfspace(x=x,data=self.dataCuda[:,self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA, device=self.device,seed=self.seed
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA, device=self.device,state=self.RNG.bit_generator.state
             )
             elif CUDA==False:DH=mtv.halfspace(x=x,data=self.data[self.distribution==d],exact=exact,method=method,
                 solver=solver,NRandom=NRandom,option=option,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,seed=self.seed
+                space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,state=self.RNG.bit_generator.state
             )
+            self.RNG.bit_generator.state=DH[-1]
+            DH=DH[:-1]
             if evaluate_dataset==False:
                 if option==1 or exact==True:self.halfspaceDepth[ind]=DH # assign value
                 elif option==2:self.halfspaceDepth[ind],self.halfspaceDir[ind]=DH # assign value
@@ -1003,13 +1023,15 @@ class DepthEucl():
             if CUDA and self.CUDA:DP=mtv.projection(x=x,data=self.dataCuda[:,self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device,seed=self.seed
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,device=self.device,state=self.RNG.bit_generator.state
             )
             else:DP=mtv.projection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
                             n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                             alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,
-                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,seed=self.seed
+                            space=space,line_solver=line_solver,bound_gc=bound_gc,CUDA=CUDA,state=self.RNG.bit_generator.state
             )
+            self.RNG.bit_generator.state=DP[-1]
+            DP=DP[:-1]
             if evaluate_dataset==False:
                 if option==1:self.projectionDepth[ind]=DP # assign value
                 elif option==2:self.projectionDepth[ind],self.projectionDir[ind]=DP # assign value
@@ -1095,7 +1117,9 @@ class DepthEucl():
             self.simplicialDepth=np.zeros((self.distRef.shape[0], x.shape[0])) 
         self._check_variables(x=x)# check if parameters are valid
         for ind,d in enumerate(self.distRef):
-            DS=mtv.simplicial(x=x,data=self.data[self.distribution==d],exact=exact,k=k,seed=self.seed)
+            DS=mtv.simplicial(x=x,data=self.data[self.distribution==d],exact=exact,k=k,state=self.RNG.bit_generator.state)
+            self.RNG.bit_generator.state=DS[-1]
+            DS=DS[:-1]
             if evaluate_dataset==False:
                 self.simplicialDepth[ind]=DS
             if evaluate_dataset==True:
@@ -1142,8 +1166,10 @@ class DepthEucl():
             try:covMCD=self.MCD[ind]
             except:covMCD=None
             DS=mtv.simplicialVolume(x=x,data=self.data[self.distribution==d],
-                                    exact=exact,k=k,mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,seed=self.seed,
+                                    exact=exact,k=k,mah_estimate=mah_estimate,mah_parMCD=mah_parMCD,state=self.RNG.bit_generator.state,
                                     covMCD=covMCD)
+            self.RNG.bit_generator.state=DS[-1]
+            DS=DS[:-1]
             if evaluate_dataset==True:self.simplicialVolumeDepthDS[ind]=DS
             elif evaluate_dataset==False:self.simplicialVolumeDepth[ind]=DS
         if self.distRef.shape[0]==1: # Fix size
@@ -1255,7 +1281,7 @@ class DepthEucl():
             sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,
             cap_size=cap_size,output_option=output_option) # check if parameters are valid
         
-        # seedZ=seed if seed!=self.seed else self.seed #set seed value to default if seed is not passed
+       
         option=self._determine_option(x,NRandom,output_option,exact=exact) # determine option number
         if option>=2:
             if evaluate_dataset:self.zonoidDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
@@ -1265,12 +1291,13 @@ class DepthEucl():
             if option==4:
                 self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
         for ind,d in enumerate(self.distRef):
-            DZ=mtv.zonoid(
-                x,self.data[self.distribution==d],seed=self.seed,exact=exact, 
+            DZ, current_state=mtv.zonoid(
+                x,self.data[self.distribution==d],state=self.RNG.bit_generator.state,exact=exact, 
                 solver=solver,NRandom=NRandom,n_refinements=n_refinements,
                 sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,
                 cap_size=cap_size,start=start,space=space,line_solver=line_solver,
                 bound_gc=bound_gc,option=option) # compute zonoid depth
+            self.RNG.bit_generator.state=current_state
             if evaluate_dataset==False:
                 if exact or option==1:self.zonoidDepth[ind]=DZ # assign value
                 elif option==2:self.zonoidDepth[ind],self.zonoidDir[ind]=DZ # assign value
@@ -1339,7 +1366,8 @@ class DepthEucl():
         
         ACA_tab=np.zeros((self.distRef.shape[0],self._spaceDim,dim))
         for ind, i in enumerate(self.distRef):
-            ACA_tab[ind]=mtv.ACA(X=self.data[self.distribution==i],dim=dim,
+            ACA_tab[ind],current_state=mtv.ACA(
+                            X=self.data[self.distribution==i],dim=dim,
                             sample_size=sample_size,
                             notion=notion,
                             solver=solver,
@@ -1352,7 +1380,10 @@ class DepthEucl():
                             start=start,
                             space=space,
                             line_solver=line_solver,
-                            bound_gc=bound_gc)
+                            bound_gc=bound_gc,
+                            state=self.RNG.bit_generator.state
+                            )
+            self.RNG.bit_generator.state = current_state
         ACA_tab = ACA_tab[0] if  self.distRef.shape[0]==1 else ACA_tab
         return ACA_tab
     
@@ -1372,9 +1403,9 @@ class DepthEucl():
             The return respresents directions that best represents anomalies in the dataset.
             
         """
-        return mtv.IsInConvexes(self.data,z,self.distribution,self.seed)
-        
-
+        res, current_state=mtv.IsInConvexes(self.data,z,self.distribution,self.RNG.bit_generator.state)
+        self.RNG.bit_generator.state=current_state
+        return res
 
     ## Det and MCD 
     def _calcDet(self,mat:np.ndarray):
@@ -1424,8 +1455,8 @@ class DepthEucl():
         self.MCD=np.zeros((self._nSamples.shape[0], self._spaceDim,self._spaceDim))
         for ind,i in enumerate(self.distRef):
             h_dist=int(h*self._nSamples[ind])
-            self.MCD[ind]=mtv.MCD(self.data[self.distribution==i],h=h_dist,seed=self.seed,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
-        
+            self.MCD[ind],current_state=mtv.MCD(self.data[self.distribution==i],h=h_dist,state=self.RNG.bit_generator.state,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
+            self.RNG.bit_generator.state=current_state
         self.MCD=self.MCD[0] if self.distRef.shape[0]==1 else self.MCD
         return  self.MCD
 
@@ -1479,9 +1510,11 @@ class DepthEucl():
         self.distRef,self._nSamples=np.unique(self.distribution,return_counts=True)
         return self
     #### auxiliar functions #### 
-    def set_seed(self,seed:int=2801)->None:
+    def set_seed(self,seed:int=None)->None:
         """Set seed for computation"""
-        self.seed=seed
+        if type(seed) == type(None) : self.RNG = np.random.default_rng()
+        elif type(seed)==int:self.RNG = np.random.default_rng(seed)
+        else : raise TypeError("seed must be an integer.")
 
     def _check_dataset(self,)->None:
         """Check if the dataset is loaded"""

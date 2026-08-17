@@ -5,7 +5,7 @@ import sys, os, glob
 import platform
 from .import_CDLL import libExact,libApprox
 
-def zonoid(x, data, seed=0, exact=True, solver="neldermead",
+def zonoid(x, data, state=None, exact=True, solver="neldermead",
                         NRandom=1000,
                         option=1,
                         n_refinements=10,
@@ -17,6 +17,8 @@ def zonoid(x, data, seed=0, exact=True, solver="neldermead",
                         space="sphere",
                         line_solver="goldensection",
                         bound_gc=True,):
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state = state
     if exact:
         points_list=data.flatten()
         objects_list=x.flatten()
@@ -28,7 +30,7 @@ def zonoid(x, data, seed=0, exact=True, solver="neldermead",
         numPoints=pointer(c_int(len(data)))
         numObjects=pointer(c_int(len(x)))
         dimension=pointer(c_int(len(data[0])))
-        seed=pointer((c_int(seed)))
+        seed=pointer((c_int(int(RNG.integers(0,10000000,1)[0]))))
         depths=pointer((c_double*len(x))(*np.zeros(len(x))))
 
         libExact.ZDepth(points,objects, numPoints,numObjects,dimension,seed,depths)
@@ -36,10 +38,10 @@ def zonoid(x, data, seed=0, exact=True, solver="neldermead",
         res=np.zeros(len(x))
         for i in range(len(x)):
             res[i]=depths[0][i]
-        return res
+        return res,RNG.bit_generator.state
     else:
         return depth_approximation(x, data, "zonoid", solver, NRandom, option, n_refinements,
-        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,seed)
+        sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,state)
 
 zonoid.__doc__= """
 

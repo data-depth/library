@@ -88,6 +88,7 @@ class DepthFunc():
             - Average the results over all L time points
         
         """ 
+        self.set_seed()
         if type(data) == type(None):
             raise Exception("You must load a dataset")
         assert type(data)==np.ndarray or type(data)==pd.DataFrame, 'Data must be a 3D numpy array of a pandas DataFrame'
@@ -436,25 +437,29 @@ class DepthFunc():
  
             # Compute depth at time i
             if option==1:
-                time_component_depth = mvt.depth_approximation(
+                time_component_depth, current_state = mvt.depth_approximation(
                     query_component, data_component_slice,
                     notion, solver, NRandom, 
                     option=option,
                     n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                     alpha_Dirichlet=alpha_Dirichlet,
                     cooling_factor=cooling_factor,cap_size=cap_size,
-                    start=start,space=space,line_solver=line_solver,bound_gc=bound_gc
+                    start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,
+                    state=self.RNG.bit_generator.state,
                 )
+                self.RNG.bit_generator.state=current_state
             if option==2:
-                time_component_depth, directions[i] = mvt.depth_approximation(
+                time_component_depth, directions[i], current_state = mvt.depth_approximation(
                         query_component, data_component_slice,
                         notion, solver, NRandom, 
                         option=2,
                         n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                         alpha_Dirichlet=alpha_Dirichlet,
                         cooling_factor=cooling_factor,cap_size=cap_size,
-                        start=start,space=space,line_solver=line_solver,bound_gc=bound_gc
+                        start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,
+                        state=self.RNG.bit_generator.state
                     )
+                self.RNG.bit_generator.state=current_state
             total_depth_sum += np.nan_to_num(time_component_depth,nan=0)
 
         # Average depth over all L time points
@@ -637,6 +642,11 @@ class DepthFunc():
         depth_array = np.empty((query_array.shape[0],), dtype = float)
         pass
 
+    def set_seed(self,seed:int=None)->None:
+        """Set seed for computation"""
+        if type(seed) == type(None) : self.RNG = np.random.default_rng()
+        elif type(seed)==int:self.RNG = np.random.default_rng(seed)
+        else : raise TypeError("seed must be an integer.")
     def _check_hyperparDepth(self,**kwargs):
         n_refinements = 10
         sphcap_shrink = 0.5

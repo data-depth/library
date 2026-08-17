@@ -5,7 +5,7 @@ import sys, os, glob
 import platform
 from .import_CDLL import libExact
 
-def IsInConvexes(X,z,distributions,seed):
+def IsInConvexes(X,z,distributions,state):
     """
     Check if points are inside the convex hull 
     """
@@ -14,7 +14,9 @@ def IsInConvexes(X,z,distributions,seed):
     except ValueError:
         n, d = X.shape[0], 1
     n_z = z.shape[0]
-    
+
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state = state
     
     distr_uniques, counts= np.unique(distributions, return_counts=True)
     numClasses=int(counts.shape[0])
@@ -34,7 +36,7 @@ def IsInConvexes(X,z,distributions,seed):
     c_dim=c_int(d)
     c_numClasses=c_int(numClasses)
     c_numObjects=c_int(n_z)
-    c_seed=c_int(int(seed))
+    c_seed=c_int(int(int(RNG.integers(0,10000000,1)[0])))
     
     libExact.IsInConvexes.restype=None
     libExact.IsInConvexes.argtypes=[
@@ -72,7 +74,7 @@ def IsInConvexes(X,z,distributions,seed):
 
 
 
-    return res
+    return res,RNG.bit_generator.state
 
 
 

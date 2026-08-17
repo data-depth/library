@@ -27,8 +27,10 @@ def calcDet(A):
     return res_pointer[0]
 
 def simplicialVolume(x, data, exact = True, k = 0.05,
-        mah_estimate = "moment", mah_parMCD = 0.75, seed = 0,
+        mah_estimate = "moment", mah_parMCD = 0.75, state=None,
         covMCD=None):
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state=state
     points_list=data.flatten()
     objects_list=x.flatten()
     if (mah_estimate == "none"):
@@ -53,7 +55,7 @@ def simplicialVolume(x, data, exact = True, k = 0.05,
     numObjects=pointer(c_int(len(x)))
     dimension=pointer(c_int(len(data[0])))
     
-    seed=pointer(c_int(seed))
+    seed=pointer(c_int(int(RNG.integers(0,10000000,1)[0])))
     exact=pointer(c_int(exact))
     if k<=0:
         print("k must be positive")
@@ -78,7 +80,7 @@ def simplicialVolume(x, data, exact = True, k = 0.05,
     res=np.zeros(len(x))
     for i in range(len(x)):
         res[i]=depths[i]
-    return res
+    return res,RNG.bit_generator.state
 
 simplicialVolume.__doc__="""
 

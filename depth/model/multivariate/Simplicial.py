@@ -12,7 +12,9 @@ def longtoint(k):
   k2 = int(k - k1*limit)
   return np.array([k1,k2])
 
-def simplicial(x, data, exact=True, k=0.05, seed=0):
+def simplicial(x, data, exact=True, k=0.05, state=None):
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state = state
     points_list=data.flatten()
     objects_list=x.flatten()
     points=(c_double*len(points_list))(*points_list)
@@ -23,7 +25,7 @@ def simplicial(x, data, exact=True, k=0.05, seed=0):
     numPoints=pointer(c_int(len(data)))
     numObjects=pointer(c_int(len(x)))
     dimension=pointer(c_int(len(data[0])))
-    seed=pointer((c_int(seed)))
+    seed=pointer((c_int(int(RNG.integers(0,10000000,1)[0]))))
     exact=pointer((c_int(exact)))
     if k<=0:
         print("k must be positive")
@@ -43,7 +45,7 @@ def simplicial(x, data, exact=True, k=0.05, seed=0):
     res=np.zeros(len(x))
     for i in range(len(x)):
         res[i]=depths[0][i]
-    return res
+    return res,RNG.bit_generator.state
 
 simplicial.__doc__ = """
 

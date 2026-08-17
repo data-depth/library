@@ -17,10 +17,10 @@ def geometrical(x, data,
         space = "sphere",
         line_solver = "goldensection",
         bound_gc = True,
-        seed=2801):
+        state=None):
 
     return depth_approximation(x, data, "geometrical", solver, NRandom, option, n_refinements,
-    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,seed)
+    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,state)
 
 
 geometrical.__doc__="""

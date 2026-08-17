@@ -20,8 +20,9 @@ def depth_approximation(z,
                         space = "sphere",
                         line_solver = "goldensection",
                         bound_gc = True,
-                        seed = 2801):
-
+                        state=None):
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state = state
     depth_indice = check_depth(notion)
     check_space(space)
     solver_indice = check_solver(solver, space)
@@ -82,7 +83,7 @@ def depth_approximation(z,
     objects=(c_double*len(objects_list))(*objects_list)
     points=pointer(points)
     objects=pointer(objects)
-    seed = pointer((c_int(seed)))
+    seed = pointer((c_int(RNG.integers(0,10000000,1)[0])))
 
     libApprox.depth_approximation(
         objects,
@@ -117,11 +118,11 @@ def depth_approximation(z,
 
     depths=np.nan_to_num(depths, nan=0)
     if(option == 1):
-        return depths
+        return depths,RNG.bit_generator.state
     elif(option == 2):
-        return depths, best_directions
+        return depths, best_directions,RNG.bit_generator.state
     elif(option == 3):
-        return depths, best_directions, depths_iter
+        return depths, best_directions, depths_iter,RNG.bit_generator.state
     elif(option == 4):
         # Resize and clear array of every directions unused
         directions = directions.tolist()
@@ -140,7 +141,7 @@ def depth_approximation(z,
                 ind_bin = directions_card[i, ~(directions_card[i] == -1)] # Clear every -1 value 
                 ind_bin_cumsum = np.cumsum(ind_bin)
                 ind_convergence.append((ind_bin_cumsum - ind_bin).tolist())
-        return depths, best_directions, depths_iter, directions, ind_convergence
+        return depths, best_directions, depths_iter, directions, ind_convergence,RNG.bit_generator.state
 
 def check_depth(depth):
     all_depths = ["mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"]

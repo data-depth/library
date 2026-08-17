@@ -4,6 +4,7 @@ from .CUDA_approximation import cudaApprox
 import sys, os, glob
 import platform
 from .import_CDLL import libApprox
+import numpy as np
 
 def aprojection(x, data,
         solver = "neldermead",
@@ -20,15 +21,17 @@ def aprojection(x, data,
         bound_gc = True,
         CUDA=False,
         device=None,
-        seed=2801):
-
+        state=None):
+    
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state = state
     if CUDA==False:
         return depth_approximation(x, data, "aprojection", solver, NRandom, option, n_refinements,
                                    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, 
-                                   bound_gc,seed=seed)
+                                   bound_gc,state)
     if CUDA==True:
         return cudaApprox(data,x, "aprojection",  solver, option,NRandom, n_refinements, sphcap_shrink,
-                          device=device, seed=seed)
+                          device=device, seed=int(RNG.integers(0,10000000,1)[0])),RNG.bit_generator.state
 
 
 aprojection.__doc__="""

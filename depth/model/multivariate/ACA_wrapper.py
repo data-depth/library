@@ -12,12 +12,13 @@ from .import_CDLL import libACA
 def ACA(X, dim = 1, sample_size = None,  notion = "projection", # Can't use halfspace with NelderMead
         solver = "neldermead", NRandom = 100, n_refinements = 10, sphcap_shrink = 0.5,
         alpha_Dirichlet = 1.25, cooling_factor = 0.95, cap_size = 1, start = "mean",
-        space = "sphere", line_solver = "goldensection", bound_gc = True):
+        space = "sphere", line_solver = "goldensection", bound_gc = True, state = None):
     
     z=X.copy()
-
+    RNG=np.random.default_rng()
+    RNG.bit_generator.state = state
     if(sample_size != None): # Run method on a (specified) sample
-        ind = np.random.default_rng().choice(X.shape[0], size=sample_size, replace=False)
+        ind = RNG.choice(X.shape[0], size=sample_size, replace=False)
         X = X[ind]
     else:
         pass
@@ -70,7 +71,9 @@ def ACA(X, dim = 1, sample_size = None,  notion = "projection", # Can't use half
             ct.c_void_p(basis.ctypes.data),
             ct.c_int(d_aca),
             ct.c_int(2),
+            ct.c_int(RNG.integers(0,10000000,1)[0])
             )
+        
         
         best_directions = np.array(best_directions, dtype=np.double)
         min_score = np.argmin(depths) # Point with highest anomaly score
@@ -86,7 +89,7 @@ def ACA(X, dim = 1, sample_size = None,  notion = "projection", # Can't use half
             return ACA_tab.T
         d_aca -= 1
 
-    return ACA_tab.T
+    return ACA_tab.T, RNG.bit_generator.state
 
 ######################################
 # Functions for arguments verification
