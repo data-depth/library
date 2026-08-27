@@ -1,6 +1,6 @@
 from ctypes import *
 from .Depth_approximation import depth_approximation
-from .CUDA_approximation import cudaApprox
+
 import sys, os, glob
 import platform
 from .import_CDLL import libApprox

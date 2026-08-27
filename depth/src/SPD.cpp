@@ -35,8 +35,9 @@ namespace DataDepth {
 	double MedCouple(double* xCopy, int n, double med){
 		double MC{0.0};
 		int n2 = ceil(n * 0.5);
-		double* hMC = new double[n2*n2];
-		int n3 = ceil((n2*n2)*0.5);
+		int n22=(n2+1)*(n2+1);
+		double* hMC = new double[n22];
+		int n3 = ceil((n22)*0.5);
 		int ij{0};
 		int k{0};
 		for(int i{0}; i <= n2; i++){
@@ -46,15 +47,16 @@ namespace DataDepth {
 				}
 				else if (xCopy[i]==xCopy[j]){
 					if (k==0){k=j-i+1;}
-					if (i+j-1<k){hMC[ij]=-1;}
-					if (i+j-1==k){hMC[ij]=0;}
-					if (i+j-1>k){hMC[ij]=1;}
+					if (i+j-1<k){hMC[ij]=-1.;}
+					if (i+j-1==k){hMC[ij]=0.;}
+					if (i+j-1>k){hMC[ij]=1.;}
 				}
 				ij++;
 			}
 		}
-		nth_element(hMC,hMC+n3,hMC+n2*n2);
+		nth_element(hMC,hMC+n3,hMC+n22);
 		return hMC[n3];
+
 
 	}
 
@@ -65,24 +67,19 @@ namespace DataDepth {
         
 		// The median is computed as the ceil(n * 0.5)-th smallest element in the
 		// array x
-		int n2 = ceil(n * 0.5);
-		double med{ xCopy[n2] };
-		double dev;
-		double MC = MedCouple(xCopy, n, med);
-		double w;
-		int n3 = ceil(n * 0.75);
+		// double dev,w;
+		double dev,w;
 		int n1 = ceil(n * 0.25);
+		int n2 = ceil(n * 0.5);
+		int n3 = ceil(n * 0.75);
+		double med{xCopy[n2]}; // values are all sorted for medcouple
+		double MC = MedCouple(xCopy, n, med);
 		double IQR=xCopy[n3]-xCopy[n1];
 		if (z >= med) {
-			// The median of positive deviations from the median is computed as
-			// the difference between the third quartile and the median
 			w=xCopy[n3] + 1.5 * exp(-4*MC)*IQR;
 			dev = w-med;
 		}
 		else {
-			// The median of negative deviations from the median is computed as
-			// the difference between the median and the first quartile.
-			
 			w=xCopy[n1] - 1.5 * exp(+3*MC)*IQR;
 			dev = med-w;
 		}

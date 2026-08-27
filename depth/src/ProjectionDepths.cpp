@@ -1,7 +1,7 @@
 /******************************************************************************/
 /* File:             ProjectionDepths.cpp                                     */
 /* Created by:       Rainer Dyckerhoff, Pavlo Mozharovskyi                    */
-/* Last revised:     04.07.2020                                               */
+/* Last revised:     27.08.2026                                               */
 /*                                                                            */
 /* Implementation of the methods in class 'cProjection'                       */
 /*                                                                            */
