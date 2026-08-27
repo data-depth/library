@@ -29,7 +29,7 @@ enum class eLineSearchCD { LineSearchUnif, LineSearchGS };
 enum class eLineSearchCDGC { LineSearchUnifGC, LineSearchGSGC };
 
 // Enumeration class for the depth notions
-enum class eDepth { MD, HD, ZD, PD, APD, CECHS, CECH, GEOM };
+enum class eDepth { MD, HD, ZD, PD, APD, CECHS, CECH, GEOM, SPD };
 
 const int nProjMeth = 10;  // number of approximation algorithms
 const int nCDMeth   =  2;  // number of line serach strategies for CoordDesc

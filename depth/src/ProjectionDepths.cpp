@@ -24,6 +24,7 @@
 #include "HD.h"
 #include "PD.h"
 #include "APD.h"
+#include "SPD.h"
 #include "WMD.h"
 #include "ProjectionDepths.h"
 #include "Matrix.h"
@@ -54,7 +55,7 @@ int Compare(Feval& fe1, Feval& fe2) { return fe1.val < fe2.val; }
 int cmp(const fVal& a, const fVal& b) { return a.val < b.val; }
 
 // array of functions for exactly computing multivariate depths
-// For PD and APD no exact algorithms are implemented, so we return always -1
+// For PD, APD and SPD no exact algorithms are implemented, so we return always -1
 function<double(const double*, const cMatrix, int, int)> multiDepths[]
 = { 
 	[](const double* z, const cMatrix x, int n, int d) { return MD(z, x, n, d); }, 
@@ -64,12 +65,13 @@ function<double(const double*, const cMatrix, int, int)> multiDepths[]
 	[](const double* z, const cMatrix x, int n, int d) { return -1.; },
     [](const double* z, const cMatrix x, int n, int d) { return -1.; },
     [](const double* z, const cMatrix x, int n, int d) { return -1.; },
+    [](const double* z, const cMatrix x, int n, int d) { return -1.; },
     [](const double* z, const cMatrix x, int n, int d) { return -1.; } };
 
 // array of functions for exactly computing univariate depths
 function<double(double, const double*, int)> uniDepths[] 
 	= { MD1, HD1, 
-	[](double z, const double* x, int n){ return ZD1(z, x, n, false); }, PD1, APD1, CechStarD1, CechD1, GeomD1 };
+	[](double z, const double* x, int n){ return ZD1(z, x, n, false); }, PD1, APD1, CechStarD1, CechD1, GeomD1, SPD1 };
 
 /****************************************************************************/
 /*                                                                          */

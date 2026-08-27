@@ -1,6 +1,7 @@
 
 
 #include "APD.cpp"
+#include "SPD.cpp"
 #include "auxLinAlg.cpp"
 #include "HD.cpp"
 #include "Matrix.cpp"

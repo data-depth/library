@@ -21,6 +21,7 @@ except:cudaApprox=None
 from .ACA_wrapper import ACA
 from .import_CDLL import libExact,libApprox
 from .isInConvexes import IsInConvexes
+from .Sprojection import sprojection
 
 __all__ = ["depth_approximation", "betaSkeleton", "cexpchull", "cexpchullstar", "geometrical", "halfspace", "L2", "mahalanobis", "potential", "projection", "aprojection", "qhpeeling", "simplicial", "simplicialVolume", "spatial", "zonoid", "depth_mesh", "depth_plot2d", "calcDet",
-    "MCD", "cudaApprox","ACA", "IsInConvexes"]
+    "MCD", "cudaApprox","ACA", "IsInConvexes","sprojection"]

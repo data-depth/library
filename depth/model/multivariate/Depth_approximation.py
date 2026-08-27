@@ -20,7 +20,7 @@ def depth_approximation(z,
                         space = "sphere",
                         line_solver = "goldensection",
                         bound_gc = True,
-                        state=None):
+                        state=None, **kwargs):
     RNG=np.random.default_rng()
     RNG.bit_generator.state = state
     depth_indice = check_depth(notion)
@@ -144,7 +144,8 @@ def depth_approximation(z,
         return depths, best_directions, depths_iter, directions, ind_convergence,RNG.bit_generator.state
 
 def check_depth(depth):
-    all_depths = ["mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"]
+    all_depths = ["mahalanobis", "halfspace", "zonoid", 
+                  "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical", "sprojection"]
     if (depth not in all_depths):
         raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))
     else:
