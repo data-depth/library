@@ -1,4 +1,4 @@
-from . import multivariate as mvt
+from . import multivariate as mtv
 # from DepthEucl import DepthEucl
 import numpy as np
 import pandas as pd
@@ -372,9 +372,9 @@ class DepthFunc():
         return interp_value_matrix
     
 
-    def _int_depth(self, query_point, notion='halfspace', solver='neldermead', NRandom=100, option=1, **kwargs):
+    def _compute_int_depth_projBase(self, query_point, notion='halfspace', solver='neldermead', NRandom=100, option=1, **kwargs):
         """
-        Compute the integrated functional depth (IFD) of a query function with respect to a sample of functional data.
+        Compute the integrated functional depth (IFD) of a query function with respect to a sample of functional data for projection-based depth notions.
 
         Parameters
         ----------
@@ -424,10 +424,12 @@ class DepthFunc():
         """
         total_depth_sum = 0
         l_points, d = query_point.shape
-        n_refinements,sphcap_shrink,alpha_Dirichlet,cooling_factor,\
-        cap_size,start,space,line_solver,bound_gc=self._check_hyperparDepth(**kwargs)
+        n_refinements,sphcap_shrink,alpha_Dirichlet,\
+            cooling_factor,cap_size,start,space,line_solver,bound_gc,\
+            exact,mah_estimate,mah_parMcd,beta,distance,Lp_p,method,\
+            pretransform,kernel,kernel_bandwidth,k=self._check_hyperparDepth(**kwargs)
         if option==2: directions=np.zeros(query_point.shape)
-        # if d==1:option=1
+
         for i in range(l_points):
             # data_component_slice: N_data x D matrix (all functions at time i)
             data_component_slice = self.data_array[:, i, :]
@@ -437,7 +439,7 @@ class DepthFunc():
  
             # Compute depth at time i
             if option==1:
-                time_component_depth, current_state = mvt.depth_approximation(
+                time_component_depth, current_state = mtv.depth_approximation(
                     query_component, data_component_slice,
                     notion, solver, NRandom, 
                     option=option,
@@ -447,9 +449,8 @@ class DepthFunc():
                     start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,
                     state=self.RNG.bit_generator.state,
                 )
-                self.RNG.bit_generator.state=current_state
             if option==2:
-                time_component_depth, directions[i], current_state = mvt.depth_approximation(
+                time_component_depth, directions[i], current_state = mtv.depth_approximation(
                         query_component, data_component_slice,
                         notion, solver, NRandom, 
                         option=2,
@@ -459,7 +460,8 @@ class DepthFunc():
                         start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,
                         state=self.RNG.bit_generator.state
                     )
-                self.RNG.bit_generator.state=current_state
+            self.RNG.bit_generator.state=current_state
+
             total_depth_sum += np.nan_to_num(time_component_depth,nan=0)
 
         # Average depth over all L time points
@@ -468,9 +470,99 @@ class DepthFunc():
         if option==1:return functional_depth_val 
         else:return functional_depth_val,directions
 
+    def _compute_int_depth_Exact(self, query_point, notion='halfspace', **kwargs):
+        """
+        Compute the integrated functional depth (IFD) of a query function with respect to a sample of functional data for exact depth notions.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            A 3D NumPy array of shape (N_data, L, D)
+            representing the sample of functional data:
+            - N_data: number of functional observations (samples)
+            - L: number of discretization points per function
+            - D: dimension of the data at each discretization point
+
+            Each element data[j, i, :] corresponds to the D-dimensional
+            observation of the j-th function at discretization point i.
+
+        query_point : np.ndarray
+            A 2D NumPy array of shape (L, D)
+            representing the function for which the integrated depth is to be computed.
+            It has the same structure as a single element of `data`.
+
+        type_of_depth : str, optional, default='halfspace'
+            The name of the multivariate depth function to use for each time slice.
+            Typical choices include:
+            - 'halfspace'
+            - 'projection'
+            - 'simplicial', etc.
+
+        solver : str, optional, default='neldermead'
+            The numerical method used to approximate the multivariate depth.
+            For example, 'neldermead' uses the Nelder–Mead optimization algorithm.
+
+        NRandom : int, optional, default=100
+            The number of random projections (or random directions)
+            
+        Returns
+        -------
+        functional_depth_val : float
+            The integrated functional depth of `query_point` with respect to `data`,
+            computed as the average of the multivariate depths across all L discretization points.
+
+        Notes
+        -----
+        For each discretization point i = 1, ..., L:
+            - Extract the data slice `data[:, i, :]` (shape: N_data x D)
+            - Extract the query vector `query_point[i, :]` (shape: D)
+            - Compute the multivariate depth of the query vector relative to the data slice
+            - Average the results over all L time points
+
+        """
+        total_depth_sum = 0
+        l_points, d = query_point.shape
+
+        notionsDict={"potential":mtv.potential,
+                     "qhpeeling":mtv.qhpeeling, 
+                     "simplicial":mtv.simplicial,
+                     "betaskeleton":mtv.betaSkeleton,
+                     "L2":mtv.L2, 
+                     "simplicialvolume":mtv.simplicialVolume,
+                     "spatial":mtv.spatial,
+                     "mahalanobis":mtv.mahalanobis, 
+                     "halfspace":mtv.halfspace, 
+                     "zonoid":mtv.zonoid}
+        n_refinements,sphcap_shrink,alpha_Dirichlet,\
+            cooling_factor,cap_size,start,space,line_solver,bound_gc,\
+            exact,mah_estimate,mah_parMcd,beta,distance,Lp_p,method,\
+            pretransform,kernel,kernel_bandwidth,k=self._check_hyperparDepth(**kwargs)
+        for i in range(l_points):
+            # data_component_slice: N_data x D matrix (all functions at time i)
+            data_component_slice = self.data_array[:, i, :]
+
+            # query_component: D-dimensional vector (query function at time i)
+            query_component = query_point[i, :]
+ 
+            # Compute depth at time i
+            time_component_depth, current_state = notionsDict[notion](n_refinements=n_refinements,
+                        sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,
+                        cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,
+                        exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,beta=beta,distance=distance,Lp_p=Lp_p,method=method,
+                        pretransform=pretransform,kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k)
+
+
+
+            self.RNG.bit_generator.state=current_state
+            total_depth_sum += np.nan_to_num(time_component_depth,nan=0)
+
+        # Average depth over all L time points
+        functional_depth_val = total_depth_sum / l_points
+
+        return functional_depth_val 
+        
     
-    def projection_based_func_depth(self, query,
-                                    notion='halfspace', solver='neldermead', NRandom=100,
+    def integral_depth(self, query,notion='halfspace', solver='neldermead', NRandom=100,
                                     output_option:Literal["lowest_depth","final_depth_dir"]="lowest_depth", **kwargs):
         """
         Compute projection-based functional depth for query functional data with respect to a reference dataset.
@@ -570,120 +662,172 @@ class DepthFunc():
         queryMM=self._MinMax(query)
         query_array = self._syncronise_over_time(queryMM,)
         depth_array = np.empty((query_array.shape[0],), dtype = float)
-        if len(self.value_cols)==1 and output_option=="final_depth_dir":
-            print("Space dimention is 1, output_option is set to 'lowest_depth'")
-            output_option="lowest_depth"
-        if output_option=="lowest_depth":
-            option=1
-            direction_array=None
-        elif output_option=="final_depth_dir":
-            option=2
-            direction_array = np.empty(query_array.shape, dtype = float)
-        else:
-            option=1
-            print(f"Invalid output_option, output_option set to 'lowest_depth'")
-        for i in range(query_array.shape[0]):
-            if option==1:
-                depth_array[i] = self._int_depth(query_array[i, :, :], notion=notion, solver=solver,option=option,
-                                            NRandom=NRandom,**kwargs)[0]
-            
-            elif option==2:
-                depth_array[i], direction_array[i] =self._int_depth(query_array[i, :, :], notion=notion, solver=solver,option=option,
-                                            NRandom=NRandom,**kwargs)
+        if "exact" in kwargs.keys():exact=kwargs["exact"]
+        else:exact=False
+        exOrApp=self._determine_depth_func(notion,exact)
+        if exOrApp=="projBase":
+            if len(self.value_cols)==1 and output_option=="final_depth_dir":
+                print("Space dimention is 1, output_option is set to 'lowest_depth'")
+                output_option="lowest_depth"
+            if output_option=="lowest_depth":
+                option=1
+                direction_array=None
+            elif output_option=="final_depth_dir":
+                option=2
+                direction_array = np.empty(query_array.shape, dtype = float)
+            else:
+                option=1
+                print(f"Invalid output_option, output_option set to 'lowest_depth'")
+            for i in range(query_array.shape[0]):
+                if option==1:
+                    depth_array[i] = self._compute_int_depth_projBase(query_array[i, :, :], notion=notion, solver=solver,option=option,
+                                                NRandom=NRandom,**kwargs)[0]
                 
-       
-        if option==1:return depth_array 
-        else:return depth_array,direction_array
-
-    def general_func_depth(self,query,notion='halfspace', **kwargs):
-        """
-        Compute non projection-based functional depth for query functional data with respect to a reference dataset.
-
-        This function computes depth values of functional observations (in `query`) relative to a 
-        reference dataset (`df`) using projection-based methods such as halfspace depth.
-        Each function (trajectory) is represented by a sequence of multivariate values over time.
+                elif option==2:
+                    depth_array[i], direction_array[i] =self._compute_int_depth_projBase(query_array[i, :, :], notion=notion, solver=solver,option=option,
+                                                NRandom=NRandom,**kwargs)
+                    
         
-        Parameters
-        ----------
-        query : pandas.DataFrame
-            Query dataset containing functional observations whose depth will be computed
-            relative to `df`. Must have the same column structure as `df`.
+            if option==1:return depth_array 
+            else:return depth_array,direction_array
+        elif exOrApp=="exact":
+            if output_option=="final_depth_dir": print("Exact algorithms do not have a respective direction, output_option is set to 'lowest_depth'")
+            for i in range(query_array.shape[0]):
+                depth_array[i] = self._compute_int_depth_Exact(query_array[i, :, :], notion=notion,**kwargs)[0]
+            return depth_array 
 
-        notion 
-            {"mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"},
-            Which depth will be computed.
+    # def general_func_depth(self,query,notion='halfspace', **kwargs):
+    #     """
+    #     Compute non projection-based functional depth for query functional data with respect to a reference dataset.
+
+    #     This function computes depth values of functional observations (in `query`) relative to a 
+    #     reference dataset (`df`) using projection-based methods such as halfspace depth.
+    #     Each function (trajectory) is represented by a sequence of multivariate values over time.
+        
+    #     Parameters
+    #     ----------
+    #     query : pandas.DataFrame
+    #         Query dataset containing functional observations whose depth will be computed
+    #         relative to `df`. Must have the same column structure as `df`.
+
+    #     notion 
+    #         {"mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"},
+    #         Which depth will be computed.
 
 
-        Returns
-        -------
-        depth_array : np.ndarray of shape (n_query,)
-        Array of depth values, where `n_query` is the number of functional observations 
-        (unique `case_id`s) in the `query` dataset.
-        The return is the lowest comuted depth regarding all explored directions in space.
+    #     Returns
+    #     -------
+    #     depth_array : np.ndarray of shape (n_query,)
+    #     Array of depth values, where `n_query` is the number of functional observations 
+    #     (unique `case_id`s) in the `query` dataset.
+    #     The return is the lowest comuted depth regarding all explored directions in space.
 
-        Notes
-        -----
-        - If `timestamp` is of type `datetime64`, it is converted internally to seconds
-        relative to the global minimum timestamp (`t_min`).
-        - Duplicate timestamps within each `case_id` group are automatically dropped.
-        - Interpolation uses linear extrapolation outside the observed time range.
-        """
-        self._check_depth(notion)
-        if type(query)==np.ndarray:
-            query=self._3Dnp_tp_pd(query,self.TSnp, self.CInp)
-        if query[self.timestamp_col].max()>self.t_max:
-            print(f"Values with {self.timestamp_col} greater the base set domain are excluded")
-            query.drop(query[query[self.timestamp_col]>self.t_max].index, inplace=True)
-        if query[self.timestamp_col].min()>self.t_min:
-            print(f"Values with {self.timestamp_col} smaller the base set domain are excluded")
-            query.drop(query[query[self.timestamp_col]<self.t_min].index, inplace=True)
-        queryMM=self._MinMax(query)
-        query_array = self._syncronise_over_time(queryMM,)
-        depth_array = np.empty((query_array.shape[0],), dtype = float)
-        pass
+    #     Notes
+    #     -----
+    #     - If `timestamp` is of type `datetime64`, it is converted internally to seconds
+    #     relative to the global minimum timestamp (`t_min`).
+    #     - Duplicate timestamps within each `case_id` group are automatically dropped.
+    #     - Interpolation uses linear extrapolation outside the observed time range.
+    #     """
+    #     self._check_depth(notion)
+    #     if type(query)==np.ndarray:
+    #         query=self._3Dnp_tp_pd(query,self.TSnp, self.CInp)
+    #     if query[self.timestamp_col].max()>self.t_max:
+    #         print(f"Values with {self.timestamp_col} greater the base set domain are excluded")
+    #         query.drop(query[query[self.timestamp_col]>self.t_max].index, inplace=True)
+    #     if query[self.timestamp_col].min()>self.t_min:
+    #         print(f"Values with {self.timestamp_col} smaller the base set domain are excluded")
+    #         query.drop(query[query[self.timestamp_col]<self.t_min].index, inplace=True)
+    #     queryMM=self._MinMax(query)
+    #     query_array = self._syncronise_over_time(queryMM,)
+    #     depth_array = np.empty((query_array.shape[0],), dtype = float)
+    #     pass
 
     def set_seed(self,seed:int=None)->None:
         """Set seed for computation"""
         if type(seed) == type(None) : self.RNG = np.random.default_rng()
         elif type(seed)==int:self.RNG = np.random.default_rng(seed)
         else : raise TypeError("seed must be an integer.")
+
     def _check_hyperparDepth(self,**kwargs):
-        n_refinements = 10
-        sphcap_shrink = 0.5
-        alpha_Dirichlet = 1.25
-        cooling_factor = 0.95
-        cap_size = 1
-        start = "mean"
-        space = "sphere"
-        line_solver = "goldensection"
-        bound_gc = True
+
+        hyperValues={
+        "n_refinements": 10,
+        "sphcap_shrink": 0.5,
+        "alpha_Dirichlet": 1.25,
+        "cooling_factor": 0.95,
+        "cap_size": 1,
+        "start": "mean",
+        "space": "sphere",
+        "line_solver": "goldensection",
+        "bound_gc": True,
+        "exact":False,
+        "mah_estimate": "moment",
+        "mah_parMcd": 0.75,
+        "beta":2,
+        "distance": "Lp",
+        "Lp_p": 2,
+        "method": "recursive",
+        "pretransform": "1Mom",
+        "kernel": "EDKernel" ,
+        "kernel_bandwidth": 0,
+        "k":0.05,
+        }
 
         for key, value in kwargs.items():
-            if key=="n_refinements":
-                n_refinements=value
-            elif key=="sphcap_shrink":
-                sphcap_shrink=value
-            elif key=="alpha_Dirichlet":
-                alpha_Dirichlet=value
-            elif key=="cooling_factor":
-                cooling_factor=value
-            elif key=="cap_size":
-                cap_size=value
-            elif key=="start":
-                start=value
-            elif key=="space":
-                space=value
-            elif key=="line_solver":
-                line_solver=value
-            elif key=="bound_gc":
-                bound_gc=value
+            if key in hyperValues.keys():
+                hyperValues[key]=value
             else:
                 print(f"{key} is not a parameter for depth computation")
             
-        return n_refinements,sphcap_shrink,alpha_Dirichlet,cooling_factor,cap_size,start,space,line_solver,bound_gc
+        return list(hyperValues.values())
 
     def _check_depth(self, depth):
-        all_depths = ["mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"]
+        all_depths = ["mahalanobis", "halfspace", "zonoid", 
+                          "cexpchullstar", "cexpchull", "geometrical", "potential", 
+                          "qhpeeling", "simplicial","betaskeleton","L2", "simplicialvolume","spatial","projection","aprojection"]
         if (depth not in all_depths):
             raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))    
-        
+
+    def _determine_depth_func(self,depth, exact):
+        all_depthsProj = ["projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"]
+        all_depthsExac = ["potential","qhpeeling", "simplicial","betaskeleton","L2", "simplicialvolume","spatial",]
+        toCheck=["mahalanobis", "halfspace", "zonoid"]
+        if depth in all_depthsExac:return "exact"
+        elif depth in all_depthsProj:return "projBase"
+        elif depth in toCheck and exact==False:return "projBase"
+        elif depth in toCheck and exact==True:return "exact"
+
+        return "projBase"
+
+    def computeMCD(self,data_component_slice, h:float=1., mfull: int = 10, nstep: int = 7, hiRegimeCompleteLastComp: bool = True)->None:
+    
+            """
+            Compute Minimum Covariance Determinant (MCD)
+    
+            Parametres 
+            ----------
+            mat: {array-like} or None, default=None
+                Matrix to compute MCD. If set to None, compute the MCD of the loaded dataset
+    
+            h: int or float, default=1.
+                Represents the amount of data of the dataset used to compute the MCD. 
+                The value is in the interval [0,1], and it is treated as the percentage of dataset
+            
+            mfull: int, default=10
+    
+            nstep: int, default=7
+                Amount of steps to compute MCD
+    
+            hiRegimeCompleteLastComp: bool, default=True
+                
+            Results 
+            -------
+            Minimum Covariance Determinant (MCD): {array-like}
+            """
+    
+            h_dist=int(h*data_component_slice.shape[0])
+            MCD,current_state=mtv.MCD(data_component_slice,h=h_dist,
+                                                    state=self.RNG.bit_generator.state,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
+            self.RNG.bit_generator.state=current_state
+            return MCD[0]

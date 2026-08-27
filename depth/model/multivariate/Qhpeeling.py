@@ -31,7 +31,7 @@ def is_in_convex(x, data, cardinalities, seed = 0):
     res=count_convexes(x, data, cardinalities, seed)
     return res 
 
-def qhpeeling(x, data):
+def qhpeeling(x, data, **kwargs):
     points_list=data.flatten()
     objects_list=x.flatten()
     nrow_data=len(data)

@@ -21,7 +21,7 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                 line_solver = "goldensection",
                 bound_gc = True,
                 covMCD=None,
-                state=None):
+                state=None, **kwargs):
 
     RNG=np.random.default_rng()
     RNG.bit_generator.state=state

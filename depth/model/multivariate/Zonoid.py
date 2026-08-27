@@ -16,7 +16,7 @@ def zonoid(x, data, state=None, exact=True, solver="neldermead",
                         start="mean",
                         space="sphere",
                         line_solver="goldensection",
-                        bound_gc=True,):
+                        bound_gc=True, **kwargs):
     RNG=np.random.default_rng()
     RNG.bit_generator.state = state
     if exact:

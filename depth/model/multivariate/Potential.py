@@ -13,7 +13,7 @@ def MCD_fun(data,alpha,NeedLoc=False):
     else:return(cov.covariance_)
 
 ## the moment trabnsform requires MCD func
-def potential(x, data, pretransform = "1Mom", kernel="EDKernel" ,mah_parMcd=0.75, kernel_bandwidth=0):
+def potential(x, data, pretransform = "1Mom", kernel="EDKernel" ,mah_parMcd=0.75, kernel_bandwidth=0, **kwargs):
 
 	if(kernel=="GKernel" or kernel==2):
 		kernel=2

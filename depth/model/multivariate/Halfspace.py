@@ -21,7 +21,7 @@ def halfspace(x, data, exact=True, method="recursive",
                 bound_gc = True,
                 CUDA=False,
                 device=None,
-                state=None):
+                state=None, **kwargs):
     RNG=np.random.default_rng()
     RNG.bit_generator.state = state
     if exact:
@@ -56,7 +56,7 @@ def halfspace(x, data, exact=True, method="recursive",
         res=np.zeros(len(x))
         for i in range(len(x)):
             res[i]=depths[0][i]
-        return res
+        return res,RNG.bit_generator.state
     else:	
         if CUDA==False:return depth_approximation(x, data, "halfspace", solver, NRandom ,option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,state)

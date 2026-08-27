@@ -5,12 +5,8 @@ import math
 
 import torch
 from torch.nn.functional import normalize
-# if torch.backends.mps.is_available():
-#     device = torch.device("mps")
-# elif torch.cuda.is_available():
-#     device = torch.device("cuda")
-# else:
-#     device = torch.device("cpu")
+
+
 def cudaApprox(data:torch.Tensor,x:torch.Tensor,notion:str,
             solver:str,option:int,NRandom:int,n_refinements:int,sphcap_shrink:float,
             step:int=10000,device="cpu", seed=2801)->torch.Tensor:

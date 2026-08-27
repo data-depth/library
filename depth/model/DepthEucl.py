@@ -749,7 +749,7 @@ class DepthEucl():
             if option==1:return self.geometricalDepthDS
             if option==2:return self.geometricalDepthDS,self.geometricalDirDS
 
-    def halfspace(self, x:np.ndarray=None,exact: bool = True,method: str = "recursive",solver: str = "neldermead",
+    def halfspace(self, x:np.ndarray=None,exact: bool = True, method: str = "recursive",solver: str = "neldermead",
                   NRandom: int = 1000,n_refinements: int = 10,sphcap_shrink: float = 0.5,alpha_Dirichlet: float = 1.25,cooling_factor: float = 0.95,
                   cap_size: int = 1,start: str = "mean",space: str = "sphere",line_solver: str = "goldensection",bound_gc: bool = True,
                   CUDA:bool=False,output_option:Literal["lowest_depth","final_depth_dir",

@@ -13,7 +13,7 @@ from .import_CDLL import libExact
 #     else:return(cov.covariance_)
 
 def betaSkeleton(x, data, beta = 2, distance = "Lp", Lp_p = 2, mah_estimate = "moment", mah_parMcd = 0.75,
-				 covMCD=None):
+				 covMCD=None, **kwargs):
 	points_list=data.flatten()
 	objects_list=x.flatten()
 	if (distance == "Mahalanobis"):

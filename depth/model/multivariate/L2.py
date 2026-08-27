@@ -10,7 +10,7 @@ import platform
 #     if NeedLoc:return([cov.covariance_,cov.location_])
 #     else:return(cov.covariance_)
 
-def L2(x, data,mah_estimate='moment',mah_parMcd=0.75,covMCD=None):
+def L2(x, data,mah_estimate='moment',mah_parMcd=0.75,covMCD=None, **kwargs):
 	points_list=data.flatten()
 	objects_list=x.flatten()
 	

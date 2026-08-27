@@ -12,7 +12,7 @@ def longtoint(k):
   k2 = int(k - k1*limit)
   return np.array([k1,k2])
 
-def simplicial(x, data, exact=True, k=0.05, state=None):
+def simplicial(x, data, exact=True, k=0.05, state=None, **kwargs):
     RNG=np.random.default_rng()
     RNG.bit_generator.state = state
     points_list=data.flatten()

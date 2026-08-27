@@ -17,7 +17,7 @@ def cexpchull(x, data,
         space = "sphere",
         line_solver = "goldensection",
         bound_gc = True,
-        state=None):
+        state=None, **kwargs):
 
     return depth_approximation(x, data, "cexpchull", solver, NRandom, option, n_refinements,
     sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,state)

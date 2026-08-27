@@ -21,7 +21,7 @@ def projection(x, data,
         bound_gc = True,
         CUDA=False,
         device=None,
-        state=None):
+        state=None, **kwargs):
     RNG=np.random.default_rng()
     RNG.bit_generator.state = state
     if CUDA==False: #check cuda

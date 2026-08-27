@@ -10,7 +10,7 @@ import sklearn.covariance as sk
 #     if NeedLoc:return([cov.covariance_,cov.location_])
 #     else:return(cov.covariance_)
 
-def spatial(x, data,mah_estimate='moment',mah_parMcd=0.75,covMCD=None):
+def spatial(x, data,mah_estimate='moment',mah_parMcd=0.75,covMCD=None, **kwargs):
     depths_tab=[]
 
     if mah_estimate=='none':
