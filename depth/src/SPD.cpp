@@ -39,16 +39,16 @@ namespace DataDepth {
 		int n3 = ceil((n2*n2)*0.5);
 		int ij{0};
 		int k{0};
-		for(int i{0}, i <= n2; i++){
-			for(int j{n-1}, j >= n2; j--){
+		for(int i{0}; i <= n2; i++){
+			for(int j{n-1}; j >= n2; j--){
 				if (xCopy[i]!=xCopy[j]){
 					hMC[ij]=(xCopy[j] + xCopy[i] - 2*med)/(xCopy[j] - xCopy[i]);
 				}
 				else if (xCopy[i]==xCopy[j]){
-					if (k==0){k=j-i+1}
-					if (i+j-1<k){hMC[ij]=-1}
-					if (i+j-1==k){hMC[ij]=0}
-					if (i+j-1>k){hMC[ij]=1}
+					if (k==0){k=j-i+1;}
+					if (i+j-1<k){hMC[ij]=-1;}
+					if (i+j-1==k){hMC[ij]=0;}
+					if (i+j-1>k){hMC[ij]=1;}
 				}
 				ij++;
 			}
