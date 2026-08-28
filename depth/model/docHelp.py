@@ -171,6 +171,82 @@ Examples
             [0.090223   0.19577999 0.15769263 0.20123535 0.10375507 0.14635662
              0.20611053 0.17846703 0.19801984 0.23230606]             
 """
+sprojection__doc__="""
+
+Calculates approximately the skew-adjusted projection depth of points w.r.t. a multivariate data set.
+
+Arguments
+    x: array-like or None, default=None 
+        Matrix of objects (numerical vector as one object) whose depth is to be calculated;
+        each row contains a d-variate point. Should have the same dimension as
+        data.
+
+    solver : str  {``'simplegrid'``, ``'refinedgrid'``, ``'simplerandom'``, ``'refinedrandom'``, ``'coordinatedescent'``, ``'randomsimplices'``, ``'neldermead'``, ``'simulatedannealing'``}, default="neldermead"
+        The type of solver used to approximate the depth.
+    
+    NRandom : int, default=1000
+        The total number of iterations to compute the depth. Some solvers are converging
+        faster so they are run several time to achieve ``NRandom`` iterations.         
+
+    n_refinements : int, default = 10
+        Set the maximum of iteration for computing the depth of one point.
+        For ``solver='refinedrandom'`` or ``'refinedgrid'``.
+                      
+    sphcap_shrink : float, default = 0.5
+        It's the shrinking of the spherical cap. For ``solver='refinedrandom'`` or ``'refinedgrid'``.
+
+    alpha_Dirichlet : float, default = 1.25
+        It's the parameter of the Dirichlet distribution. For ``solver='randomsimplices'``.
+
+    cooling_factor : float, default = 0.95
+        It's the cooling factor. For ``solver='simulatedannealing'``.
+
+    cap_size : int | float, default = 1
+        It's the size of the spherical cap. For ``solver='simulatedannealing'`` or ``'neldermead'``.
+
+    start : str {'mean', 'random'}, default = mean 
+        For ``solver='simulatedannealing'`` or ``'neldermead'``, it's the method used to compute the first depth.
+                      
+    space : str {'sphere', 'euclidean'}, default = 'sphere' 
+        For ``solver='coordinatedescent'`` or ``'neldermead'``, it's the type of spacecin which the solver is running.
+                      
+    line_solver : str {'uniform', 'goldensection'}, default = goldensection
+        For ``solver='coordinatedescent'``, it's the line searh strategy used by this solver.
+                      
+    bound_gc : bool, default = True
+        For ``solver='neldermead'``, it's ``True`` if the search is limited to the closed hemisphere.
+    
+    output_option : str {"lowest_depth","final_depth_dir","all_depth","all_depth_directions}, default = final_depth_dir
+        Determines what will be computated alongside with the final depth
+        |        If ``output_option=lowest_depth``, only approximated depths are returned.
+        |        If ``output_option=final_depth_dir``, best directions to approximate depths are also returned.
+        |        If ``output_option=all_depth``, depths calculated at every iteration are also returned.
+        |        If ``output_option=all_depth_directions``, random directions used to project depths are also returned with indices of converging for the solver selected.
+
+    evaluate_dataset : bool, default=False
+        Determines if dataset loaded will be evaluated. 
+        Automatically sets x to dataset
+
+
+References
+    * Brys, G., Hubert, M., & Struyf, A. (2004). A robust measure of skewness. Journal of Computational and Graphical Statistics, 13(4), 996-1017.
+
+    * Brys, G., Hubert, M., & Rousseeuw, P. J. (2005). A robustification of independent component analysis. Journal of Chemometrics: A Journal of the Chemometrics Society, 19(5‐7), 364-375.
+
+    * Hubert, M., Rousseeuw, P. J., & Segaert, P. (2015). Multivariate functional outlier detection. Statistical Methods & Applications, 24(2), 177-202.
+
+Examples
+            >>> import numpy as np
+            >>> from depth.model import DepthEucl
+            >>> np.random.seed(0)
+            >>> mat1=[[1, 0, 0, 0, 0],[0, 2, 0, 0, 0],[0, 0, 3, 0, 0],[0, 0, 0, 2, 0],[0, 0, 0, 0, 1]]
+            >>> mat2=[[1, 0, 0, 0, 0],[0, 1, 0, 0, 0],[0, 0, 1, 0, 0],[0, 0, 0, 1, 0],[0, 0, 0, 0, 1]]
+            >>> x = np.random.multivariate_normal([1,1,1,1,1], mat2, 10)
+            >>> data = np.random.multivariate_normal([0,0,0,0,0], mat1, 100)
+            >>> model = DepthEucl().load_dataset(data)
+            >>> model.sprojection(x, NRandom=1000, output_option="lowest_depth")
+           
+"""
 betaSkeleton__doc__= """ 
 
 Calculates the beta-skeleton depth of points w.r.t. a multivariate data set.

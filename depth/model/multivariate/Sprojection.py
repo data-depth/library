@@ -19,7 +19,6 @@ def sprojection(x, data,
         space = "sphere",
         line_solver = "goldensection",
         bound_gc = True,
-        device=None,
         state=None, **kwargs):
     
     RNG=np.random.default_rng()

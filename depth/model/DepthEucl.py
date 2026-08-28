@@ -417,6 +417,114 @@ class DepthEucl():
             if option==1:return self.aprojectionDepthDS
             if option==2:return self.aprojectionDepthDS,self.aprojectionDirDS
 
+    def sprojection(self,x:np.ndarray=None,solver: str = "neldermead", NRandom: int = 1000,
+                    n_refinements: int = 10, sphcap_shrink: float = 0.5, alpha_Dirichlet: float = 1.25, 
+                    cooling_factor: float = 0.95,cap_size: int = 1, start: str = "mean", space: str = "sphere", 
+                    line_solver: str = "goldensection", bound_gc: bool = True,
+                    output_option:Literal["lowest_depth","final_depth_dir",
+                                          "all_depth","all_depth_directions"]="lowest_depth", 
+                                          evaluate_dataset:bool=False,
+                                          ):
+        """
+        Compute skew adjusted projection depth
+
+        Parameters
+        ----------
+        x : {array-like} of shape (n_samples,d).
+            Samples matrix to compute depth
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
+                - ``"all_depth"`` : tuple of numpy arrays 
+                - ``"all_depth_directions"`` : tuple of numpy arrays 
+
+        Returns
+        -------
+        array_like or tuple of array_like
+        The first return is the lowest comuted depth regarding all explored directions in space.
+        The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+        The third return is all the computed depth values with respect to all approximative directions.
+        The fourth return is all corresponding directions. 
+            If ``output_option=="lowest_depth"`` returns:
+                array_like
+                    - Lowest Asymmetrical Projection Detph
+        
+            If ``output_option=="final_depth_dir"`` returns:
+                Tuple of array_like
+                    - Lowest Asymmetrical Projection Detph
+                    - Lowest depth respective direction
+        
+            If ``output_option=="all_depth"`` returns:
+                array_like
+                    - Lowest Asymmetrical Projection Detph
+                    - Lowest depth respective direction
+                    - All computed depths
+        
+            If ``output_option=="all_depth_directions"`` returns:
+                array_like
+                    - Lowest Asymmetrical Projection Detph
+                    - Lowest depth respective direction
+                    - All computed depths
+                    - All respective directions
+
+        """
+        if evaluate_dataset==True: # Dataset evaluation
+            print("x value is set to the loaded dataset")
+            x=self.data
+            if output_option=="all_depth"or output_option=="all_depth_directions":
+                print(f"output_option is set to {output_option}, only possible for lowest_depth or final_depth_dir, \
+                      automaticaly set to lowest_depth")
+                output_option="lowest_depth"
+            self.sprojectionDepthDS=np.empty((self.distRef.shape[0],x.shape[0]))
+        else:self.sprojectionDepth=np.empty((self.distRef.shape[0],x.shape[0]))
+        self._check_variables(x=x, solver=solver, NRandom=NRandom,n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, 
+                              alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor,cap_size=cap_size,
+                              ) # check if parameters are valid
+        option=self._determine_option(x,NRandom,output_option) # determine option number
+        if option>=2:
+            if evaluate_dataset:self.aprojectionDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            else:self.sprojectionDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if option>=3:
+                self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
+            if option==4:
+                self.allDirections=np.empty((self.distRef.shape[0],x.shape[0],NRandom,x.shape[1]))
+
+        for ind,d in enumerate(self.distRef):
+            
+            DSP=mtv.sprojection(x=x,data=self.data[self.distribution==d],solver=solver,NRandom=NRandom,option=option,
+                            n_refinements=n_refinements, sphcap_shrink=sphcap_shrink, alpha_Dirichlet=alpha_Dirichlet, cooling_factor=cooling_factor, 
+                            cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc, 
+                            state=self.RNG.bit_generator.state) #compute depth value
+            self.RNG.bit_generator.state=DSP[-1]
+            DSP=DSP[:-1]
+            if evaluate_dataset==False:
+                if option==1:self.sprojectionDepth[ind]=DSP # assign val option 1
+                elif option==2:self.sprojectionDepth[ind],self.sprojectionDir[ind]=DSP # assign value option 2
+                elif option==3:self.sprojectionDepth[ind],self.sprojectionDir[ind],self.allDepth[ind]=DSP # assign value option 3
+                elif option==4:self.sprojectionDepth[ind],self.sprojectionDir[ind],self.allDepth[ind],self.allDirections[ind],_=DSP # assign value option 4    
+            elif evaluate_dataset==True:
+                if option==1:self.sprojectionDepthDS[ind]=DSP # assign val option 1
+                elif option==2:self.sprojectionDepthDS[ind],self.sprojectionDirDS[ind]=DSP # assign value option 2
+
+        if self.distRef.shape[0]==1: #fix for one distribution
+            if evaluate_dataset:
+                self.sprojectionDepthDS=self.sprojectionDepthDS[0]
+                if option==2:self.sprojectionDirDS=self.sprojectionDirDS[0]
+            else:
+                self.sprojectionDepth=self.sprojectionDepth[0]
+                if option>=2:self.sprojectionDir=self.sprojectionDir[0]
+            if option>=3:self.allDepth=self.allDepth[0]
+            if option>=4:self.allDirections=self.allDirections[0]
+        if evaluate_dataset==False: # return correct value
+            if option==1:return self.sprojectionDepth
+            if option==2:return self.sprojectionDepth,self.sprojectionDir
+            if option==3:return self.sprojectionDepth,self.sprojectionDir,self.allDepth
+            if option==4:return self.sprojectionDepth,self.sprojectionDir,self.allDepth,self.allDirections
+        elif evaluate_dataset==True:
+            if option==1:return self.sprojectionDepthDS
+            if option==2:return self.sprojectionDepthDS,self.sprojectionDirDS
+
 
     
     def betaSkeleton(self,x:np.ndarray=None, beta:int=2,distance: str = "Lp", 
@@ -1530,6 +1638,7 @@ class DepthEucl():
         self.mahalanobisDir,self.mahalanobisDepth=None, None
         self.projectionDir,self.projectionDepth=None, None
         self.aprojectionDir,self.aprojectionDepth=None,None
+        self.sprojectionDir,self.sprojectionDepth=None,None
         self.zonoidDir,self.zonoidDepth=None,None
         self.potentialDepth=None
         self.qhpeelingDepth,self.betaSkeletonDepth,self.L2Depth=None,None,None
@@ -1542,6 +1651,7 @@ class DepthEucl():
         self.mahalanobisDirDS,self.mahalanobisDepthDS=None, None
         self.projectionDirDS,self.projectionDepthDS=None, None
         self.aprojectionDirDS,self.aprojectionDepthDS=None,None
+        self.sprojectionDirDS,self.sprojectionDepthDS=None,None
         self.zonoidDirDS,self.zonoidDepthDS=None,None
         self.potentialDepthDS=None
         self.qhpeelingDepthDS,self.betaSkeletonDepthDS,self.L2DepthDS=None,None,None
@@ -1601,6 +1711,7 @@ class DepthEucl():
         return CUDA
     
 DepthEucl.mahalanobis.__doc__=docHelp.mahalanobis__doc__
+DepthEucl.sprojection.__doc__=docHelp.sprojection__doc__
 DepthEucl.aprojection.__doc__=docHelp.aprojection__doc__
 DepthEucl.betaSkeleton.__doc__=docHelp.betaSkeleton__doc__
 DepthEucl.cexpchull.__doc__=docHelp.cexpchull__doc__

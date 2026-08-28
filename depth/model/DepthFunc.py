@@ -790,7 +790,7 @@ class DepthFunc():
             raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))    
 
     def _determine_depth_func(self,depth, exact):
-        all_depthsProj = ["projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"]
+        all_depthsProj = ["projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical", "sprojection"]
         all_depthsExac = ["potential","qhpeeling", "simplicial","betaskeleton","L2", "simplicialvolume","spatial",]
         toCheck=["mahalanobis", "halfspace", "zonoid"]
         if depth in all_depthsExac:return "exact"
