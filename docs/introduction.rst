@@ -23,6 +23,7 @@ Specifications
 15 multivariate depths are implemented in the :math:`\texttt{data-depth}` library, in both exact and approximate - to avoid excessive computational time - version:
 
  - :ref:`asymmetric projection <Aprojection>` depth [approximate];
+ - :ref:`skew adjusted projection <Sprojection>` depth [approximate];
  - :ref:`beta-skeleton <BetaSkeleton>` depth, including spherical and lens depths as special cases [exact];
  - :ref:`continous expected convex hull <Cexpchull>` depth [approximate];
  - :ref:`continous modified expected convex hull <Cexpchullstar>` depth [approximate];

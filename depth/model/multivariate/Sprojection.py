@@ -1,9 +1,5 @@
 from ctypes import *
 from .Depth_approximation import depth_approximation
-
-import sys, os, glob
-import platform
-from .import_CDLL import libApprox
 import numpy as np
 
 def sprojection(x, data,

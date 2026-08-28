@@ -1,9 +1,9 @@
 """
-===========================
-Asymmetric projection depth 
-==========================
+================================
+Skewed adjusted projection depth 
+================================
 
-Sample usage of asymmetric projection depth computation.
+Sample usage of skew adjusted projection depth computation.
 It will plot samples and dataset based on depth values.
 
 """
@@ -35,8 +35,8 @@ plt.show()
 # Create model and load dataset for depth computation 
 
 model=DepthEucl().load_dataset(dataset)
-depthX=model.aprojection(X,output_option="lowest_depth") # Compute X Depth w.r.t. the dataset  
-depthDataset=model.aprojection(evaluate_dataset=True,output_option="lowest_depth") # evaluate the dataset itself
+depthX=model.sprojection(X,output_option="lowest_depth") # Compute X Depth w.r.t. the dataset  
+depthDataset=model.sprojection(evaluate_dataset=True,output_option="lowest_depth") # evaluate the dataset itself
 
 fig, (ax1,ax2)=plt.subplots(1,2,figsize=(10,5))
 ax2.scatter(dataset[:,0],dataset[:,1],s=2, label="Dataset",marker="D")
@@ -45,6 +45,6 @@ for x, depth, name, ax in zip([dataset,X],[depthDataset,depthX],
     ax.scatter(x[:,0],x[:,1], c=depth,label=name)
     ax.set_xlabel("First component")
     ax.set_ylabel("Second component")
-    ax.set_title(f"{name} asymmetric projection depth visualization")
+    ax.set_title(f"{name} skewed adjusted projection depth visualization")
 ax2.legend()
 plt.show()

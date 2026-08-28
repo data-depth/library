@@ -7,6 +7,8 @@ Examples using data-depth library
    :maxdepth: 4
    
    auto_examples/plot_aprojDepth
+   auto_examples/plot_sprojDepth
+   auto_examples/plot_projectionDepth
    auto_examples/plot_betaSkelDepth
    auto_examples/plot_CexpchullDepth
    auto_examples/plot_CexpchullStarDepth
@@ -15,7 +17,6 @@ Examples using data-depth library
    auto_examples/plot_L2Depth
    auto_examples/plot_mahDepth
    auto_examples/plot_potentialDepth
-   auto_examples/plot_projectionDepth
    auto_examples/plot_qhpeelingDepth
    auto_examples/plot_simplicialDepth
    auto_examples/plot_simplicialVolDepth

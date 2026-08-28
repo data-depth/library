@@ -11,6 +11,8 @@ Depth in Euclidean space (multivariate depth)
    :maxdepth: 4
 
    notions/Aprojection
+   notions/Sprojection
+   notions/Projection
    notions/BetaSkeleton
    notions/Cexpchull
    notions/Cexpchullstar
@@ -19,7 +21,6 @@ Depth in Euclidean space (multivariate depth)
    notions/L2
    notions/Mahalanobis
    notions/Potential
-   notions/Projection
    notions/Qhpeeling
    notions/Simplicial
    notions/SimplicialVolume
