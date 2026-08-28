@@ -483,7 +483,7 @@ class DepthEucl():
                               ) # check if parameters are valid
         option=self._determine_option(x,NRandom,output_option) # determine option number
         if option>=2:
-            if evaluate_dataset:self.aprojectionDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
+            if evaluate_dataset:self.sprojectionDirDS=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
             else:self.sprojectionDir=np.empty((self.distRef.shape[0],x.shape[0],x.shape[1]))
             if option>=3:
                 self.allDepth=np.empty((self.distRef.shape[0],x.shape[0],NRandom))
