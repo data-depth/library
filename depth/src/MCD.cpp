@@ -149,8 +149,8 @@ void biased_cov(TDMatrix X, int n, int d, TDMatrix covX) {// same code as cov bu
 }
 
 
-void unbiased_cov(TDMatrix X, int n, int d, TDMatrix covX) {
-	double* means = new double[d];
+void unbiased_cov(TDMatrix X, int n, int d, TDMatrix covX, double* meanVals) {
+	// double* means = new double[d];
 	double* dev = new double[d];
 	// zeroing TDMatrix
 	for (int k = 0; k < d; k++){
@@ -160,16 +160,16 @@ void unbiased_cov(TDMatrix X, int n, int d, TDMatrix covX) {
 	}
 	// means
 	for (int i = 0; i < d; i++) {
-		means[i] = 0.0;
+		meanVals[i] = 0.0;
 		for (int j = 0; j < n; j++){
-			means[i] += X[j][i];
+			meanVals[i] += X[j][i];
 		}
-		means[i] /= n;
+		meanVals[i] /= n;
 	}
 	for (int i = 0; i < n; i++) {
 		// deviations
 		for (int k = 0; k < d; k++) {
-			dev[k] = X[i][k] - means[k];
+			dev[k] = X[i][k] - meanVals[k];
 		}
 		// add to cov
 		for (int k = 0; k < d; k++) {
@@ -184,7 +184,7 @@ void unbiased_cov(TDMatrix X, int n, int d, TDMatrix covX) {
 			covX[i][j] /= n - 1;
 		}
 	}
-	delete[] means;
+	// delete[] means;
 	delete[] dev;
 }
 
@@ -320,7 +320,8 @@ void ExactUnivariateMcd(TDMatrix X, int n, int h, double* T, TDMatrix M){
 }
 
 void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, 
-	double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp,int *seed){
+	double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp,int *seed,
+	double* meanVals){
 	TDMatrix M = asMatrix(mat_MCD,d,d); //address of the matrix to be computed
 	TDMatrix Xh = newM(h, d);
 	double* T = new double[d];
@@ -628,7 +629,7 @@ void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05,
 			icount++;
 		}
 	}
-	unbiased_cov(X1,ncount,d,M);
+	unbiased_cov(X1,ncount,d,M,meanVals);
 	delete[] indices;
 	// End of transforming step
 	delete[] T;

@@ -372,7 +372,8 @@ class DepthFunc():
         return interp_value_matrix
     
 
-    def _compute_int_depth_projBase(self, query_point, notion='halfspace', solver='neldermead', NRandom=100, option=1, **kwargs):
+    def _compute_int_depth_projBase(self, query_point, notion='halfspace', solver='neldermead', NRandom=100, option=1,
+                                    weights=None, **kwargs):
         """
         Compute the integrated functional depth (IFD) of a query function with respect to a sample of functional data for projection-based depth notions.
 
@@ -422,7 +423,7 @@ class DepthFunc():
             - Average the results over all L time points
 
         """
-        total_depth_sum = 0
+        functional_depth_val = 0
         l_points, d = query_point.shape
         n_refinements,sphcap_shrink,alpha_Dirichlet,\
             cooling_factor,cap_size,start,space,line_solver,bound_gc,\
@@ -462,15 +463,15 @@ class DepthFunc():
                     )
             self.RNG.bit_generator.state=current_state
 
-            total_depth_sum += np.nan_to_num(time_component_depth,nan=0)
+            functional_depth_val += np.nan_to_num(time_component_depth,nan=0)*weights[i]
 
         # Average depth over all L time points
-        functional_depth_val = total_depth_sum / l_points
+        # functional_depth_val = total_depth_sum / l_points
 
         if option==1:return functional_depth_val 
         else:return functional_depth_val,directions
 
-    def _compute_int_depth_Exact(self, query_point, notion='halfspace', **kwargs):
+    def _compute_int_depth_Exact(self, query_point, notion='halfspace', weights=None, **kwargs):
         """
         Compute the integrated functional depth (IFD) of a query function with respect to a sample of functional data for exact depth notions.
 
@@ -545,7 +546,7 @@ class DepthFunc():
             query_component = query_point[i, :]
  
             # Compute depth at time i
-            time_component_depth, current_state = notionsDict[notion](n_refinements=n_refinements,
+            time_component_depth, current_state = notionsDict[notion](query_component, data_component_slice,n_refinements=n_refinements,
                         sphcap_shrink=sphcap_shrink,alpha_Dirichlet=alpha_Dirichlet,
                         cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,line_solver=line_solver,bound_gc=bound_gc,
                         exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,beta=beta,distance=distance,Lp_p=Lp_p,method=method,
@@ -554,15 +555,16 @@ class DepthFunc():
 
 
             self.RNG.bit_generator.state=current_state
-            total_depth_sum += np.nan_to_num(time_component_depth,nan=0)
+            functional_depth_val += np.nan_to_num(time_component_depth,nan=0)*weights[i]
 
         # Average depth over all L time points
-        functional_depth_val = total_depth_sum / l_points
+        #functional_depth_val = total_depth_sum / l_points
 
         return functional_depth_val 
         
     
-    def integral_depth(self, query,notion='halfspace', solver='neldermead', NRandom=100,
+    def integral(self, query,notion='halfspace', solver='neldermead', NRandom=100, 
+                 weights=None,
                                     output_option:Literal["lowest_depth","final_depth_dir"]="lowest_depth", **kwargs):
         """
         Compute projection-based functional depth for query functional data with respect to a reference dataset.
@@ -701,12 +703,16 @@ class DepthFunc():
         - If `timestamp` is of type `datetime64`, it is converted internally to seconds
         relative to the global minimum timestamp (`t_min`).
         - Duplicate timestamps within each `case_id` group are automatically dropped.
-        - Interpolation uses linear extrapolation outside the observed time range."""
-  
-        
+        - Interpolation uses linear extrapolation outside the observed time range.
+        """        
+        # TODO
+        # Weights -- mettre un autre objet fonctionnel avec les poids
+        # max liberté pour l'user
+        # cas standard easy - arg et valeur fonc
+        # 
 
-        
         self._check_depth(notion)
+        weights=self._build_weight(weights)
         if type(query)==np.ndarray:
             query=self._3Dnp_tp_pd(query,self.TSnp, self.CInp)
         if query[self.timestamp_col].max()>self.t_max:
@@ -737,11 +743,11 @@ class DepthFunc():
             for i in range(query_array.shape[0]):
                 if option==1:
                     depth_array[i] = self._compute_int_depth_projBase(query_array[i, :, :], notion=notion, solver=solver,option=option,
-                                                NRandom=NRandom,**kwargs)[0]
+                                                NRandom=NRandom,weights=weights,**kwargs)[0]
                 
                 elif option==2:
                     depth_array[i], direction_array[i] =self._compute_int_depth_projBase(query_array[i, :, :], notion=notion, solver=solver,option=option,
-                                                NRandom=NRandom,**kwargs)
+                                                NRandom=NRandom,weights=weights,**kwargs)
                     
         
             if option==1:return depth_array 
@@ -752,7 +758,29 @@ class DepthFunc():
                 depth_array[i] = self._compute_int_depth_Exact(query_array[i, :, :], notion=notion,**kwargs)[0]
             return depth_array 
 
+    def band(self,query, modified):
+        """
+        Compute band depth
+
+        ## Do both - feature alone and all feature
+        """
+
+        queryMM=self._MinMax(query)
+        query_array = self._syncronise_over_time(queryMM,)
+        depth_array = np.empty((query_array.shape[0],), dtype = float)
+        
+        # for i in range(query_array.shape[0]):
+        #     depth_array[i] = (query_array[i, :, :],self.data_array)[0]    
     
+        return depth_array 
+        
+
+
+        
+    # TODO
+    # def halfgraph
+    # TODO
+    # def phi (see 'func isoForest' too for base / FACA) - eviter le zero = Base
 
     def set_seed(self,seed:int=None)->None:
         """Set seed for computation"""
@@ -798,7 +826,8 @@ class DepthFunc():
                           "cexpchullstar", "cexpchull", "geometrical", "potential", 
                           "qhpeeling", "simplicial","betaskeleton","L2", "simplicialvolume","spatial","projection","aprojection"]
         if (depth not in all_depths):
-            raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))    
+            raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))  
+              
 
     def _determine_depth_func(self,depth, exact):
         all_depthsProj = ["projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical", "sprojection"]
@@ -842,3 +871,19 @@ class DepthFunc():
                                                     state=self.RNG.bit_generator.state,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
             self.RNG.bit_generator.state=current_state
             return MCD[0]
+
+
+    def _build_weight(self,weights):
+        if weights==None:
+            weights=np.ones(self.data_array.shape[1])/self.data_array.shape[1]
+        elif weights.shape[0]!=self.data_array.shape[1]:
+            raise ValueError(f"Size of weights is not the same of the time steps. \n {weights.shape[0]}!={self.data_array.shape[1]}") 
+        else:
+            weights=weights/np.linalg.norm(weights)
+        return weights
+
+    # TODO
+    # Voir comment envoyer un warning pour la notion de la depth
+    # best notion and offer best option -- dimension, time, notion, data
+    # Warning on / off - switch off in the warning 
+    # Eviter a lot of warnings

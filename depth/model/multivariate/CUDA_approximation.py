@@ -137,11 +137,11 @@ def depthCompNotion(z,data,Pz,Pdata,notion,step,device)->torch.Tensor:
         torch.subtract(Pz,prjMED,out=Pz)
         torch.subtract(Pdata,prjMED.reshape(-1,1),out=Pdata)
         for i in range(0,Pdata.shape[0],step): # Compute MAD
-            prjMAD[0][i:i+step]=torch.median(torch.abs(Pdata[i:i+step]),1).values
+            prjMAD[0][i:i+step]=torch.median(torch.abs(Pdata[i:i+step]),1).values+1e-9
         torch.divide(Pz,prjMAD,out=Pz)
         torch.abs(Pz,out=Pz)
         Pz=1/(1+Pz) # Compute final depth
-        return torch.nan_to_num(Pz, nan=1.0)
+        return torch.nan_to_num(Pz, nan=0.0)
     elif notion=="halfspace":
         refQuant=Pdata.shape[1]
         ge=torch.greater_equal(Pdata,Pz.T,)

@@ -2,18 +2,19 @@ import numpy as np
 from ctypes import *
 from multiprocessing import *
 import math
-import sklearn.covariance as sk
+# import sklearn.covariance as sk
 import sys, os, glob
 import platform
 from .import_CDLL import libExact
 
-def MCD_fun(data,alpha,NeedLoc=False):
-    cov = sk.MinCovDet(support_fraction=alpha).fit(data)
-    if NeedLoc:return([cov.covariance_,cov.location_])
-    else:return(cov.covariance_)
+# def MCD_fun(data,alpha,NeedLoc=False):
+#     cov = sk.MinCovDet(support_fraction=alpha).fit(data)
+#     if NeedLoc:return([cov.covariance_,cov.location_])
+#     else:return(cov.covariance_)
 
 ## the moment trabnsform requires MCD func
-def potential(x, data, pretransform = "1Mom", kernel="EDKernel" ,mah_parMcd=0.75, kernel_bandwidth=0, **kwargs):
+def potential(x, data, pretransform = "1Mom", kernel="EDKernel" ,mah_parMcd=0.75, kernel_bandwidth=0,
+			   covMCD=None,muMCD=None,**kwargs):
 
 	if(kernel=="GKernel" or kernel==2):
 		kernel=2
@@ -27,7 +28,7 @@ def potential(x, data, pretransform = "1Mom", kernel="EDKernel" ,mah_parMcd=0.75
 	if (pretransform == "1Mom" or pretransform == "NMom"):
 		[mu,B_inv,cov]=Maha_moment(data)
 	elif (pretransform == "1MCD" or pretransform == "NMCD"):
-		[mu,B_inv,cov]=Maha_mcd(data, mah_parMcd)
+		[mu,B_inv,cov]=Maha_mcd(covMCD,muMCD, mah_parMcd)
 	data=Maha_transform(data,mu,B_inv)
 	x =Maha_transform(x,mu,B_inv)
 
@@ -67,8 +68,7 @@ def Maha_moment (x):
 	B_inv=np.linalg.inv(np.matmul(v,np.diag(np.sqrt(w))))
 	return ([mu,B_inv,cov])
 
-def Maha_mcd(x, alpha =0.5):
-	[cov,mu] = MCD_fun(x,alpha,1)
+def Maha_mcd(cov,mu, alpha =0.5):
 	w,v=np.linalg.eig(cov)
 	B_inv=np.linalg.inv(np.matmul(v,np.diag(np.sqrt(w))))
 	return ([mu,B_inv,cov])

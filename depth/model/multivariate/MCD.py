@@ -3,7 +3,7 @@ from ctypes import *
 from scipy.stats import chi2
 from .import_CDLL import libExact
 
-def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True):
+def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True,):
 
     try:
         n, d = data.shape
@@ -26,6 +26,9 @@ def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = T
     # print("cov_size",cov_size)
     mat_MCD=(c_double*cov_size)(*([0.0]*cov_size))
     c_mat_MCD=cast(mat_MCD, POINTER(c_double))
+
+    meanVals=(c_double*d)(*([0.0]*d))
+    c_meanVals=cast(meanVals, POINTER(c_double))
 
     chisqr05 =  chi2(d).isf(0.5)
     chisqr0975 = chi2(d).isf(0.025)
@@ -50,6 +53,7 @@ def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = T
                         c_int, # mfull
                         c_int, # nstep
                         c_bool, # hiRegimeCompleteLastComp
+                        POINTER(c_double), # meanVals (output, d)
                         ]
     libExact.MinimumCovarianceDeterminantEstim(
                 c_points, # POINTER(c_double)
@@ -63,16 +67,19 @@ def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = T
                 c_mfull, # plain c_int
                 c_nstep, # plain c_int
                 c_hiRegimeCompleteLastComp, 
+                c_meanVals,
                 )
 
 
     res = np.zeros((d,d))
+    resMean = np.zeros((d,d))
     for i in range(d):
         for j in range(d):
             res[i,j]=c_mat_MCD[i*d+j]    
+        resMean[i]=c_meanVals[i]    
+    return res,resMean, RNG.bit_generator.state
 
-    return res, RNG.bit_generator.state
-
+    
 # def MCD(data, h, seed=2801, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True):
 
 #     try:

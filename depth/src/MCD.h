@@ -10,5 +10,6 @@ vector<int> best(int p, vector<double>& all_det ,int rep);
 // void mcd_routine(vector<int>& index, double* distTab, double* T,TDMatrix S, TDMatrix X, TDMatrix Xh,int n, int d, int h);
 // void ExactUnivariateMcd(TDMatrix X, int n, int h, double* T, TDMatrix M);
 void Mcd(TDMatrix X, int n, int d, int h, double* mat_MCD, double chisqr05, 
-    double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp,int *seed);
+    double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp,int *seed,
+    double* meanVals);
 // void Mcd(TDMatrix X, int* n, int* d, int* h, double* mat_MCD, double* chisqr05, double* chisqr0975, int* mfull, int* nstep, bool* hiRegimeCompleteLastComp,int *seed)

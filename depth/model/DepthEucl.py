@@ -1041,11 +1041,16 @@ class DepthEucl():
             x=self.data
             self.potentialDepthDS=np.zeros((self.distRef.shape[0], x.shape[0]))
         else: # create self 
-            self.potentialDepth=np.zeros((self.distRef.shape[0], x.shape[0])) 
+            self.potentialDepth=np.zeros((self.distRef.shape[0], x.shape[0]))
+        if pretransform[1:]=="MCD":
+            if type(self.MCD)==type(None):
+                self.computeMCD(h=mah_parMcd) 
         self._check_variables(x=x,mah_parMcd=mah_parMcd)# check if parameters are valid
         #x: Any, data: Any, pretransform: str = "1Mom", kernel: str = "EDKernel", mah_parMcd: float = 0.75, kernel_bandwidth: int = 0
         for ind,d in enumerate(self.distRef):
-            DP=mtv.potential(x=x, data=self.data[self.distribution==d], pretransform=pretransform, kernel=kernel, mah_parMcd=mah_parMcd, kernel_bandwidth=kernel_bandwidth)
+            DP=mtv.potential(x=x, data=self.data[self.distribution==d], pretransform=pretransform, kernel=kernel, 
+                             mah_parMcd=mah_parMcd, kernel_bandwidth=kernel_bandwidth,
+                             covMCD=self.MCD,muMCD=self.meanMCD)
             if evaluate_dataset==True: # Dataset evaluation
                 self.potentialDepthDS[ind]=DP
             else:self.potentialDepth[ind]=DP
@@ -1561,9 +1566,10 @@ class DepthEucl():
 
         self._check_variables(h=h) # check if h is in the acceptable range
         self.MCD=np.zeros((self._nSamples.shape[0], self._spaceDim,self._spaceDim))
+        self.meanMCD=np.zeros((self._nSamples.shape[0],self._spaceDim))
         for ind,i in enumerate(self.distRef):
             h_dist=int(h*self._nSamples[ind])
-            self.MCD[ind],current_state=mtv.MCD(self.data[self.distribution==i],h=h_dist,state=self.RNG.bit_generator.state,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
+            self.MCD[ind],self.meanMCD[ind],current_state=mtv.MCD(self.data[self.distribution==i],h=h_dist,state=self.RNG.bit_generator.state,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
             self.RNG.bit_generator.state=current_state
         self.MCD=self.MCD[0] if self.distRef.shape[0]==1 else self.MCD
         return  self.MCD
@@ -1657,7 +1663,7 @@ class DepthEucl():
         self.qhpeelingDepthDS,self.betaSkeletonDepthDS,self.L2DepthDS=None,None,None
         self.simplicialVolumeDepthDS,self.simplicialDepthDS,self.spatialDepthDS=None,None,None
         # MCD
-        self.MCD=None
+        self.MCD,self.meanMCD=None,None
         # approximate depth and direction
         # self.allDepth,self.allDirections,self.dirIndiex=None,None,None
     def _determine_option(self,x:np.ndarray,NRandom:int,output_option:str,CUDA:bool=False, exact:bool=False)->int:

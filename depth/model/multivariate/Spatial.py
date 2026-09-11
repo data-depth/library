@@ -3,7 +3,7 @@ from ctypes import *
 from multiprocessing import *
 import sys, os, glob
 import platform
-import sklearn.covariance as sk
+# import sklearn.covariance as sk
     
 # def MCD_fun(data,alpha,NeedLoc=False):
 #     cov = sk.MinCovDet(support_fraction=alpha).fit(data)

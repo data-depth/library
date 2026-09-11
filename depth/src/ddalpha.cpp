@@ -261,7 +261,8 @@ void PotentialDepthsCount(double *points, int *numPoints, int *dimension, int *c
 	}
 }
 
-void BetaSkeletonDepth(double *points, double *objects, int *numPoints, int *numObjects, int *dimension, double* beta, int* distCode, double* p, double* sigma, double *depths){
+void BetaSkeletonDepth(double *points, double *objects, int *numPoints, int *numObjects,
+	 int *dimension, double* beta, int* distCode, double* p, double* sigma, double *depths){
   TDMatrix X = asMatrix(points, *numPoints, *dimension);
   TDMatrix x = asMatrix(objects, *numObjects, *dimension);
   TDMatrix s = asMatrix(sigma, *dimension, *dimension);
@@ -275,12 +276,32 @@ void BetaSkeletonDepth(double *points, double *objects, int *numPoints, int *num
 
 void MinimumCovarianceDeterminantEstim(double *points, int *numPoints, 
 	int *dimension, int *hParam, int *seed, double *mat_MCD, 
-	double chisqr05, double chisqr0975, int mfull, int nstep, bool hiRegimeCompleteLastComp){
+	double chisqr05, double chisqr0975, int mfull, int nstep, 
+	bool hiRegimeCompleteLastComp,double* meanVals){
     TDMatrix X = asMatrix(points, *numPoints, *dimension);
 	
     Mcd(X, *numPoints,*dimension, *hParam, mat_MCD, chisqr05, chisqr0975, mfull, nstep,
-		 hiRegimeCompleteLastComp, seed);
+		 hiRegimeCompleteLastComp, seed, meanVals);
     // delete[] X;
+}
+
+void SimplicialBandDepth(double *points,double *objects, int *numObjects, int *numArgs,
+	int *dimension,int *numPoints, int *seed, bool modified, double *depths){
+	
+	T3DMatrix X = as3DMatrix(points,*numPoints, *numArgs, *dimension);
+	T3DMatrix x = as3DMatrix(objects, *numObjects, *numArgs, *dimension);
+
+	ComputeSimplicialBandDepth(x, X, *numObjects, *numPoints, *numArgs, *dimension, 
+            (bool)*modified, *J, depths);
+	
+	for (int i = 0; i < *numPoints; i++){
+		delete[] X[i];
+	}
+	delete[] X;
+	for (int i = 0; i < *numObjects; i++){
+		delete[] x[i];
+	}
+	delete[] x;
 }
 
 

@@ -34,6 +34,7 @@ using namespace std;
 #include "stdafx.cpp"
 #include "HD2.cpp"
 #include "MCD.h"
+#include "BandDepth.h"
 
 #include "Common.cpp"
 #include "OjaDepth.cpp"
@@ -44,5 +45,6 @@ using namespace std;
 #include "SimplicialDepth.cpp"
 #include "PD.cpp"
 #include "MCD.cpp"
+#include "BandDepth.cpp"
 
 int random(int x);
