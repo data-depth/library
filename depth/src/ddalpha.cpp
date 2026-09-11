@@ -286,13 +286,51 @@ void MinimumCovarianceDeterminantEstim(double *points, int *numPoints,
 }
 
 void SimplicialBandDepth(double *points,double *objects, int *numObjects, int *numArgs,
-	int *dimension,int *numPoints, int *seed, bool modified, double *depths){
+	int *dimension,int *numPoints, int *seed,  int *J,bool modified, double *depths){
 	
 	T3DMatrix X = as3DMatrix(points,*numPoints, *numArgs, *dimension);
 	T3DMatrix x = as3DMatrix(objects, *numObjects, *numArgs, *dimension);
 
 	ComputeSimplicialBandDepth(x, X, *numObjects, *numPoints, *numArgs, *dimension, 
             (bool)*modified, *J, depths);
+	
+	for (int i = 0; i < *numPoints; i++){
+		delete[] X[i];
+	}
+	delete[] X;
+	for (int i = 0; i < *numObjects; i++){
+		delete[] x[i];
+	}
+	delete[] x;
+}
+
+
+void BandDepth(double *points,double *objects, int *numObjects, int *numArgs,
+	int *dimension,int *numPoints, double *depths){
+	
+	T3DMatrix X = as3DMatrix(points,*numPoints, *numArgs, *dimension);
+	T3DMatrix x = as3DMatrix(objects, *numObjects, *numArgs, *dimension);
+
+	ComputeBandDepth(x, X, *numObjects, *numPoints, *numArgs, *dimension, 
+            (bool)*modified, depths);
+	
+	for (int i = 0; i < *numPoints; i++){
+		delete[] X[i];
+	}
+	delete[] X;
+	for (int i = 0; i < *numObjects; i++){
+		delete[] x[i];
+	}
+	delete[] x;
+}
+void ModifiedBandDepth(double *points,double *objects, int *numObjects, int *numArgs,
+	int *dimension,int *numPoints, double *depths){
+	
+	T3DMatrix X = as3DMatrix(points,*numPoints, *numArgs, *dimension);
+	T3DMatrix x = as3DMatrix(objects, *numObjects, *numArgs, *dimension);
+
+	ComputeModBandDepth(x, X, *numObjects, *numPoints, *numArgs, *dimension, 
+            (bool)*modified, depths);
 	
 	for (int i = 0; i < *numPoints; i++){
 		delete[] X[i];

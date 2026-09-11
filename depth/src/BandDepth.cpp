@@ -92,7 +92,7 @@ void ComputeModBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d,
     unsigned long long* NumBellow = new double[m];
     unsigned long long* NumEqual = new double[m];
     // double* X1Dview = new double[n];
-    unsigned long long totalPairs = t*n*(n-1)/2;
+    unsigned long long totalPairs = d*t*n*(n-1)/2;
     // double* z = new double[d + 1];
     // int* counters = new int[d + 1];
     // TDMatrix A = newM(d + 1, d + 1);
@@ -124,35 +124,45 @@ void ComputeModBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d,
   
   
   // Release memory
-  delete[] b;
-  delete[] z;
-  delete[] counters;
-  deleteM(A);
+  delete[] NumAbove;
+  delete[] NumBellow;
+  delete[] NumEqual;
 }
 
 void ComputeBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d, 
                 double* depths){
     // double* b = new double[d + 1]; b[d] = 1;
-    double* X1Dview = new double[n];
-    unsigned long long totalPairs = t*n*(n-1)/2;
+    unsigned long long totalPairs = d*t*n*(n-1)/2;
+    bool isInside = true;
     // double* z = new double[d + 1];
-    // int* counters = new int[d + 1];
     // TDMatrix A = newM(d + 1, d + 1);
     // unsigned long long div0 = choose(n, d + 1); // num simplices
     
     for (int iDim = 0; iDim < d; iDim++){
-    for (int iTime = 0; iTime < t; iTime++){
-    for (int iObs = 0; iObs < m; iObs++){
-    
-    }
-    }
+      for (int iObs = 0; iObs < m; iObs++){
+        unsigned long long theCounter = 0;
+        for (int iFirst = 0; iFirst < n-1; iFirst++){
+          for (int iSecond = iFirst+1; iSecond < n; iSecond++){
+          isInside = true;
+          int iTime = 0;
+          while(isInside && iTime < t)
+            {
+              if(x[iObs][iTime][iDim]>X[iFirst][iTime][iDim] && 
+                 x[iObs][iTime][iDim]>X[iSecond][iTime][iDim]){isInside=false;}
+
+              if(x[iObs][iTime][iDim]<X[iFirst][iTime][iDim] && 
+                 x[iObs][iTime][iDim]<X[iSecond][iTime][iDim]){isInside=false;}
+              iTime++;}
+          if (isInside){theCounter += 1}  
+          }
+        }
+        depths[iObs] += (double)theCounter / totalPairs;
+      }
     }
     
   
   
   // Release memory
   delete[] b;
-  delete[] z;
-  delete[] counters;
-  deleteM(A);
+
 }
