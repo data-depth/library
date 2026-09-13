@@ -52,7 +52,8 @@ void ComputeSimplicialBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, i
         for (int k = 0; k < d + 1; k++){
           A[d][k] = 1;
         }
-        memcpy(b, x[iObs][iTime], d * sizeof(double)); b[d] = 1;
+        if (d*sizeof(double) <= PTRDIFF_MAX){
+        memcpy(b, x[iObs][iTime], d * sizeof(double)); b[d] = 1;}
         if (solveUnique(A, b, z, d + 1)){
           bool isInside = true;
           for (int j = 0; j < d + 1; j++){
@@ -134,7 +135,7 @@ void ComputeModBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d,
 void ComputeBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d, 
                 double* depths){
     // double* b = new double[d + 1]; b[d] = 1;
-    unsigned long long totalPairs = d*t*n*(n-1)/2;
+    unsigned long long totalPairs = d*n*(n-1)/2;
     bool isInside = true;
     // double* z = new double[d + 1];
     // TDMatrix A = newM(d + 1, d + 1);
@@ -154,8 +155,9 @@ void ComputeBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d,
 
               if(x[iObs][iTime][iDim]<X[iFirst][iTime][iDim] && 
                  x[iObs][iTime][iDim]<X[iSecond][iTime][iDim]){isInside=false;}
-              iTime++;}
-          if (isInside){theCounter += 1;}  
+              iTime++;
+              if (isInside && iTime==t){theCounter += 1;}  
+            }
           }
         }
         depths[iObs] += (double)theCounter / totalPairs;
