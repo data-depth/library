@@ -9,8 +9,6 @@
 
 
 
-#ifndef __BandDepth__
-#define __BandDepth__
 
 
 void ComputeSimplicialBandDepth(T3DMatrix x, T3DMatrix X, 
@@ -19,4 +17,4 @@ void ComputeSimplicialBandDepth(T3DMatrix x, T3DMatrix X,
 void ComputeBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d, 
                 double* depths);
 void ComputeModBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d, 
-                double* depths)
+                double* depths);

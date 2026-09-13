@@ -1,4 +1,5 @@
 from . import multivariate as mtv
+from . import functional as fct
 # from DepthEucl import DepthEucl
 import numpy as np
 import pandas as pd

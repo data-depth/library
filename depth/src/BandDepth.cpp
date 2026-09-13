@@ -15,6 +15,8 @@
 #include <cstring>
 #include <stdlib.h>
 #include <math.h>
+#include "BandDepth.h"
+
 
 const double eps_band = 1e-10;
 
@@ -88,9 +90,9 @@ void ComputeSimplicialBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, i
 void ComputeModBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d, 
                 double* depths){
     // double* b = new double[d + 1]; b[d] = 1;
-    unsigned long long* NumAbove = new double[m];
-    unsigned long long* NumBellow = new double[m];
-    unsigned long long* NumEqual = new double[m];
+    double* NumAbove = new double[m];
+    double* NumBellow = new double[m];
+    double* NumEqual = new double[m];
     // double* X1Dview = new double[n];
     unsigned long long totalPairs = d*t*n*(n-1)/2;
     // double* z = new double[d + 1];
@@ -153,7 +155,7 @@ void ComputeBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d,
               if(x[iObs][iTime][iDim]<X[iFirst][iTime][iDim] && 
                  x[iObs][iTime][iDim]<X[iSecond][iTime][iDim]){isInside=false;}
               iTime++;}
-          if (isInside){theCounter += 1}  
+          if (isInside){theCounter += 1;}  
           }
         }
         depths[iObs] += (double)theCounter / totalPairs;
@@ -163,6 +165,5 @@ void ComputeBandDepth(T3DMatrix x, T3DMatrix X, int m, int n, int t, int d,
   
   
   // Release memory
-  delete[] b;
 
 }
