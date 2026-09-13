@@ -565,8 +565,7 @@ class DepthFunc():
         
     
     def integral(self, query,notion='halfspace', solver='neldermead', NRandom=100, 
-                 weights=None,
-                                    output_option:Literal["lowest_depth","final_depth_dir"]="lowest_depth", **kwargs):
+                 weights=None,output_option:Literal["lowest_depth","final_depth_dir"]="lowest_depth", **kwargs):
         """
         Compute projection-based functional depth for query functional data with respect to a reference dataset.
 
@@ -759,19 +758,43 @@ class DepthFunc():
                 depth_array[i] = self._compute_int_depth_Exact(query_array[i, :, :], notion=notion,**kwargs)[0]
             return depth_array 
 
-    def band(self,query, modified):
+    def band(self,query, modified=False):
         """
-        Compute band depth
+        Compute band depth and modified band depth.
+        Parameters
+        ----------
+        query : pandas.DataFrame
+            Query dataset containing functional observations whose depth will be computed
+            relative to `df`. Must have the same column structure as `df`.
+
+        modified : bool {True, False}, default='False'
+            Boolean determining which band depth to be computed.
+            False computes the band depth.
+            True computed the modified band depth.
+        
+
+        Returns
+        -------
+        depth_array : np.ndarray of shape (n_query,)
+        Array of depth values, where `n_query` is the number of functional observations 
+        (unique `case_id`s) in the `query` dataset.
+        
+
+        Notes
+        -----
+        - If `timestamp` is of type `datetime64`, it is converted internally to seconds
+        relative to the global minimum timestamp (`t_min`).
+        - Duplicate timestamps within each `case_id` group are automatically dropped.
+        - Interpolation uses linear extrapolation outside the observed time range.
+        """  
 
         ## Do both - feature alone and all feature
-        """
+        
 
         queryMM=self._MinMax(query)
         query_array = self._syncronise_over_time(queryMM,)
-        depth_array = np.empty((query_array.shape[0],), dtype = float)
-        
-        # for i in range(query_array.shape[0]):
-        #     depth_array[i] = (query_array[i, :, :],self.data_array)[0]    
+
+        depth_array = fct.bandDepth(query_array, self.data_array,modified)
     
         return depth_array 
         
