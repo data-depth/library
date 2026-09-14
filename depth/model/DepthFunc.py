@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 from typing import Literal
+from . import docHelp
 
 
 class DepthFunc():
@@ -566,7 +567,7 @@ class DepthFunc():
     def integral(self, query,notion='halfspace', solver='neldermead', NRandom=100, 
                  weights=None,output_option:Literal["lowest_depth","final_depth_dir"]="lowest_depth", **kwargs):
         """
-        Compute projection-based functional depth for query functional data with respect to a reference dataset.
+        Compute functional depth for query functional data with respect to a reference dataset.
 
         This function computes depth values of functional observations (in `query`) relative to a 
         reference dataset (`df`) using projection-based methods such as halfspace depth.
@@ -679,6 +680,10 @@ class DepthFunc():
             If ``0 < k < 1``,then the algorithmic complexity is exponential in the number of observations in data, 
             but the calculation precision stays approximately the same.
 
+        output_option : str
+            Determines the format of the output.
+                - ``"lowest_depth"`` : single numpy array
+                - ``"final_depth_dir"`` : tuple of numpy arrays 
 
         Returns
         -------
@@ -924,3 +929,6 @@ class DepthFunc():
     # best notion and offer best option -- dimension, time, notion, data
     # Warning on / off - switch off in the warning 
     # Eviter a lot of warnings
+
+DepthFunc.integral.__doc__=docHelp.integral__doc__
+DepthFunc.band.__doc__=docHelp.band__doc__

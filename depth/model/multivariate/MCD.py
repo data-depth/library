@@ -11,9 +11,9 @@ def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = T
         n, d = data.shape[0], 1
     RNG=np.random.default_rng()
     RNG.bit_generator.state=state
-    hParam = pointer(c_int(h))
-    numPoints = pointer(c_int(n))
-    dimension = pointer(c_int(d))
+    # hParam = pointer(c_int(h))
+    # numPoints = pointer(c_int(n))
+    # dimension = pointer(c_int(d))
 
     points_list=np.ascontiguousarray(data, dtype=np.float64).flatten()
     points=(c_double*len(points_list))(*points_list)
@@ -72,7 +72,7 @@ def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = T
 
 
     res = np.zeros((d,d))
-    resMean = np.zeros((d,d))
+    resMean = np.zeros((d))
     for i in range(d):
         for j in range(d):
             res[i,j]=c_mat_MCD[i*d+j]    

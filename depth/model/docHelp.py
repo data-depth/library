@@ -1158,8 +1158,150 @@ ACA__doc__="""
 
 
 integral__doc__="""
-    Integral depth computation
-"""
+    Compute the integrated functional depth (IFD) of a query function with respect to a sample of functional data for exact depth notions.
+    
+    This function computes depth values of functional observations (in `query`) relative to a 
+    reference dataset (`df`) using projection-based methods such as halfspace depth.
+    Each function (trajectory) is represented by a sequence of multivariate values over time.
+    
+    Parameters
+    ----------
+    query : pandas.DataFrame
+        Query dataset containing functional observations whose depth will be computed
+        relative to `df`. Must have the same column structure as `df`.
+
+    notion : {"mahalanobis", "halfspace", "zonoid", "projection", "aprojection", "cexpchullstar", "cexpchull", "geometrical"}, default='halfspace'
+        Type of functional depth to compute. Currently supports 'halfspace', but 
+        can be extended to other projection-based depths.
+
+    solver : str, default='neldermead'
+        {'simplegrid', 'refinedgrid', 'simplerandom', 'refinedrandom', 'coordinatedescent', 'randomsimplices', 'neldermead', 'simulatedannealing'},
+        The type of solver used to approximate the depth.
+        Optimization solver used within the internal depth computation.
+
+    NRandom : int, default=100
+        Number of random projections or optimization restarts used in computing 
+        projection-based depth.
+
+    n_refinements  
+        For ``solver`` = ``refinedrandom`` or ``refinedgrid``, set the maximum of iteration for 
+        computing the depth of one point. 
+        
+    sphcap_shrink  
+        For ``solver`` = ``refinedrandom`` or `refinedgrid`, it's the shrinking of the spherical cap. 
+        
+    alpha_Dirichlet  
+        For ``solver`` = ``randomsimplices``. it's the parameter of the Dirichlet distribution. 
+        
+    cooling_factor  
+        For ``solver`` = ``randomsimplices``, it's the cooling factor. 
+        
+    cap_size 
+        For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the size of the spherical cap. 
+        
+    start 
+        {'mean', 'random'}, 
+        For ``solver`` = ``simulatedannealing`` or ``neldermead``, it's the method used to compute the first depth.
+        
+    space  
+        {'sphere', 'euclidean'}, 
+        For ``solver`` = ``coordinatedescent`` or ``neldermead``, it's the type of spacecin which
+        the solver is running.
+        
+    line_solver 
+        {'uniform', 'goldensection'}, 
+        For ``solver`` = ``coordinatedescent``, it's the line searh strategy used by this solver.
+        
+    bound_gc 
+        For ``solver`` = ``neldermead``, it's ``True`` if the search is limited to the closed hemisphere.
+    
+    exact : bool, delfaut=True
+        Whether the depth computation is exact.
+    
+    mah_estimate : str, {"none", "moment", "mcd"}, default="moment"
+        Specifying which estimates to use when calculating the depth
+        A character string specifying which estimates to use when calculating sample
+        covariance matrix; can be ``'none'``, ``'moment'`` or ``'MCD'``, determining whether
+        traditional moment or Minimum Covariance Determinant (MCD)
+        estimates for mean and covariance are used. By default ``'moment'`` is used. Is
+        used only when ``distance='Mahalanobis'``.
+        
+    mah_parMcd : float, default=0.75
+        Value of the argument alpha for the function covMcd
+    
+    beta
+        The parameter defining the positionning of the balls’ centers, see Yang and Modarres (2017) for details.
+        By default (together with other arguments) equals
+        ``2``, which corresponds to the lens depth, see Liu and Modarres (2011).
+    
+    distance	
+        A character string defining the distance to be used for determining inclusion
+        of a point into the lens (influence region), see Yang and Modarres (2017) for
+        details. Possibilities are ``'Lp'`` for the Lp-metric (default) or ``'Mahalanobis'`` for
+        the Mahalanobis distance adjustment.
+    
+    Lp_p    
+        A non-negative number defining the distance’s power equal ``2`` by default (Euclidean distance)
+        is used only when ``distance='Lp'``.
+
+    method			
+        For ``exact=True``, the Tukey depth is calculated as the minimum over all combinations of k points from data (see Details below).
+        In this case parameter method specifies k, with possible values 1 for ``method='recursive'`` (by default), d−2
+        for ``method='plane'``, d−1 for ``'method=line'``.
+        The name of the method may be given as well as just parameter exact, in which
+        case the default method will be used.
+    
+    pretransform: str, default="1Mom"
+        The method of data scaling.
+        ``'1Mom'`` or ``'NMom'`` for scaling using data moments.
+        ``'1MCD'`` or ``'NMCD'`` for scaling using robust data moments (Minimum Covariance Determinant (MCD).
+    
+    kernel: str, default="EDKernel"
+        ``'EDKernel'`` for the kernel of type 1/(1+kernel.bandwidth*EuclidianDistance2(x,y)),
+        ``'GKernel'`` [default and recommended] for the simple Gaussian kernel,
+        ``'EKernel'`` exponential kernel: exp(-kernel.bandwidth*EuclidianDistance(x, y)),
+        ``'VarGKernel'`` variable Gaussian kernel, where kernel.bandwidth is proportional to the depth.zonoid of a point.
+    
+    kernel_bandwidth: int, default=0
+        the single bandwidth parameter of the kernel. If ``0`` - the Scott`s rule of thumb is used.
+    
+    k: float, default=0.05
+        Number (``k > 1``) or portion (if ``0 < k < 1``) of simplices that are considered if ``exact=False``.
+        If ``k > 1``, then the algorithmic complexity is polynomial in d but is independent of the number of observations in data, given k. 
+        If ``0 < k < 1``,then the algorithmic complexity is exponential in the number of observations in data, 
+        but the calculation precision stays approximately the same.
+
+    output_option : str
+        Determines the format of the output.
+        Available for projection-based notions only.
+            - ``"lowest_depth"`` : single numpy array
+            - ``"final_depth_dir"`` : tuple of numpy arrays 
+        
+    Returns
+    -------
+    depth_array : np.ndarray of shape (n_query,)
+    Array of depth values, where `n_query` is the number of functional observations 
+    (unique `case_id`s) in the `query` dataset.
+    The first return is the lowest comuted depth regarding all explored directions in space.
+    The second return is the direction that best represents the analyzed point, the direction corresponfing to the lowest depth.
+
+        If ``output_option=="lowest_depth"`` returns:
+            array_like
+                - Lowest Detph value
+    
+        If ``output_option=="final_depth_dir"`` returns:
+            Tuple of array_like
+                - Lowest Detph value
+                - Lowest depth respective direction
+
+    Notes
+    -----
+    - If `timestamp` is of type `datetime64`, it is converted internally to seconds
+    relative to the global minimum timestamp (`t_min`).
+    - Duplicate timestamps within each `case_id` group are automatically dropped.
+    - Interpolation uses linear extrapolation outside the observed time range.
+    
+            """
 
 band__doc__="""
     Integral depth computation
