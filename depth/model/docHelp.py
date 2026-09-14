@@ -1156,3 +1156,11 @@ ACA__doc__="""
 
     """
 
+
+integral__doc__="""
+    Integral depth computation
+"""
+
+band__doc__="""
+    Integral depth computation
+"""

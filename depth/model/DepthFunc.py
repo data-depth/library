@@ -218,7 +218,6 @@ class DepthFunc():
         return df
 
 
-
     def _MinMax(self,data):
         """
         fix min max values for border times
@@ -712,7 +711,7 @@ class DepthFunc():
         # 
 
         self._check_depth(notion)
-        weights=self._build_weight(weights)
+        weights=self._build_weight(weights,query.shape[0])
         if type(query)==np.ndarray:
             query=self._3Dnp_tp_pd(query,self.TSnp, self.CInp)
         if query[self.timestamp_col].max()>self.t_max:
@@ -743,11 +742,11 @@ class DepthFunc():
             for i in range(query_array.shape[0]):
                 if option==1:
                     depth_array[i] = self._compute_int_depth_projBase(query_array[i, :, :], notion=notion, solver=solver,option=option,
-                                                NRandom=NRandom,weights=weights,**kwargs)[0]
+                                                NRandom=NRandom,weights=weights[i],**kwargs)[0]
                 
                 elif option==2:
                     depth_array[i], direction_array[i] =self._compute_int_depth_projBase(query_array[i, :, :], notion=notion, solver=solver,option=option,
-                                                NRandom=NRandom,weights=weights,**kwargs)
+                                                NRandom=NRandom,weights=weights[i],**kwargs)
                     
         
             if option==1:return depth_array 
@@ -897,13 +896,27 @@ class DepthFunc():
             return MCD[0]
 
 
-    def _build_weight(self,weights):
-        if weights==None:
-            weights=np.ones(self.data_array.shape[1])/self.data_array.shape[1]
-        elif weights.shape[0]!=self.data_array.shape[1]:
-            raise ValueError(f"Size of weights is not the same of the time steps. \n {weights.shape[0]}!={self.data_array.shape[1]}") 
-        else:
+    def _build_weight(self,weights, queryShape):
+        if type(weights)==type(None):
+            weights=np.ones((queryShape,self.data_array.shape[1]))/self.data_array.shape[1]
+            return weights
+        if len(weights.shape)==1:
+            if weights.shape[0]!=self.data_array.shape[1]:
+                raise ValueError(f"Size of weights is not the same of the time steps. \n {weights.shape[1]}!={self.data_array.shape[1]}")
             weights=weights/np.linalg.norm(weights)
+            weights=np.repeat(weights[np.newaxis,...], queryShape, axis=0)
+            return weights
+        if weights.shape[1]!=self.data_array.shape[1]:
+            raise ValueError(f"Size of weights is not the same of the time steps. \n {weights.shape[1]}!={self.data_array.shape[1]}") 
+        elif weights.shape[0]==1:
+            print("here")
+            weights=weights/np.linalg.norm(weights,axis=1,keepdims=True)
+            weights=np.repeat(weights[0][np.newaxis,...], queryShape, axis=0)
+    
+        elif weights.shape[0]!=queryShape:
+            raise ValueError(f"Size of weights is not the same of the query amount. \n {weights.shape[0]}!={queryShape}") 
+        else:
+            weights=weights/np.linalg.norm(weights,axis=1,keepdims=True)
         return weights
 
     # TODO
