@@ -80,57 +80,6 @@ def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = T
     return res,resMean, RNG.bit_generator.state
 
     
-# def MCD(data, h, seed=2801, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = True):
-
-#     try:
-#         n, d = data.shape
-#     except ValueError:
-#         n,d = data.shape[0],1
-
-#     c_hParam = c_int(h)
-#     c_numPoints = c_int(n)
-#     c_dimension = c_int(d)
-
-#     points=(c_double*data.size)(*data.flatten().astype(np.float64))
-#     # points=pointer(points)
-
-#     c_seed=c_int(int(seed))
-
-#     cov_size = d*d
-#     c_mat_MCD=(c_double*(cov_size))(*([0]*cov_size))
-#     chisqr05 =  chi2(d).isf(0.5)
-#     chisqr0975 = chi2(d).isf(0.025)
-#     c_chisqr05 = c_double(chisqr05)
-#     c_chisqr0975 = c_double(chisqr0975)
-#     c_mfull = c_int(mfull)
-#     c_nstep = c_int(nstep)
-#     c_hiRegimeCompleteLastComp = c_bool(hiRegimeCompleteLastComp)
-
-#     #MinimumCovarianceDeterminantEstim(double *points, int *numPoints, int *dimension, int *hParam, int *seed, double *mat_MCD, double chisqr05, double chisqr0975, int mfull, 
-# 	# int nstep, bool hiRegimeCompleteLastComp)
-
-#     libExact.MinimumCovarianceDeterminantEstim(
-#         points, 
-#         byref(c_numPoints), 
-#         byref(c_dimension), 
-#         byref(c_hParam), 
-#         byref(c_seed), 
-#         c_mat_MCD,
-#         byref(c_chisqr05),
-#         byref(c_chisqr0975),
-#         byref(c_mfull),
-#         byref(c_nstep),
-#         byref(c_hiRegimeCompleteLastComp),
-#         )
-
-#     res = np.zeros((d,d))
-#     print(c_mat_MCD[8])
-#     # for i in range(d):
-#     #     for j in range(d):
-#     #         print(c_mat_MCD[i])        
-#     # res[i,j]=c_mat_MCD[0][i*d+j]    
-
-#     return res
 
 MCD.__doc__= """
 
@@ -160,7 +109,5 @@ Arguments
 References
     * Peter J. Rousseeuw & Katrien Van Driessen (1999) A Fast Algorithm for the Minimum Covariance Determinant Estimator, Technometrics, 41:3, 212-223
 
-Examples
-    To write
 
 """

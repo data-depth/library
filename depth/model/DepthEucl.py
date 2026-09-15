@@ -1561,6 +1561,7 @@ class DepthEucl():
             
         Results 
         -------
+        Location parameter: {array-like}
         Minimum Covariance Determinant (MCD): {array-like}
         """
 
@@ -1572,7 +1573,8 @@ class DepthEucl():
             self.MCD[ind],self.meanMCD[ind],current_state=mtv.MCD(self.data[self.distribution==i],h=h_dist,state=self.RNG.bit_generator.state,mfull=mfull, nstep=nstep, hiRegimeCompleteLastComp=hiRegimeCompleteLastComp)
             self.RNG.bit_generator.state=current_state
         self.MCD=self.MCD[0] if self.distRef.shape[0]==1 else self.MCD
-        return  self.MCD
+        self.meanMCD=self.meanMCD[0] if self.distRef.shape[0]==1 else self.meanMCD
+        return self.meanMCD,self.MCD
 
     
     def change_dataset(self,newDataset:np.ndarray,newY:np.ndarray=None, newDistribution:np.ndarray=None,keepOld:bool=False,)->None:
