@@ -680,6 +680,10 @@ class DepthFunc():
             If ``0 < k < 1``,then the algorithmic complexity is exponential in the number of observations in data, 
             but the calculation precision stays approximately the same.
 
+        weights: array
+            weight for each time step for the integral depth computation.
+            Default is equal weights.
+
         output_option : str
             Determines the format of the output.
                 - ``"lowest_depth"`` : single numpy array
@@ -791,15 +795,9 @@ class DepthFunc():
         - Duplicate timestamps within each `case_id` group are automatically dropped.
         - Interpolation uses linear extrapolation outside the observed time range.
         """  
-
-        ## Do both - feature alone and all feature
-        
-
         queryMM=self._MinMax(query)
         query_array = self._syncronise_over_time(queryMM,)
-
         depth_array = fct.bandDepth(query_array, self.data_array,modified)
-    
         return depth_array 
         
 

@@ -1,3 +1,3 @@
-from BandDepth import *
+from .BandDepth import *
 
 __all__=["bandDepth","SimplicialBandDepth"]

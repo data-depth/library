@@ -3,7 +3,7 @@ import numpy as np
 from ..multivariate.import_CDLL import libExact
 
 
-def bandDepth(z,X,modified=True,state=None):
+def bandDepth(z,X,modified=True,):
 
     
     try:
