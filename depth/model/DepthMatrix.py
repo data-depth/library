@@ -20,7 +20,7 @@ class DepthMatrix():
     Notes
     -----
     Possible depth notions are : `mahalanobis`,`halfspace`,`zonoid`,`cexpchullstar`,`cexpchull`,`geometrical`,`potential`,`qhpeeling`,`simplicial`,`betaskeleton`,`L2`,`simplicialvolume`,`spatial`,`projection`,`aprojection`,`sprojection`
-    Metric spaces : `Riemannian`, `logEuclidean`,`Cholesky`, `Euclidean`, `rootEuclidean`
+    Metric spaces : `Riemannian`, `logEuclidean`,`cholesky`, `Euclidean`, `rootEuclidean`
     
     There are two possibilits: 
     Pointwise depth:
@@ -49,6 +49,14 @@ class DepthMatrix():
                              "halfspace":mtv.halfspace, 
                              "zonoid":mtv.zonoid,
                              "PorjBased":mtv.depth_approximation}
+        self.DataLogeuclidean=None
+        # self.ModelLogeuclidean=None
+        self.DataCholesky=None
+        # self.ModelCholesky=None
+        self.DataEuclidean=None
+        # self.ModelEuclidean=None
+        self.DataRootEuclidean=None
+        # self.ModelRootEuclidean=None
         
         
     
@@ -113,20 +121,57 @@ class DepthMatrix():
             for i in range(matrix.shape[0]):
                 z=np.zeros((self.dim*self.dim))
                 dataR=self._applyLogmECoeff(matrix[i], self.data)
-                depth[i]=self._notionsDict[notionDic](z,dataR,notion=notion,
+                dpt,state=self._notionsDict[notionDic](z,dataR,notion=notion,
                                              solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                                              alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
                                              line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
                                              beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
-                                             kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k)
+                                             kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+                depth[i]+=dpt
+                self.RNG.bit_generator.state=state
+                
         if metric=="logeuclidean":
-            pass
+            if type(self.DataLogeuclidean)==type(None):
+                self.DataLogeuclidean=self._applyLogmECoeff(np.eye(self.dim), self.data)
+                # self.ModelLogeuclidean=DepthEucl().load_dataset(self.DataLogeuclidean)
+            z=self._applyLogmECoeff(np.eye(self.dim), matrix)
+            depth,state=self._notionsDict[notionDic](z,self.DataLogeuclidean,notion=notion,
+                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+            self.RNG.bit_generator.state=state
+            
+            
         if metric=="cholesky":
-            pass
+            if type(self.DataCholesky)==type(None):
+                # self.DataCholesky=self._ECoeff(self.DataCholesky)
+                pass
+            print("Not implemented")
         if metric=="euclidean":
-            pass
+            if type(self.DataEuclidean)==type(None):
+                self.DataEuclidean=self._ECoeff(self.DataEuclidean)
+            z=self._ECoeff(matrix)
+            depth,state=self._notionsDict[notionDic](z,self.DataEuclidean,notion=notion,
+                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+            self.RNG.bit_generator.state=state
+            
         if metric=="rooteuclidean":
-            pass
+            if type(self.DataRootEuclidean)==type(None):
+                self.DataRootEuclidean=self._ECoeff(np.sqrt(self.DataRootEuclidean))
+            z=self._ECoeff(np.sqrt(matrix))
+            depth,state=self._notionsDict[notionDic](z,self.DataRootEuclidean,notion=notion,
+                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+            self.RNG.bit_generator.state=state
         
         return depth
 
@@ -141,20 +186,52 @@ class DepthMatrix():
                 for t in range(matrix.shape[1]):
                     z=np.zeros((self.dim*self.dim))
                     dataR=self._applyLogmECoeff(matrix[i,t],self.data[:,t])
-                    depth[i]+=self._notionsDict[notionDic](z,dataR,notion=notion,
+                    dpt,state=self._notionsDict[notionDic](z,dataR,notion=notion,
                                 solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                                 alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
                                 line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
                                 beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
-                                kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k)*weights[i,t]
+                                kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k)
+                    depth[i]+=dpt*weights[i,t]
+                    self.RNG.bit_generator.state=state
         if metric=="logeuclidean":
-            pass
+            for t in range(self.timesteps):
+                DataLogeuclidean=self._applyLogmECoeff(np.eye(self.dim), self.data[:,t])
+                z=self._applyLogmECoeff(np.eye(self.dim),matrix[:,t])
+                dpt,state=self._notionsDict[notionDic](z,DataLogeuclidean,notion=notion,
+                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+                depth+=dpt*weights[:,t]
+                self.RNG.bit_generator.state=state
         if metric=="cholesky":
-            pass
+            print("Not implemented")
         if metric=="euclidean":
-            pass
+            for t in range(self.timesteps):
+                DataEuclidean=self._ECoeff(self.data[:,t])
+                z=self._ECoeff(matrix[:,t])
+                dpt,state=self._notionsDict[notionDic](z,DataEuclidean,notion=notion,
+                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+                depth+=dpt*weights[:,t]
+                self.RNG.bit_generator.state=state
         if metric=="rooteuclidean":
-            pass
+            for t in range(self.timesteps):
+                DataRooteuclidean=self._ECoeff(np.sqrt(self.data[:,t]))
+                z=self._ECoeff(np.sqrt(matrix[:,t]))
+                dpt,state=self._notionsDict[notionDic](z,DataRooteuclidean,notion=notion,
+                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+                depth+=dpt*weights[:,t]
+                self.RNG.bit_generator.state=state
         return depth
     
     
@@ -179,7 +256,7 @@ class DepthMatrix():
     def _applyLogmECoeff(self,y,X):
         out = np.empty((self.samples,self.dim*self.dim))
         for k in range(self.samples):
-            out[:, k] = self._ECoeff(self._Logm(y, X[k]))
+            out[:, k] = self._ECoeff(self._Logm(y, X[k]).reshape(1,self.dim,self.dim))
         return out
     def _sympd_funcm(self,mat,func):
         """Apply scalar function f to the eigenvalues of Hermitian PD matrix A."""
@@ -199,15 +276,24 @@ class DepthMatrix():
         P3=self._logm_sympd(P2@Q@P2)
         return P1@P3@P1
     
+    # def _ECoeff(self,H):
+    #     coeff=np.empty((self.dim, self.dim))
+    #     di=np.diag_indices(self.dim)
+    #     il=np.tril_indices(self.dim,-1)
+    #     iu=np.triu_indices(self.dim,1)
+    #     coeff[di]=H[di].real
+    #     coeff[il]=np.sqrt(2)*H[il].real
+    #     coeff[iu]=np.sqrt(2)*H[iu].imag
+    #     return coeff.ravel()
     def _ECoeff(self,H):
-        coeff=np.empty((self.dim, self.dim))
+        coeff=np.empty((H.shape[0],self.dim, self.dim))
         di=np.diag_indices(self.dim)
         il=np.tril_indices(self.dim,-1)
         iu=np.triu_indices(self.dim,1)
-        coeff[di]=H[di].real
-        coeff[il]=np.sqrt(2)*H[il].real
-        coeff[iu]=np.sqrt(2)*H[iu].imag
-        return coeff.ravel()
+        coeff[:,di]=H[:,di].real
+        coeff[:,il]=np.sqrt(2)*H[:,il].real
+        coeff[:,iu]=np.sqrt(2)*H[:,iu].imag
+        return coeff.reshape(H.shape[0],self.dim*self.dim)
     
     def check_HPD(self,X=None,tol=1e-10):
         """
