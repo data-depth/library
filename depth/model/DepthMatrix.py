@@ -50,7 +50,7 @@ class DepthMatrix():
                              "zonoid":mtv.zonoid,
                              "PorjBased":mtv.depth_approximation}
         
-        pass
+        
     
     
     def load_dataset(self,data:np.ndarray=None,distribution:np.ndarray=None, CUDA:bool=False,y:np.ndarray=None):
@@ -112,8 +112,8 @@ class DepthMatrix():
         if metric=='riemannian':
             for i in range(matrix.shape[0]):
                 z=np.zeros((self.dim*self.dim))
-                dataR=self._applyLogmECoeff(matrix[i])
-                self._notionsDict[notionDic](z,dataR,notion=notion,
+                dataR=self._applyLogmECoeff(matrix[i], self.data)
+                depth[i]=self._notionsDict[notionDic](z,dataR,notion=notion,
                                              solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
                                              alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
                                              line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
@@ -131,9 +131,22 @@ class DepthMatrix():
         return depth
 
     def _integratedDepth(self,matrix,notion, metric,notionDic, weights,**kwargs):
+        depth=np.zeros(matrix.shape[0])
+        solver,NRandom,n_refinements,sphcap_shrink,alpha_Dirichlet,cooling_factor,cap_size,start,space,\
+                line_solver,bound_gc,exact,mah_estimate,mah_parMcd,beta,distance,Lp_p,method,pretransform,\
+                kernel,kernel_bandwidth,k=self._check_hyperparDepth(**kwargs)
+        
         if metric=='riemannian':
-            
-            self._notionsDict[notionDic]
+            for i in range(matrix.shape[0]):
+                for t in range(matrix.shape[1]):
+                    z=np.zeros((self.dim*self.dim))
+                    dataR=self._applyLogmECoeff(matrix[i,t],self.data[:,t])
+                    depth[i]+=self._notionsDict[notionDic](z,dataR,notion=notion,
+                                solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k)*weights[i,t]
         if metric=="logeuclidean":
             pass
         if metric=="cholesky":
@@ -142,7 +155,7 @@ class DepthMatrix():
             pass
         if metric=="rooteuclidean":
             pass
-        pass
+        return depth
     
     
     
@@ -163,10 +176,10 @@ class DepthMatrix():
             weights=weights/sum(weights,axis=1,keepdims=True)
             weights=np.repeat(weights[0][np.newaxis,...], queryShape, axis=0)
     
-    def _applyLogmECoeff(self,y):
+    def _applyLogmECoeff(self,y,X):
         out = np.empty((self.samples,self.dim*self.dim))
         for k in range(self.samples):
-            out[:, k] = self._ECoeff(self._Logm(y, self.data[k]))
+            out[:, k] = self._ECoeff(self._Logm(y, X[k]))
         return out
     def _sympd_funcm(self,mat,func):
         """Apply scalar function f to the eigenvalues of Hermitian PD matrix A."""
