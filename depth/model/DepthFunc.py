@@ -18,7 +18,7 @@ class DepthFunc():
     
     Notes
     -----
-    Possible depth notions are : `mahalanobis`, `halfspace`, `zonoid`, `projection`, `aprojection`, `cexpchullstar`, `cexpchull`, `geometrical`.
+    Possible depth notions are : `mahalanobis`,`halfspace`,`zonoid`,`cexpchullstar`,`cexpchull`,`geometrical`,`potential`,`qhpeeling`,`simplicial`,`betaskeleton`,`L2`,`simplicialvolume`,`spatial`,`projection`,`aprojection`,`sprojection`
     
     For each discretization point i = 1, ..., L:
         - Extract the data slice `data[:, i, :]` (shape: N_data x D)
@@ -29,6 +29,7 @@ class DepthFunc():
     """
     def __init__(self):
         self.data=None
+        self.set_seed()
     
     def load_dataset(self, data:pd.DataFrame=None, y:np.ndarray=None, 
                      timestamp_col:str|int='timestamp',value_cols:str|list|int='value', case_id:str|int="case_id", 
@@ -850,7 +851,8 @@ class DepthFunc():
     def _check_depth(self, depth):
         all_depths = ["mahalanobis", "halfspace", "zonoid", 
                           "cexpchullstar", "cexpchull", "geometrical", "potential", 
-                          "qhpeeling", "simplicial","betaskeleton","L2", "simplicialvolume","spatial","projection","aprojection"]
+                          "qhpeeling", "simplicial","betaskeleton","L2", "simplicialvolume","spatial","projection","aprojection",
+                          "sprojection"]
         if (depth not in all_depths):
             raise ValueError("Depths approximation is available only for depths in %s, got %s."%(all_depths, depth))  
               
@@ -906,20 +908,20 @@ class DepthFunc():
         if len(weights.shape)==1:
             if weights.shape[0]!=self.data_array.shape[1]:
                 raise ValueError(f"Size of weights is not the same of the time steps. \n {weights.shape[1]}!={self.data_array.shape[1]}")
-            weights=weights/np.linalg.norm(weights)
+            weights=weights/sum(weights)
             weights=np.repeat(weights[np.newaxis,...], queryShape, axis=0)
             return weights
         if weights.shape[1]!=self.data_array.shape[1]:
             raise ValueError(f"Size of weights is not the same of the time steps. \n {weights.shape[1]}!={self.data_array.shape[1]}") 
         elif weights.shape[0]==1:
             print("here")
-            weights=weights/np.linalg.norm(weights,axis=1,keepdims=True)
+            weights=weights/sum(weights,axis=1,keepdims=True)
             weights=np.repeat(weights[0][np.newaxis,...], queryShape, axis=0)
     
         elif weights.shape[0]!=queryShape:
             raise ValueError(f"Size of weights is not the same of the query amount. \n {weights.shape[0]}!={queryShape}") 
         else:
-            weights=weights/np.linalg.norm(weights,axis=1,keepdims=True)
+            weights=weights/np.sum(weights,axis=1,keepdims=True)
         return weights
 
     # TODO
