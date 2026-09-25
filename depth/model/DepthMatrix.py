@@ -24,7 +24,7 @@ class DepthMatrix():
     Notes
     -----
     Possible depth notions are : `mahalanobis`,`halfspace`,`zonoid`,`cexpchullstar`,`cexpchull`,`geometrical`,`potential`,`qhpeeling`,`simplicial`,`betaskeleton`,`L2`,`simplicialvolume`,`spatial`,`projection`,`aprojection`,`sprojection`
-    Metric spaces : `Riemannian`, `logEuclidean`,`cholesky`, `Euclidean`, `rootEuclidean`
+    Metric spaces : `riemannian`, `logeuclidean`,`cholesky`, `euclidean`, `rooteuclidean`
     
     There are two possibilits: 
     Pointwise depth:
@@ -33,7 +33,7 @@ class DepthMatrix():
             - Compute the multivariate depth for a matrix relative to all matrices
 
     Integrated / functional depth:
-        For each discretization point i = 1, ..., L:
+        For each discretization point i = 1, ..., T:
                 - Extract the data slice `data[:, i, :, :]` (shape: N_data x d x d)
                 - Extract the query matrix `x[i, :, :]` (shape: d x d)
                 - Compute the multivariate depth of the query matrix relative to the data slice
@@ -168,13 +168,13 @@ class DepthMatrix():
             z=self.applyCholEchol(matrix)
         if metric=="euclidean":
             if type(self.DataEuclidean)==type(None):
-                self.DataEuclidean=self._ECoeff(self.DataEuclidean)
+                self.DataEuclidean=self._ECoeff(self.data)
             XData=self.DataEuclidean
             z=self._ECoeff(matrix)
             
         if metric=="rooteuclidean":
             if type(self.DataRootEuclidean)==type(None):
-                self.DataRootEuclidean=self._ECoeff(np.sqrt(self.DataRootEuclidean))
+                self.DataRootEuclidean=self._ECoeff(np.sqrt(self.data))
             XData=self.DataRootEuclidean
             z=self._ECoeff(np.sqrt(matrix))
 
@@ -253,7 +253,7 @@ class DepthMatrix():
     def _applyLogmECoeff(self,y,X):
         out = np.empty((self.samples,self.dim*self.dim))
         for k in range(self.samples):
-            out[:, k] = self._ECoeff(self._Logm(y, X[k]).reshape(1,self.dim,self.dim))
+            out[k] = self._ECoeff(self._Logm(y, X[k])).reshape(self.dim*self.dim)
         return out
     def _sympd_funcm(self,mat,func):
         """Apply scalar function f to the eigenvalues of Hermitian PD matrix A."""
@@ -283,14 +283,15 @@ class DepthMatrix():
     #     coeff[iu]=np.sqrt(2)*H[iu].imag
     #     return coeff.ravel()
     def _ECoeff(self,H):
-        coeff=np.empty((H.shape[0],self.dim, self.dim))
+        coeff=np.empty((H.shape))
         di=np.diag_indices(self.dim)
         il=np.tril_indices(self.dim,-1)
         iu=np.triu_indices(self.dim,1)
+        # print(coeff[:,di].shape,H[:,di].real.shape)
         coeff[:,di]=H[:,di].real
         coeff[:,il]=np.sqrt(2)*H[:,il].real
         coeff[:,iu]=np.sqrt(2)*H[:,iu].imag
-        return coeff.reshape(H.shape[0],self.dim*self.dim)
+        return coeff.reshape(-1,self.dim*self.dim)
     
     def check_HPD(self,X=None,tol=1e-10):
         """
@@ -428,10 +429,10 @@ class DepthMatrix():
     #         return P
     def applyCholEchol(self,X):
         """
-        """
+        """ 
         L=np.linalg.cholesky(X)
-        ri,rj=self._lowerTriColmajor(self.dim, diag=True)
-        si,sj=self._lowerTriColmajor(self.dim, diag=False)
+        ri,rj=self._lowerTriColmajor(diag=True)
+        si,sj=self._lowerTriColmajor(diag=False)
         real_part=L[:,ri,rj].real
         imag_part=L[:,si,sj].imag
         return np.concatenate([real_part, imag_part], axis=1)
