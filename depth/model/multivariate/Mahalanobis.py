@@ -24,7 +24,8 @@ def mahalanobis(x, data, exact=True, mah_estimate="moment", mah_parMcd = 0.75,
                 state=None, **kwargs):
 
     RNG=np.random.default_rng()
-    RNG.bit_generator.state=state
+    try:RNG.bit_generator.state = state
+    except:pass
     if exact:
         points_list=data.flatten()
         objects_list=x.flatten()

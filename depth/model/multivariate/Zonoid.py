@@ -18,7 +18,8 @@ def zonoid(x, data, state=None, exact=True, solver="neldermead",
                         line_solver="goldensection",
                         bound_gc=True, **kwargs):
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
+    try:RNG.bit_generator.state = state
+    except:pass
     if exact:
         points_list=data.flatten()
         objects_list=x.flatten()

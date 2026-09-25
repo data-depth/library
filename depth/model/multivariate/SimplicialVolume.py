@@ -30,7 +30,8 @@ def simplicialVolume(x, data, exact = True, k = 0.05,
         mah_estimate = "moment", mah_parMCD = 0.75, state=None,
         covMCD=None, **kwargs):
     RNG=np.random.default_rng()
-    RNG.bit_generator.state=state
+    try:RNG.bit_generator.state = state
+    except:pass
     points_list=data.flatten()
     objects_list=x.flatten()
     if (mah_estimate == "none"):

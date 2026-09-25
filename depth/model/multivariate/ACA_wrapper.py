@@ -16,7 +16,8 @@ def ACA(X, dim = 1, sample_size = None,  notion = "projection", # Can't use half
     
     z=X.copy()
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
+    try:RNG.bit_generator.state = state
+    except:pass
     if(sample_size != None): # Run method on a (specified) sample
         ind = RNG.choice(X.shape[0], size=sample_size, replace=False)
         X = X[ind]

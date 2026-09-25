@@ -16,7 +16,8 @@ def IsInConvexes(X,z,distributions,state):
     n_z = z.shape[0]
 
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
+    try:RNG.bit_generator.state = state
+    except:pass
     
     distr_uniques, counts= np.unique(distributions, return_counts=True)
     numClasses=int(counts.shape[0])

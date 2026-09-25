@@ -2,6 +2,7 @@ from ctypes import *
 from .Depth_approximation import depth_approximation
 import sys, os, glob
 import platform
+import numpy as np
 from .import_CDLL import libApprox
 
 def cexpchull(x, data,
@@ -19,8 +20,13 @@ def cexpchull(x, data,
         bound_gc = True,
         state=None, **kwargs):
 
+    RNG=np.random.default_rng()
+    try:RNG.bit_generator.state = state
+    except:pass
+
     return depth_approximation(x, data, "cexpchull", solver, NRandom, option, n_refinements,
-    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,state)
+    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,
+    RNG.bit_generator.state)
 
 cexpchull.__doc__="""
 

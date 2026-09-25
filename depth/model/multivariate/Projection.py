@@ -23,7 +23,8 @@ def projection(x, data,
         device=None,
         state=None, **kwargs):
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
+    try:RNG.bit_generator.state = state
+    except:pass
     if CUDA==False: #check cuda
         return depth_approximation(x, data, "projection", solver, NRandom, option, n_refinements,
         sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, bound_gc,state)

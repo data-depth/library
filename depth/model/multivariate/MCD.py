@@ -10,7 +10,8 @@ def MCD(data, h, state=None, mfull = 10, nstep = 7, hiRegimeCompleteLastComp = T
     except ValueError:
         n, d = data.shape[0], 1
     RNG=np.random.default_rng()
-    RNG.bit_generator.state=state
+    try:RNG.bit_generator.state = state
+    except:pass
     # hParam = pointer(c_int(h))
     # numPoints = pointer(c_int(n))
     # dimension = pointer(c_int(d))

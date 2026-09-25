@@ -14,7 +14,8 @@ def longtoint(k):
 
 def simplicial(x, data, exact=True, k=0.05, state=None, **kwargs):
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
+    try:RNG.bit_generator.state = state
+    except:pass
     points_list=data.flatten()
     objects_list=x.flatten()
     points=(c_double*len(points_list))(*points_list)

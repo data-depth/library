@@ -22,7 +22,8 @@ def depth_approximation(z,
                         bound_gc = True,
                         state=None, **kwargs):
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
+    try:RNG.bit_generator.state = state
+    except:pass
     depth_indice = check_depth(notion)
     check_space(space)
     solver_indice = check_solver(solver, space)

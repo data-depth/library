@@ -18,8 +18,9 @@ def sprojection(x, data,
         state=None, **kwargs):
     
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
-    
+    try:RNG.bit_generator.state = state
+    except:pass
+        
     return depth_approximation(x, data, "sprojection", solver, NRandom, option, n_refinements,
                                    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, 
                                    bound_gc,state)

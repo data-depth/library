@@ -24,7 +24,8 @@ def aprojection(x, data,
         state=None, **kwargs):
     
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
+    try:RNG.bit_generator.state = state
+    except:pass
     if CUDA==False:
         return depth_approximation(x, data, "aprojection", solver, NRandom, option, n_refinements,
                                    sphcap_shrink, alpha_Dirichlet, cooling_factor, cap_size, start, space, line_solver, 

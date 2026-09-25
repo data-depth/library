@@ -23,7 +23,8 @@ def halfspace(x, data, exact=True, method="recursive",
                 device=None,
                 state=None, **kwargs):
     RNG=np.random.default_rng()
-    RNG.bit_generator.state = state
+    try:RNG.bit_generator.state = state
+    except:pass
     if exact:
         if (method =="recursive" or method==1):
             method=1
