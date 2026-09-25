@@ -8,7 +8,9 @@ except:torch=None
 import sys, os
 from .matrix import *
 from .DepthEucl import DepthEucl 
-from .DepthFunc import DepthFunc 
+from .DepthFunc import DepthFunc
+from scipy.linalg import cho_factor, cho_solve 
+from math import gamma,sqrt
 
 
 class DepthMatrix():
@@ -60,10 +62,8 @@ class DepthMatrix():
         self.DataRootEuclidean=None
         # self.ModelRootEuclidean=None
         
-        
     
-    
-    def load_dataset(self,data:np.ndarray=None,distribution:np.ndarray=None, CUDA:bool=False,y:np.ndarray=None):
+    def load_dataset(self,data:np.ndarray=None,distribution:np.ndarray=None, y:np.ndarray=None):
         """
         Load the dataset X for reference calculations. Depth is computed with respect to this dataset.
 
@@ -100,7 +100,30 @@ class DepthMatrix():
     
     
     def evaluate(self, matrix,notion='zonoid',metric ='riemannian', weights=None,**kwargs):
+        """
+        Compute the depth of the matrix w.r.t. the set of matrices.
+        If the matrix is (n_sample,d,d), the pointwise depth is computed.
+        If the matrix is (n_sample,t,d,d), the integrated depth is computed.
         
+        Parameters
+        ----------
+        data : {array-like} of shape (n_sample,d,d) or (n_sample,t,d,d).
+            Dataset to evaluate the depth 
+        
+        notion : str, default=zonoid
+            chosen notion for depth evaluation.
+
+        metric : str, default=riemannian
+            metric used for depth evaluation.
+        
+        weights : {array-like}, default=None
+            weights for integrated depth computation.
+
+        Returns
+        -------
+        self : DepthMatrix model object.
+            Returns the instance itself.
+        """
         self._checkSpaceMetric(metric=metric)
         if "exact" in kwargs.keys():exact=kwargs["exact"]
         else:exact=False
@@ -131,49 +154,37 @@ class DepthMatrix():
                                              kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
                 depth[i]+=dpt
                 self.RNG.bit_generator.state=state
+            return depth
                 
         if metric=="logeuclidean":
             if type(self.DataLogeuclidean)==type(None):
                 self.DataLogeuclidean=self._applyLogmECoeff(np.eye(self.dim), self.data)
-                # self.ModelLogeuclidean=DepthEucl().load_dataset(self.DataLogeuclidean)
+            XData=self.DataLogeuclidean
             z=self._applyLogmECoeff(np.eye(self.dim), matrix)
-            depth,state=self._notionsDict[notionDic](z,self.DataLogeuclidean,notion=notion,
-                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
-                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
-                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
-                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
-            self.RNG.bit_generator.state=state
-            
-            
         if metric=="cholesky":
             if type(self.DataCholesky)==type(None):
-                # self.DataCholesky=self._ECoeff(self.DataCholesky)
-                pass
-            print("Not implemented")
+                self.DataCholesky=self.applyCholEchol(self.data)
+            XData=self.DataCholesky
+            z=self.applyCholEchol(matrix)
         if metric=="euclidean":
             if type(self.DataEuclidean)==type(None):
                 self.DataEuclidean=self._ECoeff(self.DataEuclidean)
+            XData=self.DataEuclidean
             z=self._ECoeff(matrix)
-            depth,state=self._notionsDict[notionDic](z,self.DataEuclidean,notion=notion,
-                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
-                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
-                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
-                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
-            self.RNG.bit_generator.state=state
             
         if metric=="rooteuclidean":
             if type(self.DataRootEuclidean)==type(None):
                 self.DataRootEuclidean=self._ECoeff(np.sqrt(self.DataRootEuclidean))
+            XData=self.DataRootEuclidean
             z=self._ECoeff(np.sqrt(matrix))
-            depth,state=self._notionsDict[notionDic](z,self.DataRootEuclidean,notion=notion,
-                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
-                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
-                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
-                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
-            self.RNG.bit_generator.state=state
+
+        depth,state=self._notionsDict[notionDic](z,XData,notion=notion,
+                                        solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                        alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                        line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                        beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                        kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+        self.RNG.bit_generator.state=state
         
         return depth
 
@@ -196,44 +207,28 @@ class DepthMatrix():
                                 kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k)
                     depth[i]+=dpt*weights[i,t]
                     self.RNG.bit_generator.state=state
-        if metric=="logeuclidean":
-            for t in range(self.timesteps):
-                DataLogeuclidean=self._applyLogmECoeff(np.eye(self.dim), self.data[:,t])
+            return depth
+        for t in range(self.timesteps):
+            if metric=="logeuclidean":
+                DataTrans=self._applyLogmECoeff(np.eye(self.dim), self.data[:,t])
                 z=self._applyLogmECoeff(np.eye(self.dim),matrix[:,t])
-                dpt,state=self._notionsDict[notionDic](z,DataLogeuclidean,notion=notion,
-                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
-                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
-                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
-                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
-                depth+=dpt*weights[:,t]
-                self.RNG.bit_generator.state=state
-        if metric=="cholesky":
-            print("Not implemented")
-        if metric=="euclidean":
-            for t in range(self.timesteps):
-                DataEuclidean=self._ECoeff(self.data[:,t])
+            if metric=="cholesky":
+                DataTrans=self.applyCholEchol(self.data[:,t])
+                z=self.applyCholEchol(matrix[:,t])
+            if metric=="euclidean":
+                DataTrans=self._ECoeff(self.data[:,t])
                 z=self._ECoeff(matrix[:,t])
-                dpt,state=self._notionsDict[notionDic](z,DataEuclidean,notion=notion,
-                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
-                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
-                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
-                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
-                depth+=dpt*weights[:,t]
-                self.RNG.bit_generator.state=state
-        if metric=="rooteuclidean":
-            for t in range(self.timesteps):
-                DataRooteuclidean=self._ECoeff(np.sqrt(self.data[:,t]))
+            if metric=="rooteuclidean":
+                DataTrans=self._ECoeff(np.sqrt(self.data[:,t]))
                 z=self._ECoeff(np.sqrt(matrix[:,t]))
-                dpt,state=self._notionsDict[notionDic](z,DataRooteuclidean,notion=notion,
-                                            solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
-                                            alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
-                                            line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
-                                            beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
-                                            kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
-                depth+=dpt*weights[:,t]
-                self.RNG.bit_generator.state=state
+            dpt,state=self._notionsDict[notionDic](z,DataTrans,notion=notion,
+                                        solver=solver,NRandom=NRandom,n_refinements=n_refinements,sphcap_shrink=sphcap_shrink,
+                                        alpha_Dirichlet=alpha_Dirichlet,cooling_factor=cooling_factor,cap_size=cap_size,start=start,space=space,
+                                        line_solver=line_solver,bound_gc=bound_gc,exact=exact,mah_estimate=mah_estimate,mah_parMcd=mah_parMcd,
+                                        beta=beta,distance=distance,Lp_p=Lp_p,method=method,pretransform=pretransform,
+                                        kernel=kernel,kernel_bandwidth=kernel_bandwidth,k=k,state=self.RNG.bit_generator.state)
+            depth+=dpt*weights[:,t]
+            self.RNG.bit_generator.state=state
         return depth
     
     
@@ -325,8 +320,6 @@ class DepthMatrix():
                         return False
         
         return True
-            
-    
     
     def _check_hyperparDepth(self,**kwargs):
     
@@ -380,4 +373,67 @@ class DepthMatrix():
         if type(seed) == type(None) : self.RNG = np.random.default_rng()
         elif type(seed)==int:self.RNG = np.random.default_rng(seed)
         else : raise TypeError("seed must be an integer.")
+
+    
+    def _invHPD(self,A):
+        """Inverse an HPD matrix with Cholesky factor."""
+        c,low=cho_factor(A,lower=True)
+        return cho_solve((c,low),np.eye(A.shape[0],dtype=A.dtype))
+
+    def chol_c(self,M, bias=False, inverse=False):
+        if not inverse:
+            return np.linalg.cholesky(M)
+        if inverse and not bias:
+            return M@M.conj().T
+        M1=np.zeros((self.dim, self.dim), dtype=complex)
+        bias_vec=np.array([gamma(self.dim-k+0.5)/(sqrt(self.dim)*gamma(self.dim-k)) for k in range(self.dim)])
+        M1[0,0]=(M[0,0]*np.conj(M[0, 0])).real/bias_vec[0]**2
+        for k in range(self.dim-1):
+            top = slice(0,k+1)
+            Mk = M[0:k+1,0:k+1]
+            M1k = M1[0:k+1,0:k+1]
+            row = M[k + 1, top] @ self._invHPD(Mk) @ M1k
+            M1[k+1,top] = row
+            M1[top,k+1] = row.conj()
+
+            diag_term=(M[k + 1, k + 1] * np.conj(M[k + 1, k + 1])).real / bias_vec[k + 1] ** 2
+            quad_term=row@self._invHPD(M1k) @ row.conj().T
+            M1[k+1,k+1]=(diag_term+quad_term).real
+        return M1
+
+    def _lowerTriColmajor(self, diag=True):
+        """Row/col indices of the lower triangle, in R's column-major order."""
+        rows,cols=[],[]
+        for j in range(self.dim):
+            start=j if diag else j + 1
+            for i in range(start,self.dim):
+                rows.append(i)
+                cols.append(j)
+        return np.array(rows), np.array(cols)
+
+    # def EChol(self,R, inverse=False):
+    #     if not inverse:
+    #         ri,rj=self._lowerTriColmajor(self.dim, diag=True)
+    #         si,sj=self._lowerTriColmajor(self.dim, diag=False)
+    #         return np.concatenate([R[ri,rj].real,R[si,sj].imag])
+    #     else:
+    #         n = R.shape[0]
+    #         d = round(np.sqrt(n))
+    #         n_diag = d * (d + 1) // 2
+    #         ri,rj=self._lowerTriColmajor(d, diag=True)
+    #         si,sj=self._lowerTriColmajor(d, diag=False)
+    #         P=np.zeros((d, d), dtype=complex)
+    #         P[ri,rj]=R[:n_diag]
+    #         P[si,sj]+=1j*R[n_diag:]
+    #         return P
+    def applyCholEchol(self,X):
+        """
+        """
+        L=np.linalg.cholesky(X)
+        ri,rj=self._lowerTriColmajor(self.dim, diag=True)
+        si,sj=self._lowerTriColmajor(self.dim, diag=False)
+        real_part=L[:,ri,rj].real
+        imag_part=L[:,si,sj].imag
+        return np.concatenate([real_part, imag_part], axis=1)
+
     

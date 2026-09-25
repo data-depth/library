@@ -1,6 +1,13 @@
 import numpy as np
 
 
+def randomHPD(d,RNG):
+    """
+    Generate a random HPD matrix of size d
+    """
+    A=RNG.normal(size=(d, d)) + 1j*RNG.normal(size=(d,d))
+    return A@A.conj().T+d*np.eye(d)
+
 
 def isHermitian(H,tol=1e-10):
     """
