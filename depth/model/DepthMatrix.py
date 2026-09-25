@@ -6,8 +6,10 @@ from typing import Literal, List
 try:import torch
 except:torch=None
 import sys, os
-from matrix import *
-import DepthEucl, DepthFunc
+from .matrix import *
+from .DepthEucl import DepthEucl 
+from .DepthFunc import DepthFunc 
+
 
 class DepthMatrix():
     """
